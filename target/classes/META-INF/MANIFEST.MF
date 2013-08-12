@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ClassPath: .,trove-3.0.3.jar,colt-1.2.0.jar,RserveEngine-1.0.0.
+ jar,REngine-1.0.0.jar,guava-12.0.jar
+Built-By: user
+Tool: Bnd-1.15.0
+Bundle-Name: HyperModules
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk: 1.7.0_09
+Bundle-Version: 3.1.0.SNAPSHOT
+Bnd-LastModified: 1376325328687
+Bundle-ManifestVersion: 2
+Bundle-Activator: org.cytoscape.hypermodules.internal.CyActivator
+Bundle-SymbolicName: HyperModules
+Import-Package: EDU.oswego.cs.dl.util.concurrent;resolution:=optional,
+ javax.annotation;resolution:=optional,javax.swing;resolution:=optiona
+ l,javax.swing.border;resolution:=optional,javax.swing.event;resolutio
+ n:=optional,javax.swing.table;resolution:=optional,javax.swing.text;r
+ esolution:=optional,javax.swing.text.html;resolution:=optional,org.cy
+ toscape.application;resolution:=optional;version="[3.1,4)",org.cytosc
+ ape.application.swing;resolution:=optional;version="[3.1,4)",org.cyto
+ scape.event;resolution:=optional;version="[3.1,4)",org.cytoscape.mode
+ l;resolution:=optional;version="[3.1,4)",org.cytoscape.model.events;r
+ esolution:=optional;version="[3.1,4)",org.cytoscape.model.subnetwork;
+ resolution:=optional;version="[3.1,4)",org.cytoscape.service.util;res
+ olution:=optional;version="[3.1,4)",org.cytoscape.session;resolution:
+ =optional;version="[3.1,4)",org.cytoscape.util.swing;resolution:=opti
+ onal;version="[3.1,4)",org.cytoscape.view.model;resolution:=optional;
+ version="[3.1,4)",org.cytoscape.work;resolution:=optional;version="[3
+ .1,4)",org.osgi.framework;resolution:=optional;version="[1.5,2)",sun.
+ misc;resolution:=optional
+Embed-Dependency: trove,colt,RserveEngine,REngine,guava,javastat;inlin
+ e=true
+
