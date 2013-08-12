@@ -44,7 +44,6 @@ public class AlgorithmTask implements Task {
 	
 	private boolean interrupted;
 	
-	
 	//Done:
 	//only sort once, not at every Log Rank Test, see if it makes it faster
 	//1. fix mine hublets (figure out last step)
@@ -214,7 +213,12 @@ public class AlgorithmTask implements Task {
 		System.out.println("Finished Adjusting");
 		
 		HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults = resultsFormat();
-		OpenResultsTaskFactory resultsTaskFac = new OpenResultsTaskFactory(utils, allResults, this.network);
+		HashMap<String, String> parameters = new HashMap<String, String>();
+		parameters.put("length", this.lengthOption);
+		parameters.put("expand", this.expandOption);
+		parameters.put("nShuffled", String.valueOf(this.nShuffled));
+		parameters.put("stat", this.statTest);
+		OpenResultsTaskFactory resultsTaskFac = new OpenResultsTaskFactory(parameters, utils, allResults, this.network);
 		utils.taskMgr.execute(resultsTaskFac.createTaskIterator());
 		
 		

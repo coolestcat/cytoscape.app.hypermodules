@@ -52,11 +52,13 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	private JTable resultsTable;
 	private JPanel buttonPanel;
 	private CyNetwork network;
+	private HashMap<String, String> parameters;
 	
-	public ResultsPanel(CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network){
+	public ResultsPanel(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network){
 		this.utils = utils;
 		this.allResults = allResults;
 		this.network = network;
+		this.parameters = parameters;
 		makeComponents();
 		makeLayout();
 
@@ -143,6 +145,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				fout = new FileWriter(file);
 				fout.write("HyperModules Results" + lineSep);
 				fout.write("Date: " + DateFormat.getDateTimeInstance().format(new Date()) + lineSep + lineSep);
+				
+				fout.write("Length Option: " + parameters.get("length") + lineSep);
+				fout.write("Expand Option: " + parameters.get("expand") + lineSep);
+				fout.write("Shuffle Number: " + parameters.get("nShuffled") + lineSep);
+				fout.write("Statistical Test: " + parameters.get("stat") + lineSep + lineSep);
 				
 				fout.write("Most Correlated Results:" + lineSep + lineSep);
 				
