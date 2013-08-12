@@ -52,6 +52,13 @@ public class CyActivator extends AbstractCyActivator {
 	@Override
 	public void start(BundleContext bc) throws Exception {
 		
+		/**
+		 * 
+		 * test comment
+		 * 
+		 * 
+		 */
+		
 		CyApplicationManager appMgr = getService(bc,CyApplicationManager.class);
 		TaskManager<?, ?> taskMgr = getService(bc, TaskManager.class);
 		
