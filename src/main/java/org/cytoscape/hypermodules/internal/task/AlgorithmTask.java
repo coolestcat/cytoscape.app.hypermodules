@@ -78,6 +78,7 @@ public class AlgorithmTask implements Task {
 	//hookup networkSelectionPanel logic
 	//FIX MAIN PANEL LAYOUT/collapsible/on load, change label background (green?)
 	//change log rank test to output corresponding high survival or low survival
+	//test comment!
 	
 
 
