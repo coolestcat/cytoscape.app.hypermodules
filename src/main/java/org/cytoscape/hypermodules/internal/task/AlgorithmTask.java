@@ -79,27 +79,7 @@ public class AlgorithmTask implements Task {
 	//FIX MAIN PANEL LAYOUT/collapsible/on load, change label background (green?)
 	//change log rank test to output corresponding high survival or low survival
 	
-	//TODO: 
-	//visualize SELECTED networks only
-	//copy hotnet cytoscape plugin visual styles for generate networks
-	//make sure it works on cytoscape 3.0.1
-	//fix generate networks (HashSet<String> to String)
-	//include parameters in export
-	//in Results JTable, only show most correlated if find most (both <0.05)
-	//fix default serialVersionUID's
-	//fix cancel
-	//javadoc documentation
-	//written documentation (eg specify input)
-	//load as TSV
-	//export as CSV
-	//have ONE CSVModel class
-	//coxph logic
-	//fix network listeners
-	//is shuffling adjust wrong?
-	//apply fisher's test only to survival test results
-	//upload to git?
-	//algorithm task factory fix
-	//doc : must use at least java 7
+
 
 	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String lengthOption, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){
 		this.utils = utils;
