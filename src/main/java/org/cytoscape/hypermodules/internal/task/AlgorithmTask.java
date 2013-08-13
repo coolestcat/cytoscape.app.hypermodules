@@ -78,7 +78,9 @@ public class AlgorithmTask implements Task {
 	//FIX MAIN PANEL LAYOUT/collapsible/on load, change label background (green?)
 	//change log rank test to output corresponding high survival or low survival
 	//test comment!
-	
+	//upload to github
+	//include parameters in export
+	//fix generate networks (HashSet<String> to String)
 
 
 	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String lengthOption, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){

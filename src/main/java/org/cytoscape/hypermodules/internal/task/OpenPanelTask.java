@@ -40,7 +40,6 @@ public class OpenPanelTask implements Task{
 				MainPanel mainPanel = new MainPanel(swingApp, utils);
 				utils.serviceRegistrar.registerService(mainPanel, CytoPanelComponent.class, new Properties());
 				mainPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-				
 			}
 			
 			/*

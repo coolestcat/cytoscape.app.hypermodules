@@ -18,6 +18,7 @@ import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.hypermodules.internal.task.CloseTaskFactory;
 import org.cytoscape.hypermodules.internal.task.OpenAboutTaskFactory;
 import org.cytoscape.hypermodules.internal.task.OpenPanelTaskFactory;
+import org.cytoscape.hypermodules.internal.task.OpenVisualizeTaskFactory;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
@@ -25,12 +26,8 @@ import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
 import org.cytoscape.model.subnetwork.CyRootNetworkManager;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
-
-
 import org.cytoscape.util.swing.FileUtil;
 import org.cytoscape.util.swing.OpenBrowser;
-
-
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
@@ -99,6 +96,15 @@ public class CyActivator extends AbstractCyActivator {
 		openAboutFactoryProps.setProperty("menuGravity","3.0");
 		
 		registerService(bc, openAboutFactory, TaskFactory.class, openAboutFactoryProps);
+		
+		OpenVisualizeTaskFactory openVisualizeFactory = new OpenVisualizeTaskFactory(utils);
+		Properties openVisualizeProps = new Properties();
+		openVisualizeProps.setProperty("preferredMenu", "Apps.HyperModules");
+		openVisualizeProps.setProperty("title", "Visualize");
+		openVisualizeProps.setProperty("menuGravity", "4.0");
+		
+		registerService(bc, openVisualizeFactory, TaskFactory.class, openVisualizeProps);
+		
 	}
 
 }

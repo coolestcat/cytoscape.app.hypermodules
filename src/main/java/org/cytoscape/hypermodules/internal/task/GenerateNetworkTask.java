@@ -14,11 +14,11 @@ import org.cytoscape.work.TaskMonitor;
 
 public class GenerateNetworkTask implements Task{
 
-	private HashMap<String, ArrayList<HashMap<HashSet<String>, Double>>> generation;
+	private HashMap<String, ArrayList<HashMap<String, Double>>> generation;
 	private CyNetwork network;
 	private CytoscapeUtils utils;
 	
-	public GenerateNetworkTask(HashMap<String, ArrayList<HashMap<HashSet<String>, Double>>> generation, CyNetwork originalNetwork, CytoscapeUtils utils){
+	public GenerateNetworkTask(HashMap<String, ArrayList<HashMap<String, Double>>> generation, CyNetwork originalNetwork, CytoscapeUtils utils){
 		this.generation = generation;
 		this.network = originalNetwork;
 		this.utils = utils;
@@ -36,11 +36,16 @@ public class GenerateNetworkTask implements Task{
 		
 		
 		for (String seedNode : generation.keySet()){
-			ArrayList<HashMap<HashSet<String>, Double>> ahsd = generation.get(seedNode);
-			HashMap<HashSet<String>, Double> firstMap = ahsd.get(0);
+			ArrayList<HashMap<String, Double>> ahsd = generation.get(seedNode);
+			HashMap<String, Double> firstMap = ahsd.get(0);
 			CyNode seed = nameAndNode.get(seedNode);
 			
-			for (HashSet<String> oneNetwork : firstMap.keySet()){
+			for (String start : firstMap.keySet()){
+				String[] deconstructed = start.split(":");
+				HashSet<String> oneNetwork = new HashSet<String>();
+				for (int k=0; k<deconstructed.length; k++){
+					oneNetwork.add(deconstructed[k]);
+				}
 				CyNetwork myNet = utils.networkFactory.createNetwork();
 				HashSet<String> myNetNames = new HashSet<String>();
 				seed = myNet.addNode();

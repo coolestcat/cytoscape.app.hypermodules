@@ -363,10 +363,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		}
 		
 		if (ae.getSource()==generate){
-			HashMap<String, ArrayList<HashMap<HashSet<String>, Double>>> generation = new HashMap<String, ArrayList<HashMap<HashSet<String>, Double>>>();
+			HashMap<String, ArrayList<HashMap<String, Double>>> generation = new HashMap<String, ArrayList<HashMap<String, Double>>>();
 			for (String s : allResults.keySet()){
 				for (ArrayList<HashMap<String, Double>> a : allResults.get(s).keySet()){
-					//generation.put (s, a);
+					generation.put (s, a);
 				}
 			}
 			
@@ -375,7 +375,6 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			
 		}
 	}
-	
 	
 	  private class Model extends AbstractTableModel {
 		 	 
