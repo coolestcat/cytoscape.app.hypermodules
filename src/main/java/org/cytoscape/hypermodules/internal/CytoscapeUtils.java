@@ -16,8 +16,12 @@ import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.session.CyNetworkNaming;
 import org.cytoscape.util.swing.FileUtil;
 import org.cytoscape.util.swing.OpenBrowser;
+import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.vizmap.VisualMappingFunctionFactory;
+import org.cytoscape.view.vizmap.VisualMappingManager;
+import org.cytoscape.view.vizmap.VisualStyleFactory;
 import org.cytoscape.work.TaskManager;
 
 public class CytoscapeUtils {
@@ -35,6 +39,12 @@ public class CytoscapeUtils {
 	public CyRootNetworkManager rootNetworkMgr;
 	public CySwingApplication swingApp;
 	public CyNetworkFactory networkFactory;
+	public VisualMappingManager vmmServiceRef;
+	public VisualStyleFactory visualStyleFactoryServiceRef;
+	public VisualMappingFunctionFactory vmfFactoryC;
+	public VisualMappingFunctionFactory vmfFactoryD;
+	public VisualMappingFunctionFactory vmfFactoryP;
+	public CyLayoutAlgorithmManager cyLayoutManager;
 	
 	public CytoscapeUtils(CyApplicationManager appMgr, 
 			TaskManager<?,?> taskMgr,
@@ -48,7 +58,13 @@ public class CytoscapeUtils {
 			CyNetworkViewFactory netViewFactory,
 			CyRootNetworkManager rootNetworkMgr,
 			CySwingApplication swingApp,
-			CyNetworkFactory networkFactory){
+			CyNetworkFactory networkFactory,
+			VisualMappingManager vmmServiceRef,
+			VisualStyleFactory visualStyleFactoryServiceRef,
+			VisualMappingFunctionFactory vmfFactoryC,
+			VisualMappingFunctionFactory vmfFactoryD,
+			VisualMappingFunctionFactory vmfFactoryP,
+			CyLayoutAlgorithmManager cyLayoutManager){
 		
 		this.appMgr = appMgr;
 		this.taskMgr = taskMgr;
@@ -63,8 +79,12 @@ public class CytoscapeUtils {
 		this.rootNetworkMgr = rootNetworkMgr;
 		this.swingApp = swingApp;
 		this.networkFactory = networkFactory;
-		
-		
+		this.vmmServiceRef = vmmServiceRef;
+		this.visualStyleFactoryServiceRef = visualStyleFactoryServiceRef;
+		this.vmfFactoryC = vmfFactoryC;
+		this.vmfFactoryD = vmfFactoryD;
+		this.vmfFactoryP = vmfFactoryP;
+		this.cyLayoutManager = cyLayoutManager;
 	}
 	
 	

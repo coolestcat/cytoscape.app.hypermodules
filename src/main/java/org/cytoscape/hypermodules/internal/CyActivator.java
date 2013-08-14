@@ -28,6 +28,7 @@ import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.util.swing.FileUtil;
 import org.cytoscape.util.swing.OpenBrowser;
+import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
@@ -71,7 +72,19 @@ public class CyActivator extends AbstractCyActivator {
 		
 		CyNetworkFactory networkFactory = getService(bc, CyNetworkFactory.class);
 		
-		CytoscapeUtils utils = new CytoscapeUtils(appMgr, taskMgr, netViewMgr, netMgr, serviceRegistrar, eventHelper, networkNaming, fileUtil, openBrowser, netViewFactory, rootNetworkMgr, swingApp, networkFactory);
+		VisualMappingManager vmmServiceRef = getService(bc,VisualMappingManager.class);
+		VisualStyleFactory visualStyleFactoryServiceRef = getService(bc,VisualStyleFactory.class);
+		
+		VisualMappingFunctionFactory vmfFactoryC = getService(bc,VisualMappingFunctionFactory.class, "(mapping.type=continuous)");
+		VisualMappingFunctionFactory vmfFactoryD = getService(bc,VisualMappingFunctionFactory.class, "(mapping.type=discrete)");
+		VisualMappingFunctionFactory vmfFactoryP = getService(bc,VisualMappingFunctionFactory.class, "(mapping.type=passthrough)");
+		
+		CyLayoutAlgorithmManager cyLayoutManager = getService(bc, CyLayoutAlgorithmManager.class);
+		
+		CytoscapeUtils utils = new CytoscapeUtils(appMgr, taskMgr, netViewMgr, netMgr, serviceRegistrar, 
+					eventHelper, networkNaming, fileUtil, openBrowser, netViewFactory, 
+					rootNetworkMgr, swingApp, networkFactory, vmmServiceRef, visualStyleFactoryServiceRef,
+					vmfFactoryC, vmfFactoryD, vmfFactoryP, cyLayoutManager);
 		
 		OpenPanelTaskFactory openTaskFactory = new OpenPanelTaskFactory(swingApp, utils);
 		Properties openTaskFactoryProps = new Properties();
@@ -104,6 +117,9 @@ public class CyActivator extends AbstractCyActivator {
 		openVisualizeProps.setProperty("menuGravity", "4.0");
 		
 		registerService(bc, openVisualizeFactory, TaskFactory.class, openVisualizeProps);
+		
+		
+		
 		
 	}
 

@@ -1,5 +1,7 @@
 package org.cytoscape.hypermodules.internal.task;
 
+import java.awt.Color;
+import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,11 +12,19 @@ import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.VisualProperty;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.view.vizmap.mappings.BoundaryRangeValues;
+import org.cytoscape.view.vizmap.mappings.ContinuousMapping;
+import org.cytoscape.view.vizmap.mappings.PassthroughMapping;
+import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 
-public class VisualizeNetworkTask implements Task {
+public class VisualizeNetworkTask extends AbstractTask implements Task {
 
 	private CytoscapeUtils utils;
 	private String input;
@@ -24,14 +34,13 @@ public class VisualizeNetworkTask implements Task {
 		this.utils = utils;
 		this.input = s;
 	}
-	
-	
+
 	@Override
 	public void cancel() {
 
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "unused", "unchecked" })
 	@Override
 	public void run(TaskMonitor tm) throws Exception {
 		System.out.println("visualizing network...");
@@ -174,5 +183,41 @@ public class VisualizeNetworkTask implements Task {
 		CyNetworkView myView = this.utils.netViewFactory.createNetworkView(generated);
 		this.utils.netViewMgr.addNetworkView(myView);
 		
+		VisualStyle vs = utils.visualStyleFactoryServiceRef.createVisualStyle("My Visual Style");
+
+		String ctrAttrName1 = "name";
+		PassthroughMapping<String, ?> pMapping = (PassthroughMapping<String, ?>) utils.vmfFactoryP.createVisualMappingFunction(ctrAttrName1, String.class, BasicVisualLexicon.NODE_LABEL);
+		vs.addVisualMappingFunction(pMapping);
+		vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
+		
+		
+		
+		 /*
+		  // Set node color map to attribute "Degree"
+		  @SuppressWarnings("rawtypes")
+		ContinuousMapping mapping = (ContinuousMapping)
+		  utils.vmfFactoryC.createVisualMappingFunction("Degree", Integer.class, BasicVisualLexicon.NODE_FILL_COLOR);
+		
+		      // Define the points
+		      Double val1 = 2d;
+		      BoundaryRangeValues<Paint> brv1 = new BoundaryRangeValues<Paint>(Color.RED, Color.GREEN, Color.PINK);
+		    
+		     Double val2 = 12d;
+		     BoundaryRangeValues<Paint> brv2 = new BoundaryRangeValues<Paint>(Color.WHITE, Color.YELLOW, Color.BLACK);
+		                   
+		     // Set the points
+		     mapping.addPoint(val1, brv1);
+		     mapping.addPoint(val2, brv2);
+		
+		     vs.addVisualMappingFunction(mapping);
+		  */
+		utils.vmmServiceRef.addVisualStyle(vs);
+		
+		vs.apply(myView);
+		myView.updateView();
+		
+		CyLayoutAlgorithm layout = utils.cyLayoutManager.getLayout("attribute-circle");
+		String layoutAttribute = null;
+		insertTasksAfterCurrentTask(layout.createTaskIterator(myView, layout.createLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, layoutAttribute));
 	}
 }

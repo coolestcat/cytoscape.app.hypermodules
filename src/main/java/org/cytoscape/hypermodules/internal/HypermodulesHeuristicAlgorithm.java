@@ -854,7 +854,7 @@ public class HypermodulesHeuristicAlgorithm {
 					}
 				}
 			}
-			else if (seedClassification .equals("SHORT")){
+			else if (seedClassification.equals("SHORT")){
 				for (String list : allPatients.keySet()){
 					String[] genes = allPatients.get(list).split(":");
 					boolean toAdd = true;

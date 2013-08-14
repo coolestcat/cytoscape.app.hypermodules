@@ -69,7 +69,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		export.addActionListener(this);
 		exportMostCorrelated = new JButton("export most correlated");
 		exportMostCorrelated.addActionListener(this);
-		generate = new JButton("visualize network");
+		generate = new JButton("visualize networks");
 		generate.addActionListener(this);
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridBagLayout());
@@ -113,7 +113,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		add(buttonPanel);
 	}
 	
-	public void exportMostCorrelated(){
+	public ArrayList<HashMap<String, Double>> extractMostCorrelated(){
+		ArrayList<HashMap<String, Double>> rt = new ArrayList<HashMap<String, Double>>();
 		HashMap<String, Double> mostCorrelated = new HashMap<String, Double>();
 		HashMap<String, Double> mostCorrelatedFDR = new HashMap<String, Double>();
 		
@@ -132,7 +133,42 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			}
 		}
 		
-
+		rt.add(mostCorrelated);
+		rt.add(mostCorrelatedFDR);
+		
+		return rt;
+		
+	}
+	
+	public HashMap<String, String> seedAndString(){
+		HashMap<String, String> hss = new HashMap<String, String>();
+		for (String s : allResults.keySet()){
+			for (ArrayList<HashMap<String, Double>> ahhs : allResults.get(s).keySet()){
+				HashMap<String, Double> original = ahhs.get(0);
+				HashMap<String, Double> adjusted = ahhs.get(1);
+				for (String set : original.keySet()){
+					if (adjusted.containsKey(set)){
+						if (original.get(set)<0.05 && adjusted.get(set)<0.05){
+							hss.put(s, set);
+						}
+					}
+				}
+			}
+		}
+		
+		return hss;
+		
+	}
+	
+	
+	
+	public void exportMostCorrelated(){
+		
+		ArrayList<HashMap<String, Double>> a = extractMostCorrelated();
+		
+		HashMap<String, Double> mostCorrelated = a.get(0);
+		HashMap<String, Double> mostCorrelatedFDR = a.get(1);
+		
 		final String lineSep = System.getProperty("line.separator");
 		String fileName = null;
 		FileWriter fout = null;
@@ -363,15 +399,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		}
 		
 		if (ae.getSource()==generate){
-			HashMap<String, ArrayList<HashMap<String, Double>>> generation = new HashMap<String, ArrayList<HashMap<String, Double>>>();
-			for (String s : allResults.keySet()){
-				for (ArrayList<HashMap<String, Double>> a : allResults.get(s).keySet()){
-					generation.put (s, a);
-				}
-			}
-			
-			this.utils.taskMgr.execute(new TaskIterator(new GenerateNetworkTask(generation, this.network, utils)));
-			
+			HashMap<String, String> sas = seedAndString();
+			this.utils.taskMgr.execute(new TaskIterator(new GenerateNetworkTask(sas, this.network, utils)));
 			
 		}
 	}
