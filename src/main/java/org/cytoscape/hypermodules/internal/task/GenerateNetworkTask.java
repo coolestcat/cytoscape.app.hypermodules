@@ -23,6 +23,7 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 
 	private HashMap<String, String> generation;
 	private CyNetwork runNetwork;
+	private CyNetwork generated;
 	private CytoscapeUtils utils;
 	
 	public GenerateNetworkTask(HashMap<String, String> generation, CyNetwork originalNetwork, CytoscapeUtils utils){
@@ -34,11 +35,38 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
 		int x = 1;
+		this.generated = utils.networkFactory.createNetwork();
 		for (String s : generation.keySet()){
 			visualize(s, generation.get(s));
 			taskMonitor.setProgress(x/(double) generation.size());
 			x++;
 		}
+		applyVisualStyle();
+	}
+	
+	public void applyVisualStyle(){
+		
+		generated.getDefaultNetworkTable().getRow(generated.getSUID()).set("name", this.utils.networkNaming.getSuggestedNetworkTitle("Visualization"));
+		this.utils.netMgr.addNetwork(generated);
+		CyNetworkView myView = this.utils.netViewFactory.createNetworkView(generated);
+		this.utils.netViewMgr.addNetworkView(myView);
+		
+		VisualStyle vs = utils.visualStyleFactoryServiceRef.createVisualStyle("My Visual Style");
+
+		String ctrAttrName1 = "name";
+		PassthroughMapping<String, ?> pMapping = (PassthroughMapping<String, ?>) utils.vmfFactoryP.createVisualMappingFunction(ctrAttrName1, String.class, BasicVisualLexicon.NODE_LABEL);
+		vs.addVisualMappingFunction(pMapping);
+		vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
+		
+		utils.vmmServiceRef.addVisualStyle(vs);
+		
+		vs.apply(myView);
+		myView.updateView();
+		
+		CyLayoutAlgorithm layout = utils.cyLayoutManager.getLayout("attribute-circle");
+		String layoutAttribute = null;
+		insertTasksAfterCurrentTask(layout.createTaskIterator(myView, layout.createLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, layoutAttribute));
+		
 	}
 
 	public void visualize(String s, String t){
@@ -63,7 +91,7 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 		}
 		
 		
-		CyNetwork generated = utils.networkFactory.createNetwork();
+
 		HashSet<String> myNetNames = new HashSet<String>();
 		seed = generated.addNode();
 		generated.getRow(seed).set(CyNetwork.NAME, seedString);
@@ -158,28 +186,7 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 			}
 			seed = runNetwork.getNode(seedID);
 		}
-		
-		generated.getDefaultNetworkTable().getRow(generated.getSUID()).set("name", this.utils.networkNaming.getSuggestedNetworkTitle("Visualization"));
-		this.utils.netMgr.addNetwork(generated);
-		CyNetworkView myView = this.utils.netViewFactory.createNetworkView(generated);
-		this.utils.netViewMgr.addNetworkView(myView);
-		
-		VisualStyle vs = utils.visualStyleFactoryServiceRef.createVisualStyle("My Visual Style");
 
-		String ctrAttrName1 = "name";
-		PassthroughMapping<String, ?> pMapping = (PassthroughMapping<String, ?>) utils.vmfFactoryP.createVisualMappingFunction(ctrAttrName1, String.class, BasicVisualLexicon.NODE_LABEL);
-		vs.addVisualMappingFunction(pMapping);
-		vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
-		
-		utils.vmmServiceRef.addVisualStyle(vs);
-		
-		vs.apply(myView);
-		myView.updateView();
-		
-		CyLayoutAlgorithm layout = utils.cyLayoutManager.getLayout("attribute-circle");
-		String layoutAttribute = null;
-		insertTasksAfterCurrentTask(layout.createTaskIterator(myView, layout.createLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, layoutAttribute));
-		
 	}
 	@Override
 	public void cancel() {
