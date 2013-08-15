@@ -81,6 +81,9 @@ public class AlgorithmTask implements Task {
 	//upload to github
 	//include parameters in export
 	//fix generate networks (HashSet<String> to String)
+	//copy hotnet cytoscape plugin visual styles for generate networks
+	//in Results JTable, only show most correlated if find most (both <0.05) (maybe?)
+
 
 
 	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String lengthOption, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){

@@ -368,6 +368,10 @@ public class HypermodulesHeuristicAlgorithm {
         				minKey = key7;
         			}
     			}
+    			else{
+    				hubletsTested.remove(key6[0]);
+    				hubletsTested.remove(key6[1]);
+    			}
     		}
 
     		if (pairwiseConcat.isEmpty()){
@@ -871,7 +875,9 @@ public class HypermodulesHeuristicAlgorithm {
 				}
 			}
 			else if (seedClassification.equals("MEDIUM")){
-				
+				for (String list : allPatients.keySet()){
+					compress.add(allPatients.get(list));
+				}
 			}
 		}
 		
