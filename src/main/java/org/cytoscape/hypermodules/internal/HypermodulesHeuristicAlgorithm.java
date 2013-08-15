@@ -838,13 +838,13 @@ public class HypermodulesHeuristicAlgorithm {
 		//System.out.println(seedClassification);
 
 		if (seedClassification!=null){
-			if (seedClassification.equals("LONG") || seedClassification.equals("MEDIUM")){
+			if (seedClassification.equals("LONG")){
 				for (String list : allPatients.keySet()){
 					String[] genes = allPatients.get(list).split(":");
 					boolean toAdd = true;
 					for (int i=0; i<genes.length; i++){
 						if (survivalClassification.get(genes[i])!=null){
-							if (survivalClassification.get(genes[i]).equals("SHORT")){
+							if (survivalClassification.get(genes[i]).equals("SHORT") || survivalClassification.get(genes[i]).equals("MEDIUM")){
 								toAdd = false;
 							}
 						}
@@ -860,7 +860,7 @@ public class HypermodulesHeuristicAlgorithm {
 					boolean toAdd = true;
 					for (int i=0; i<genes.length; i++){
 						if (survivalClassification.get(genes[i])!=null){
-							if (survivalClassification.get(genes[i]).equals("LONG")){
+							if (survivalClassification.get(genes[i]).equals("LONG") || survivalClassification.get(genes[i]).equals("MEDIUM")){
 								toAdd = false;
 							}
 						}
@@ -869,6 +869,9 @@ public class HypermodulesHeuristicAlgorithm {
 						compress.add(allPatients.get(list));
 					}
 				}
+			}
+			else if (seedClassification.equals("MEDIUM")){
+				
 			}
 		}
 		
