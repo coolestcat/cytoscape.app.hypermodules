@@ -8,6 +8,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 /**
+ * 
  * Class that goes through the current network and finds all paths of length two from the given seed node.
  * @author alvinleung
  *

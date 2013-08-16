@@ -382,7 +382,6 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		if (ae.getSource()==run){
 			
-			utils.discardResults();
 			String shuffleNumber = nShuffled.getText();
 			int number = Integer.parseInt(shuffleNumber);
 			

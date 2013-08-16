@@ -5,6 +5,7 @@ import java.util.HashSet;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanel;
+import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.hypermodules.internal.gui.MainPanel;
@@ -24,26 +25,90 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
 import org.cytoscape.work.TaskManager;
 
+/**
+ * 
+ * A convenience class that groups together all the cytoscape services (already registered in cyActivator) that need to be used.
+ * @author alvinleung
+ *
+ */
+
 public class CytoscapeUtils {
 	
+	/**
+	 * Application Manager
+	 */
 	public CyApplicationManager appMgr;
+	/**
+	 * Creates new Task Iterators to run cytoscape tasks
+	 */
 	public TaskManager<?,?> taskMgr;
+	/**
+	 * Manages cynetwork views
+	 */
 	public CyNetworkViewManager netViewMgr;
+	/**
+	 * Manages cynetworks
+	 */
 	public CyNetworkManager netMgr;
+	/**
+	 * Allows us to register services (like cytopanels)
+	 */
 	public CyServiceRegistrar serviceRegistrar;
+	/**
+	 * eventHelper
+	 */
 	public CyEventHelper eventHelper;
+	/**
+	 * Naming class
+	 */
 	public CyNetworkNaming networkNaming;
+	/**
+	 * I/O
+	 */
 	public FileUtil fileUtil;
+	/**
+	 * Opens default browser for hyperlinks
+	 */
 	public OpenBrowser openBrowser;
+	/**
+	 * generates network views
+	 */
 	public CyNetworkViewFactory netViewFactory;
+	/**
+	 * manages root network
+	 */
 	public CyRootNetworkManager rootNetworkMgr;
+	/**
+	 * cySwingApp
+	 */
 	public CySwingApplication swingApp;
+	/**
+	 * generates networks
+	 */
 	public CyNetworkFactory networkFactory;
+	/**
+	 * manages vizmapper
+	 */
 	public VisualMappingManager vmmServiceRef;
+	/**
+	 * generates visual styles
+	 */
 	public VisualStyleFactory visualStyleFactoryServiceRef;
+	/**
+	 * continuous vizmapping functions
+	 */
 	public VisualMappingFunctionFactory vmfFactoryC;
+	/**
+	 * discrete vizmapping functions
+	 */
 	public VisualMappingFunctionFactory vmfFactoryD;
+	/**
+	 * passthrough vizmapping functions
+	 */
 	public VisualMappingFunctionFactory vmfFactoryP;
+	/**
+	 * manages layouts
+	 */
 	public CyLayoutAlgorithmManager cyLayoutManager;
 	
 	public CytoscapeUtils(CyApplicationManager appMgr, 
@@ -87,24 +152,21 @@ public class CytoscapeUtils {
 		this.cyLayoutManager = cyLayoutManager;
 	}
 	
-	
+	/**
+	 * tests if the main panel is opened or not
+	 * @return true if opened, false if not
+	 */
 	public boolean isMainOpened(){
 		if (this.getMainPanel()==null){
 			return false;
 		}
 		return true;
-		/*CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.WEST);
-		int count = cytoPanel.getCytoPanelComponentCount();
-
-		for (int i = 0; i < count; i++) {
-			if (cytoPanel.getComponentAt(i) instanceof MainPanel)
-				return true;
-		}
-
-		return false;
-		*/
 	}
 	
+	/**
+	 * gets the main HyperModules panel in the control pane
+	 * @return MainPanel
+	 */
 	public MainPanel getMainPanel(){
 		CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.WEST);
 		int count = cytoPanel.getCytoPanelComponentCount();
@@ -118,7 +180,10 @@ public class CytoscapeUtils {
 		
 	}
 	
-	
+	/**
+	 * tests if the results panel is opened or not
+	 * @return true if opened, false if not
+	 */
 	public boolean isResultOpened(){
 		if (this.getResultsPanel()==null){
 			return false;
@@ -128,11 +193,19 @@ public class CytoscapeUtils {
 		
 	}
 	
+	/**
+	 * fetches results panels
+	 * @return CytoPanelEAST
+	 */
 	public CytoPanel getCytoPanelEast(){
 		return swingApp.getCytoPanel(CytoPanelName.EAST);
 	}
 	
 	
+	/**
+	 * fetches a result panel
+	 * @return ResultsPanel
+	 */
 	public ResultsPanel getResultsPanel(){
 		CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.EAST);
 		int count = cytoPanel.getCytoPanelComponentCount();
@@ -145,7 +218,10 @@ public class CytoscapeUtils {
 		return null;
 	}
 	
-	
+	/**
+	 * fetches all opened results panels
+	 * @return HashSet<ResultsPanel> rph
+	 */
 	public HashSet<ResultsPanel> getAllResultsPanels(){
 		CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.EAST);
 		int count = cytoPanel.getCytoPanelComponentCount();
@@ -160,8 +236,11 @@ public class CytoscapeUtils {
 		
 	}
 	
-	public void discardResults(){
-		
+	/**
+	 * discards a result panel
+	 */
+	public void discardResults(ResultsPanel rp){
+		serviceRegistrar.unregisterService(rp, CytoPanelComponent.class);
 	}
 	
 	

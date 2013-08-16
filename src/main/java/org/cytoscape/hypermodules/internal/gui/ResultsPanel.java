@@ -47,6 +47,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	private JButton export;
 	private JButton exportMostCorrelated;
 	private JButton generate;
+	private JButton discard;
 	private CytoscapeUtils utils;
 	private JScrollPane viewer;
 	private JTable resultsTable;
@@ -71,11 +72,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		exportMostCorrelated.addActionListener(this);
 		generate = new JButton("visualize networks");
 		generate.addActionListener(this);
+		discard = new JButton("discard results");
+		discard.addActionListener(this);
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridBagLayout());
 		buttonPanel.add(export);
 		buttonPanel.add(exportMostCorrelated);
 		buttonPanel.add(generate);
+		buttonPanel.add(discard);
 		Model tab = new Model();
 		ArrayList<String[]> addToTable = new ArrayList<String[]>();
 		
@@ -402,6 +406,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			HashMap<String, String> sas = seedAndString();
 			this.utils.taskMgr.execute(new TaskIterator(new GenerateNetworkTask(sas, this.network, utils)));
 			
+		}
+		
+		if (ae.getSource()==discard){
+			utils.discardResults(this);
 		}
 	}
 	

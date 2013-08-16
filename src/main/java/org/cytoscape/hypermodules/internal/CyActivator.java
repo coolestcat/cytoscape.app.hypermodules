@@ -41,6 +41,12 @@ import org.cytoscape.session.CyNetworkNaming;
 import org.osgi.framework.BundleContext;
 
 
+/**
+ * 
+ * Bundle activator class
+ * @author alvinleung
+ *
+ */
 public class CyActivator extends AbstractCyActivator {
 
 	public CyActivator() {
@@ -81,10 +87,13 @@ public class CyActivator extends AbstractCyActivator {
 		
 		CyLayoutAlgorithmManager cyLayoutManager = getService(bc, CyLayoutAlgorithmManager.class);
 		
+		//everything is grouped into cytoscape utils so that it can be used by all classes
 		CytoscapeUtils utils = new CytoscapeUtils(appMgr, taskMgr, netViewMgr, netMgr, serviceRegistrar, 
 					eventHelper, networkNaming, fileUtil, openBrowser, netViewFactory, 
 					rootNetworkMgr, swingApp, networkFactory, vmmServiceRef, visualStyleFactoryServiceRef,
 					vmfFactoryC, vmfFactoryD, vmfFactoryP, cyLayoutManager);
+		
+		//register menu options: 
 		
 		OpenPanelTaskFactory openTaskFactory = new OpenPanelTaskFactory(swingApp, utils);
 		Properties openTaskFactoryProps = new Properties();
@@ -117,10 +126,6 @@ public class CyActivator extends AbstractCyActivator {
 		openVisualizeProps.setProperty("menuGravity", "4.0");
 		
 		registerService(bc, openVisualizeFactory, TaskFactory.class, openVisualizeProps);
-		
-		
-		
-		
 	}
 
 }

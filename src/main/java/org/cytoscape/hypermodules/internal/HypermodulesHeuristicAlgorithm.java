@@ -19,41 +19,132 @@ import org.cytoscape.work.TaskMonitor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+/**
+ * 
+ * The main class of the app. Subject to change. Implements all the methods of the algorithm - this class is called by OriginalTest, ShuffleTestCall, and ShuffleTestTMCall.
+ * @author alvinleung
+ *
+ */
 public class HypermodulesHeuristicAlgorithm {
 	
+	/**
+	 * which statistical test to be used
+	 */
 	private String statTest;
+	/**
+	 * List of genes and their correlated samples
+	 */
 	private ArrayList<String[]> sampleValues;
+	/**
+	 * Clinical survival data
+	 */
 	private ArrayList<String[]> clinicalValues;
+	/**
+	 * data for the other clinical variable provided
+	 */
 	private ArrayList<String[]> otherValues;
+	/**
+	 * Maps genes to their samples - a copy of sampleValues
+	 */
 	private HashMap<String, String> allGeneSamplesMap;
+	/**
+	 * the network to run the algorithm on
+	 */
 	private CyNetwork network;
+	/**
+	 * all PatientID's
+	 */
 	private String[] allPatients;
+	/**
+	 * all patient statuses (same order as allPatients);
+	 */
 	private boolean[] status;
+	/**
+	 * patient days followup
+	 */
 	private double[] followupDays;
+	/**
+	 * patient days from birth
+	 */
 	private double[] daysFromBirth;
+	/**
+	 * patient age (- days from birth + days followup)
+	 */
 	private double[] age;
+	/**
+	 * patient censor values - 0 means alive (censored), 1 means deceased;
+	 */
 	private double[] censor;
+	/**
+	 * list of patients in otherValues
+	 */
 	private String[] otherPatients;
+	/**
+	 * clinical variable value in otherValues
+	 */
 	private String[] clinicalVariable;
+	/**
+	 * HashSet of all clinicalVariable values (to count unique values)
+	 */
 	private HashSet<String> clinicalVariableHash;
+	/**
+	 * copy of otherValues
+	 */
 	private HashMap<String, String> clinicalVariableMap;
+	/**
+	 * utility arraylist
+	 */
 	private ArrayList<String> hashArray;
+	/**
+	 * runs the log rank test 
+	 */
 	private LogRankTest logRankObject;
+	/**
+	 * fits the cox proportional hazards model
+	 */
 	private CoxPh coxModel;
-	
+	/**
+	 * all genes in sampleValues
+	 */
 	private ArrayList<String> allGenes;
+	/**
+	 * all samples in sampleValues
+	 */
 	private ArrayList<String> allSamples;
-	
-	//<gene, level of survival (long, medium, short)>
+	/**
+	 * HashMap:
+	 * <gene, level of survival (long, medium, short)>
+	 */
 	private HashMap<String, String> survivalClassification;
+	/**
+	 * Maps patients to followup days
+	 */
 	private HashMap<String, Integer> patientDaysFollowup;
+	/**
+	 * Maps each (seed) gene to the average survival time of its associated patients
+	 */
 	private HashMap<String, Double> geneAverageSurvival;
-	
+	/**
+	 * mean + sd ("HIGH" criterion)
+	 */
 	private double highCutoff;
+	/**
+	 * mean - sd ("LOW" criterion)
+	 */
 	private double lowCutoff;
-	
+	/**
+	 * Used to count the number of times logRankTest or CoxPh is run - diagnostic only
+	 */
 	private int numberTests;
 	
+	/**
+	 * constructor
+	 * @param statTest
+	 * @param sampleValues
+	 * @param clinicalValues
+	 * @param otherValues
+	 * @param network
+	 */
 	public HypermodulesHeuristicAlgorithm(String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CyNetwork network){
 		this.statTest = statTest;
 		this.sampleValues = sampleValues;
@@ -62,6 +153,9 @@ public class HypermodulesHeuristicAlgorithm {
 		this.network = network;
 	}
 
+	/**
+	 * Initializes many of the private fields of the class by extracting data from sampleValues, clinicalValues, and otherValues
+	 */
 	public void initialize(){
 		this.numberTests = 0;
 		if (!otherValues.isEmpty()){
@@ -134,6 +228,9 @@ public class HypermodulesHeuristicAlgorithm {
 		initializeSurvivalClassification();
 	}
 	
+	/**
+	 * 
+	 */
 	public void initializeSurvivalClassification(){
 		this.patientDaysFollowup = new HashMap<String, Integer>();
 		for (int i=0; i<this.clinicalValues.size(); i++){
@@ -368,10 +465,13 @@ public class HypermodulesHeuristicAlgorithm {
         				minKey = key7;
         			}
     			}
+    			
+    			/*
     			else{
     				hubletsTested.remove(key6[0]);
     				hubletsTested.remove(key6[1]);
     			}
+    			*/
     		}
 
     		if (pairwiseConcat.isEmpty()){

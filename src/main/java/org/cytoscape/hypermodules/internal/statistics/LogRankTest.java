@@ -153,7 +153,7 @@ public class LogRankTest {
 			alreadyAdded2.put(sortedTime2.get(i), true);
 		}
 
-*/
+		 */
 		
 		//number still at risk (alive) at the beginning of time i in group 1 (before event occurs)
 		double[] n1i = new double[hashSize];
