@@ -11,18 +11,62 @@ import org.cytoscape.work.TaskMonitor;
 
 import com.google.common.collect.Multimap;
 
+/**
+ * the first time we run the algorithm (without the randomization needed for FDR adjustment)
+ * @author alvinleung
+ *
+ */
 public class OriginalTest {
 	
+	/**
+	 * cytoscape utilities
+	 */
 	private CytoscapeUtils utils;
+	/**
+	 * 1 - paths of length 1, 2 - paths of length 2
+	 */
 	private String lengthOption;
+	/**
+	 * either find most correlated among all seed genes, or find most correlated among selected seed genes
+	 */
 	private String expandOption;
+	/**
+	 * statistical test to be employed
+	 */
 	private String statTest;
+	/**
+	 * gene-patient associations
+	 */
 	private ArrayList<String[]> sampleValues;
+	/**
+	 * clinical survival data
+	 */
 	private ArrayList<String[]> clinicalValues;
+	/**
+	 * clinical variable data for fisher's test
+	 */
 	private ArrayList<String[]> otherValues;
+	/**
+	 * network of interations to run the algorithm on
+	 */
 	private CyNetwork network;
+	/**
+	 * progress bar
+	 */
 	private TaskMonitor tm;
 	
+	/**
+	 * constructor
+	 * @param lengthOption
+	 * @param expandOption
+	 * @param statTest
+	 * @param sampleValues
+	 * @param clinicalValues
+	 * @param otherValues
+	 * @param utils
+	 * @param tm
+	 * @param network
+	 */
 	public OriginalTest(String lengthOption, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils, TaskMonitor tm, CyNetwork network){
 		this.utils = utils;
 		this.lengthOption = lengthOption;
@@ -35,6 +79,13 @@ public class OriginalTest {
 		this.network = network;
 	}
 	
+	/**
+	 * test whether the p-value obtained for each "most correlated" module corresponds to 
+	 * high survival or low survival
+	 * @param ot results of original test
+	 * @return HashMap<String, HashMap<String, Double>>:
+	 * HashMap<seedName, HashMap<(a most correlated module expanded from the seed), (double representing high, low, or other - 1 is high, 0 is low, 2 is other)>>
+	 */
 	public HashMap<String, HashMap<String, Double>> testHighOrLow(HashMap<String, HashMap<String, Double>> ot){
 		HashMap<String, HashMap<String, Double>> rt = new HashMap<String, HashMap<String, Double>>();
 		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
@@ -59,7 +110,10 @@ public class OriginalTest {
 		return rt;
 	}
 	
-	
+	/**
+	 * sets up to run the algorithm on either all seeds or seeds selected
+	 * @return results
+	 */
 	public HashMap<String, HashMap<String, Double>> callTest(){
 		HashMap<String, HashMap<String, Double>> rt = new HashMap<String, HashMap<String, Double>>();
 		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
@@ -118,7 +172,15 @@ public class OriginalTest {
 		
 		return rt;
 	}
-	
+	/**
+	 * Runs the hypermodules algorithm - first finds all paths with FindPaths,
+	 * then compresses the paths with ha.compressTokens, then mines the most correlated modules with
+	 * ha.mineHublets.
+	 * @param ha algorithm instance
+	 * @param seedName name of the seed
+	 * @param seedExpand the CyNode corresponding to seedName in this.network
+	 * @return HashMap<String, Double> results - the most correlated modules expanded from a given seed
+	 */
 	public HashMap<String, Double> testSeed (HypermodulesHeuristicAlgorithm ha, String seedName, CyNode seedExpand){
 		
 		HashMap<String, Double> returnMap = new HashMap<String, Double>();

@@ -229,6 +229,10 @@ public class HypermodulesHeuristicAlgorithm {
 	}
 	
 	/**
+	 * initializes the survival classification heuristic. we take the average of the survival times (censored or not) 
+	 * of all patients associated with a gene, to classify a gene as having either a "HIGH", "MEDIUM",
+	 * or "LOW" survival rating. This is used to reduced the number of paths we must enter into the
+	 * mineHublets method after compressTokens.
 	 * 
 	 */
 	public void initializeSurvivalClassification(){
@@ -293,6 +297,12 @@ public class HypermodulesHeuristicAlgorithm {
 		
 	}
 	
+	/**
+	 * experimenting with not running the test within mineHublets
+	 * @param one
+	 * @param two
+	 * @return true if test should be run
+	 */
 	public boolean testClassification(String one, String two){
 		String[] a = one.split(":");
 		String[] b = two.split(":");
@@ -327,6 +337,12 @@ public class HypermodulesHeuristicAlgorithm {
 		}
 	}
 	
+	/**
+	 * experimenting with not running the test within mineHublets
+	 * @param one
+	 * @param two
+	 * @return true if test should be run
+	 */
 	public boolean testClassification2(String one, String two){
 		String[] a = one.split(":");
 		String[] b = two.split(":");
@@ -382,6 +398,17 @@ public class HypermodulesHeuristicAlgorithm {
 		return true;
 	}
 	
+	/**
+	 * the main iteration step of the algorithm. takes all compressed paths and iteratively merges
+	 * all possible combinations of paths; in each iteration, the top hit (pairwise combination with
+	 * the lowest p-value) is added to hubletsTested, and the original 2 paths are removed, 
+	 * and the process continues until no further improvements can be made by combining paths.
+	 * After, we filter out all such modules with only one sample associated with them, and finally filter 
+	 * out modules so that only those with a unique set of patient associations among all its constituent genes
+	 * remain.
+	 * @param compressedList
+	 * @return HashMap<String, Double> hubletsTested
+	 */
 	public HashMap<String, Double> mineHublets(ArrayList<String> compressedList){
 		
 		HashMap<String, Double> hubletsTested = new HashMap<String, Double>();
@@ -590,12 +617,20 @@ public class HypermodulesHeuristicAlgorithm {
     	return hubletsTested;
 	}
 	
-	
+	/**
+	 * diagnostic
+	 * @return numberTests the number of times the statistical test is run
+	 */
 	public int getNumberTests(){
 		return this.numberTests;
 	}
 	
-	
+	/**
+	 * combines two paths into one
+	 * @param one
+	 * @param two
+	 * @return newNetwork
+	 */
 	
 	public String concatenateNetwork(String one, String two){
 		String newNetwork = new String();
@@ -626,6 +661,12 @@ public class HypermodulesHeuristicAlgorithm {
 		
 	}
 	
+	/**
+	 * runs fisher's test on thisNetwork, with the given clinical variable data
+	 * @param thisNetwork
+	 * @param limit
+	 * @return Double pValue
+	 */
 	public Double testModuleFisher(String thisNetwork, int limit){
 
 		
@@ -694,7 +735,13 @@ public class HypermodulesHeuristicAlgorithm {
 	}
 	
 	
-	
+	/**
+	 * Runs statistical test on the final list of most correlated modules to determine whether 
+	 * the module is correlated with high or low survival (we look at observed vs. expected 
+	 * number of deceased patients)
+	 * @param thisNetwork
+	 * @return 1 if high, 0 if low
+	 */
 	public int testModuleBoolean(String thisNetwork){
 		String[] genes = thisNetwork.split(":");
 		HashSet<String> truePatients = new HashSet<String>();
@@ -737,6 +784,15 @@ public class HypermodulesHeuristicAlgorithm {
 		}
 	}
 	
+	/**
+	 * The main method for running the statistical test on the survival data of
+	 * the module to be tested (thisNetwork)
+	 * @param thisNetwork
+	 * @param limit those modules with patient associations less than limit are filtered out
+	 * and given a p-value of 1
+	 * @param flag whether we actually have to run the statistical test or not - saves time
+	 * @return Double p-value
+	 */
 	public Double testModuleClinical(String thisNetwork, int limit, boolean flag){
 		if (this.statTest.equals("fisher")){
 			return testModuleFisher(thisNetwork, limit);
@@ -756,12 +812,6 @@ public class HypermodulesHeuristicAlgorithm {
 
 		
 		int alpha=truePatients.size();
-		
-		/*
-		System.out.println("Alpha size: " + alpha);
-		System.out.println("truePatients size: " + truePatients.size());
-		System.out.println("|");
-		*/
 		
 		if (alpha<limit){
 			return null;
@@ -832,6 +882,9 @@ public class HypermodulesHeuristicAlgorithm {
 		return pValue;
 	}
 	
+	/**
+	 * initializes clinical variable data
+	 */
 	public void initOther(){
 		otherPatients = new String[this.otherValues.size()];
 		for (int k=0; k<this.otherValues.size(); k++){
@@ -855,7 +908,9 @@ public class HypermodulesHeuristicAlgorithm {
 		}
 	}
 	
-	
+	/**
+	 * initializes clinical survival data
+	 */
 	public void initClinicals(){
 		//have a "load (String/Double) Column" method?
 
@@ -906,7 +961,14 @@ public class HypermodulesHeuristicAlgorithm {
 		
 	}
 	
-
+	/**
+	 * the main path filtering method - first we filter out only those paths that have patient samples associated
+	 * with its genes, and then we filter out paths according to the survival classification
+	 * we determed in initSurvivalClassification
+	 * @param allPaths all paths of lengths two from the seed, returned by FindPaths class
+	 * @param seedName name of the seed
+	 * @return ArrayList<String> compress list of paths we need to run mineHublets on
+	 */
 	public ArrayList<String> compressTokens(HashSet<String> allPaths, String seedName){
 		
 		ArrayList<String> compress = new ArrayList<String>();
@@ -990,7 +1052,11 @@ public class HypermodulesHeuristicAlgorithm {
 		return compress;
 	}
 	
-	
+	/**
+	 * formats the data into hashsets for export into results panel - deprecated
+	 * @param original
+	 * @return
+	 */
 	public HashMap<HashSet<String>, Double> expandToHashSet(HashMap<String, Double> original){
 		HashMap<HashSet<String>, Double> returnValue = new HashMap<HashSet<String>, Double>();
 		for (String genez : original.keySet()){
@@ -1005,6 +1071,10 @@ public class HypermodulesHeuristicAlgorithm {
 		return returnValue;
 	}
 
+	/**
+	 * shuffles the associations between genes and samples, so that FDR randomization permutation test can be run
+	 * to validate the results of the statistical test
+	 */
 	public void shuffleLabels(){
 		Collections.shuffle(this.allSamples);
 		for (int i=0; i<allGenes.size(); i++){

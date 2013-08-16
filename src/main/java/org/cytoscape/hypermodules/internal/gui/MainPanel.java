@@ -47,12 +47,32 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * 
+ * the main hypermodules panel in the cytoscape control panel. contains all the options.
+ * @author alvinleung
+ *
+ */
 public class MainPanel extends JPanel implements CytoPanelComponent, ActionListener{
-
+	/**
+	 * cytoscape utilities
+	 */
 	private CytoscapeUtils utils;
+	/**
+	 * swingApp
+	 */
 	private CySwingApplication swingApp;
+	/**
+	 * serialization ID
+	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * network selection panel
+	 */
 	private NetworkSelectionPanel netSelect;
+	/**
+	 * main panel - these panel names are pretty self explanatory
+	 */
 	private JPanel mainPanel;
 				private JPanel expandOptionPanel;
 				private JPanel pathPanel;
@@ -69,36 +89,98 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		private JPanel otherPanel;
 		private JScrollPane otherPanelScrollPane;
 			private CollapsiblePanel loadOtherPanel;
+	/**
+	 * run panel
+	 */
 	private JPanel runPanel;
+	/**
+	 * expand from selected seeds
+	 */
 	private JRadioButton expand;
+	/**
+	 * find most correlated modules among all seeds
+	 */
 	private JRadioButton findMost;
+	/**
+	 * expand options group
+	 */
 	private ButtonGroup options;
+	/**
+	 * paths of length 1 from seed
+	 */
 	private JRadioButton one;
+	/**
+	 * paths of length 2 from seed
+	 */
 	private JRadioButton two;
+	/**
+	 * length options group
+	 */
 	private ButtonGroup lengthOptions;
+	/**
+	 * log rank test for comparing survival curves
+	 */
 	private JRadioButton logRank;
+	/**
+	 * cox proportional hazards model
+	 */
 	private JRadioButton CoxPh;
+	/**
+	 * fisher's test (Size 2xC) for discrete clinical variable
+	 */
 	private JRadioButton fisher;
+	/**
+	 * statistical test option group
+	 */
 	private ButtonGroup statTest;
+	/**
+	 * "shuffle"
+	 */
 	private JLabel shuffle;
+	/**
+	 * number of times to shuffle for FDR permutation validation
+	 */
 	private JTextField nShuffled;
+	/**
+	 * load gene-sample association - we have a jscrollpane to view data
+	 */
 	private JButton loadSamples;
-	private JTable allGeneSamples;
-	private JScrollPane sampleScrollPane;
+		private JTable allGeneSamples;
+		private JScrollPane sampleScrollPane;
+	/**
+	 * load clinical survival data
+	 */
 	private JButton loadSurvivalData;
-	private JTable survivalTable;
-	private JScrollPane survivalScrollPane;
+		private JTable survivalTable;
+		private JScrollPane survivalScrollPane;
+	/**
+	 * load other clinical variable data
+	 */
 	private JButton loadOtherData;
-	private JTable otherDataTable;
-	private JScrollPane otherScrollPane;
+		private JTable otherDataTable;
+		private JScrollPane otherScrollPane;
+	/**
+	 * run algorithm button
+	 */
 	private JButton run;
-	
-	
+	/**
+	 * gene-sample associations
+	 */
 	private ArrayList<String[]> genes2samplesvalues;
+	/**
+	 * clinical survival data
+	 */
 	private ArrayList<String[]> clinicalValues;
+	/**
+	 * clinical variable data
+	 */
 	private ArrayList<String[]> otherValues;
 	
-	
+	/**
+	 * constructor
+	 * @param swingApp
+	 * @param utils
+	 */
 	public MainPanel(CySwingApplication swingApp, CytoscapeUtils utils){
 		this.utils = utils;
 		this.swingApp = swingApp;
@@ -107,7 +189,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		makeComponents();		
 		makeLayout();
 	}
-	
+
 	public void makeLayout(){
 		
 		setLayout(new BorderLayout());
@@ -307,7 +389,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	public String getTitle() {
 		return "HyperModules";
 	}
-
+	/**
+	 * extracts data from MAF (mutation annotation format) standard 
+	 */
 	public void extractDataFromMaf(){
 		Multimap<String, String> map = ArrayListMultimap.create();
 		System.out.println(this.genes2samplesvalues.size());
@@ -429,6 +513,11 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 	}
 
+	/**
+	 * CSVFile class - represents/reads data from a comma separated value file
+	 * @author alvinleung
+	 *
+	 */
 	public class CSVFile {
 	     private ArrayList<String[]> Rs = new ArrayList<String[]>();
 	     private String[] OneRow;
@@ -454,6 +543,12 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	        }
 	    }
 	
+	/**
+	 * 
+	 * MyModel classes - extends tables to include the column names and number of columns we want.
+	 * @author alvinleung
+	 *
+	 */
 	
 	private class MyModel1 extends AbstractTableModel {
 

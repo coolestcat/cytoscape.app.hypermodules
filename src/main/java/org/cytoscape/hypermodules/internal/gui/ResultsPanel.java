@@ -41,20 +41,72 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * 
+ * the JPanel for displaying and exporting HyperModules results
+ * @author alvinleung
+ *
+ */
 public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionListener {
 	
+	/**
+	 * all results from AlgorithmTask.
+	 * Formatted as follows:
+	 * HashMap<seedName, seedData>
+	 * seedData is a hashmap of 3 arraylists of HashMap<String, Double> and a multimap
+	 * arraylist.get(0) - original test results (module - statistical test pValue)
+	 * arraylist.get(1) - FDR permutation p values (module - FDR permutation test pValue)
+	 * arraylist.get(2) - classification of high or low (module - 0,1, or 2)
+	 * multimap - all the shuffled data, in case user wants to export all the results
+	 * 
+	 */
 	private HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults;
+	/**
+	 * export all the hypermodules algorithm data 
+	 */
 	private JButton export;
+	/**
+	 * export the most correlated modules according to the algorithm
+	 */
 	private JButton exportMostCorrelated;
+	/**
+	 * visualize the most correlated modules nicely in a new Cytoscape network view
+	 */
 	private JButton generate;
+	/**
+	 * discard the current results panel along with its data
+	 */
 	private JButton discard;
+	/**
+	 * cytoscape utils
+	 */
 	private CytoscapeUtils utils;
+	/**
+	 * table to view results
+	 */
 	private JScrollPane viewer;
-	private JTable resultsTable;
+		private JTable resultsTable;
+	/**
+	 * button panel
+	 */
 	private JPanel buttonPanel;
+	/**
+	 * the network that the algorithm was run on (may not be current selected network)
+	 */
 	private CyNetwork network;
+	/**
+	 * test parameters
+	 * length, expandOption, stat, nShuffled - obtained from user input in main panel
+	 */
 	private HashMap<String, String> parameters;
 	
+	/**
+	 * constructor
+	 * @param parameters
+	 * @param utils
+	 * @param allResults
+	 * @param network
+	 */
 	public ResultsPanel(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network){
 		this.utils = utils;
 		this.allResults = allResults;
@@ -65,6 +117,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 
 	}
 
+	/**
+	 * make components
+	 */
 	public void makeComponents(){
 		export  = new JButton("export");
 		export.addActionListener(this);
@@ -110,6 +165,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 	}
 
+	/**
+	 * set layout
+	 */
 	public void makeLayout(){
 		this.setPreferredSize(new Dimension(500, 350));
 		add(viewer);
@@ -117,6 +175,12 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		add(buttonPanel);
 	}
 	
+	/**
+	 * We look at all the data and take all modules with statistical test pValue less than 0.05 
+	 * AND also FDR permutation pValue of less than 0.05 - these are the most correlated modules that
+	 * are also validated
+	 * @return an arraylist of map of most correlated module in string form to the pValue of that module
+	 */
 	public ArrayList<HashMap<String, Double>> extractMostCorrelated(){
 		ArrayList<HashMap<String, Double>> rt = new ArrayList<HashMap<String, Double>>();
 		HashMap<String, Double> mostCorrelated = new HashMap<String, Double>();
@@ -144,6 +208,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 	}
 	
+	/**
+	 * We find the most correlated modules, and find which seed that module was expanded from 
+	 * (to visualize the network)
+	 * @return HashMap<seedName, moduleString>
+	 */
 	public HashMap<String, String> seedAndString(){
 		HashMap<String, String> hss = new HashMap<String, String>();
 		for (String s : allResults.keySet()){
@@ -165,7 +234,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	}
 	
 	
-	
+	/**
+	 * export the most correlated data into a text file
+	 */
 	public void exportMostCorrelated(){
 		
 		ArrayList<HashMap<String, Double>> a = extractMostCorrelated();
@@ -217,7 +288,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 	}
 	
-	
+	/**
+	 * old export correlated method definition - this exports all results sorted based on the pValue 
+	 * (lowest pValue first)
+	 */
 	public void exportCorrelatedNetworks(){
 		
 		Multimap<Double, String> newMultimap = ArrayListMultimap.create();
@@ -301,6 +375,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		}
 	}
 
+	/**
+	 * exports all hypermodules algorithm results, including the random permutation data, the original
+	 * test results, and the FDR test results.
+	 */
 	public void exportResults(){
 		System.out.println("hello");
 
@@ -413,6 +491,12 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		}
 	}
 	
+	/**
+	 * 
+	 * Table model for results table
+	 * @author alvinleung
+	 *
+	 */
 	  private class Model extends AbstractTableModel {
 		 	 
 			private static final long serialVersionUID = 1L;

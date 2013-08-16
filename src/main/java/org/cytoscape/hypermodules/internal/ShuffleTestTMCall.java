@@ -12,7 +12,13 @@ import org.cytoscape.work.TaskMonitor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-
+/**
+ * 
+ * The first instance (thread) of the randomization call to run the algorithm - 
+ * a task monitor is passed in so that we can set the progress bar in the Cytoscape UI
+ * @author alvinleung
+ *
+ */
 public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<String, Double>>> {
 
 	private String lengthOption;

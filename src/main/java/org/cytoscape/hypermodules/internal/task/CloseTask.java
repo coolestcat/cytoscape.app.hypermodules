@@ -11,6 +11,12 @@ import org.cytoscape.hypermodules.internal.gui.ResultsPanel;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 
+/**
+ * 
+ * Closes the main hypermodules along with all the results panels generated from running the algorithm.
+ * @author alvinleung
+ *
+ */
 public class CloseTask implements Task {
 	private CytoscapeUtils utils;
 	

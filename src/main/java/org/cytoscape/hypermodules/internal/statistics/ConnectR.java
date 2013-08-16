@@ -9,7 +9,14 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
-
+/**
+ * 
+ * A class used for testing the validity of my implementation of the statistical tests - log rank, coxph,
+ * and FDR permutation. It connects to R through the Rserve interface, where it runs R commands equivalent
+ * to the java code in HypermodulesHeuristicAlgorithm.testModuleClinical.
+ * @author alvinleung
+ *
+ */
 
 public class ConnectR {
 	

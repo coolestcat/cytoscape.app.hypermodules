@@ -14,6 +14,12 @@ import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 
+/**
+ * 
+ * Opens the main hypermodules panel in the left control panel, if it is not already opened.
+ * @author alvinleung
+ *
+ */
 public class OpenPanelTask implements Task{
 
 	private CytoscapeUtils utils;

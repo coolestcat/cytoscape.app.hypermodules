@@ -24,11 +24,15 @@ public class FishersExact {
 	private int[] columnTotals;
 	private ArrayList<Double> pValues;
 	
-	
+	/**
+	 * constructor
+	 * @param thisMatrix - input matrix 
+	 */
 	public FishersExact(int[][] thisMatrix){
 		this.thisMatrix = thisMatrix;
 	}
 	
+	//test main method
 	/*
 	public static void main(String[] args){
 		int[][] thisMatrix = {{0,4}, {0, 150}, {2,29}};
@@ -40,6 +44,10 @@ public class FishersExact {
 	}
 	*/
 
+	/**
+	 * pretty print of 2 dimensional matrix
+	 * @param mat
+	 */
 	public static void printMatrix(int[][] mat){
 		System.out.print("\n");
 		for (int[] is : mat) {
@@ -52,6 +60,10 @@ public class FishersExact {
 		System.out.print("\n");
 	}
 	
+	/**
+	 * runs fisher's exact test on 2 columns and x rows. 
+	 * @return pValue
+	 */
 	public double fisher2c(){
 		double p = 0;
 		
@@ -120,7 +132,11 @@ public class FishersExact {
 	}
 	
 
-	
+	/**
+	 * recursive method for enumeration - adapted from the FORTRAN code found in Boulton and Wallace's paper
+	 * on matrix enumeration (finding all possible matrices with the row and column totals provided)
+	 * @param level
+	 */
 	private void enumerate(int level){
 		if (level==this.nRows){
 			this.pValues.add(calculateStatistic());
@@ -152,6 +168,10 @@ public class FishersExact {
 		}
 	}
 
+	/**
+	 * implements the formula for fisher's exact test
+	 * @return the testStatistic for a given enumeration matrix
+	 */
 	private Double calculateStatistic(){
 		int[][] matrix = new int[nRows][nColumns];
 		int sum = 0;
@@ -184,6 +204,12 @@ public class FishersExact {
 		return statistic.doubleValue();
 	}
 	
+	/**
+	 * find the columntotal of a column
+	 * @param column
+	 * @param nRows
+	 * @return
+	 */
 	private int findSumColumn(int column, int nRows){
 		int sum = 0;
 		for (int i=0; i<nRows; i++){
@@ -193,6 +219,12 @@ public class FishersExact {
 		
 	}
 	
+	/**
+	 * find the rowtotal of a row
+	 * @param row
+	 * @param nColumns
+	 * @return
+	 */
 	private int findSumRow(int row, int nColumns){
 		int sum = 0;
 		for (int i=0; i<nColumns; i++){

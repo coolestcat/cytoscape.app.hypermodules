@@ -13,6 +13,14 @@ import org.cytoscape.work.TaskMonitor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+/**
+ * 
+ * Running the test many times, according to the number of time to shuffle specified, optimized
+ * to run on multiple cores (each core runs the algorithm nShuffled/nCores times) - see OriginalTest 
+ * for description of fields/methods
+ * @author alvinleung
+ *
+ */
 public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String, Double>>> {
 
 	private String lengthOption;

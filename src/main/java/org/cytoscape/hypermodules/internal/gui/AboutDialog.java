@@ -18,7 +18,13 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.util.swing.OpenBrowser;
-
+/**
+ * 
+ * A short JDialog explaining the app, with a link to the paper where the algorithm comes from. Right 
+ * now only a short outline.
+ * @author alvinleung
+ *
+ */
 public class AboutDialog extends JDialog {
 
 	private CytoscapeUtils utils;

@@ -19,6 +19,14 @@ import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 
+/**
+ * 
+ * Called by ResultsPanel. This class generates a new network view in cytoscape which has all the most correlated
+ * modules arranged in a circle-attribute layout by taking as input the string forms of the modules
+ * and expanding from the seed to obtain the edges
+ * @author alvinleung
+ *
+ */
 public class GenerateNetworkTask extends AbstractTask implements Task{
 
 	private HashMap<String, String> generation;

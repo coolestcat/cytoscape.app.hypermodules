@@ -7,6 +7,12 @@ import org.cytoscape.hypermodules.internal.gui.VisualizePanel;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 
+/**
+ * 
+ * Opens the visualize network panel
+ * @author alvinleung
+ *
+ */
 public class OpenVisualizeTask implements Task{
 
 	private CytoscapeUtils utils;

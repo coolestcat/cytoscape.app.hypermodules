@@ -1,7 +1,12 @@
 package org.cytoscape.hypermodules.internal;
 
 import java.net.URL;
-
+/**
+ * 
+ * gets the images for the expanded and collapsed icon for collapsible panels
+ * @author alvinleung
+ *
+ */
 public class Resources {
 	public static enum ImageName {
 

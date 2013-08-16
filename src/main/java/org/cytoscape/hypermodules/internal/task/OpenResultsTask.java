@@ -16,6 +16,11 @@ import org.cytoscape.work.TaskMonitor;
 
 import com.google.common.collect.Multimap;
 
+/**
+ * Opens the results panel from AlgorithmTask
+ * @author alvinleung
+ *
+ */
 public class OpenResultsTask implements Task {
 	
 	private HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults;

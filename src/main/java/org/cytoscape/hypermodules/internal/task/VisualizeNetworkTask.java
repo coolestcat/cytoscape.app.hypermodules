@@ -24,6 +24,12 @@ import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 
+/**
+ * 
+ * Visualizes a network, represented by a comma separated string of gene names.
+ * @author alvinleung
+ *
+ */
 public class VisualizeNetworkTask extends AbstractTask implements Task {
 
 	private CytoscapeUtils utils;

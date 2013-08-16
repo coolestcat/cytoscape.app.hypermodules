@@ -13,6 +13,14 @@ import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.hypermodules.internal.task.VisualizeNetworkTask;
 import org.cytoscape.work.TaskIterator;
 
+/**
+ * 
+ * Diagnostic - visualize a submodule of the current network given a string of the following
+ * format: seedName,gene2,gene3,gene4
+ * (seedName followed by other genes in the module, separated by commas)
+ * @author alvinleung
+ *
+ */
 public class VisualizePanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;

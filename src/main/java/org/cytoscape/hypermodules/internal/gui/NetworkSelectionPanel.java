@@ -16,6 +16,11 @@ import org.cytoscape.model.events.NetworkAddedListener;
 import org.cytoscape.model.events.NetworkDestroyedEvent;
 import org.cytoscape.model.events.NetworkDestroyedListener;
 
+/**
+ * A JPanel for selecting the network to run the algorithm on
+ * @author user
+ *
+ */
 public class NetworkSelectionPanel extends JPanel implements NetworkAddedListener, NetworkDestroyedListener {
 
 	
@@ -23,6 +28,10 @@ public class NetworkSelectionPanel extends JPanel implements NetworkAddedListene
 	private JComboBox comboBox;
 	private CytoscapeUtils utils;
 	
+	/**
+	 * constructor
+	 * @param utils
+	 */
 	public NetworkSelectionPanel(CytoscapeUtils utils){
 		super();
 		this.utils = utils;
@@ -33,6 +42,9 @@ public class NetworkSelectionPanel extends JPanel implements NetworkAddedListene
 		updateNetworkList();
 	}
 	
+	/**
+	 * update the list of networks in the JComboBox
+	 */
 	private void updateNetworkList() {
 		final Set<CyNetwork> networks = utils.netMgr.getNetworkSet();
 		final SortedSet<String> networkNames = new TreeSet<String>();
@@ -53,6 +65,9 @@ public class NetworkSelectionPanel extends JPanel implements NetworkAddedListene
 		}
 	}
 	
+	/**
+	 * @return CyNetwork associated with the selected name
+	 */
 	public CyNetwork getSelectedNetwork() {
 		for (CyNetwork net : utils.netMgr.getNetworkSet()) {
 			String networkTitle = net.getRow(net).get("name", String.class);
@@ -67,11 +82,17 @@ public class NetworkSelectionPanel extends JPanel implements NetworkAddedListene
 		return this.comboBox;
 	}
 
+	/**
+	 * handles network destroy events - updates network list in JComboBox
+	 */
 	@Override
 	public void handleEvent(NetworkDestroyedEvent nde) {
 		updateNetworkList();
 	}
 
+	/**
+	 * handles network addition events - updates network list in JComboBox
+	 */
 	@Override
 	public void handleEvent(NetworkAddedEvent nae) {
 		updateNetworkList();

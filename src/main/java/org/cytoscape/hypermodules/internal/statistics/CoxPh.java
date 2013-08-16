@@ -3,7 +3,14 @@ package org.cytoscape.hypermodules.internal.statistics;
 import JSci.maths.statistics.NormalDistribution;
 import JSci.maths.statistics.ChiSqrDistribution;
 
-
+/**
+ * 
+ * An implementation of fitting the cox proportional hazards model to a set of survival data
+ * with n covariates. Copied directly from C source code of the survival library of R.
+ * All methods and fields are the same. Very slow and inefficient for the purposes of this app.
+ * @author alvinleung
+ *
+ */
 public class CoxPh {
 	
 	private static final int LARGE = 22;

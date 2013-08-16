@@ -24,13 +24,36 @@ import org.cytoscape.work.TaskMonitor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+/**
+ * The main task for running the algorithm. Manages all the threads and compiles the final test results set
+ * to send to resultsPanel for display and export.
+ * @author alvinleung
+ *
+ */
 public class AlgorithmTask implements Task {
 
+	/**
+	 * original pValues from OriginalTest
+	 */
 	private HashMap<String, HashMap<String, Double>> originalResults;
+	/**
+	 * classification of "HIGH" or "LOW" survival for all the modules in originalResults
+	 */
 	private HashMap<String, HashMap<String, Double>> classification;
+	/**
+	 * all the shuffled data to perform FDR adjustment
+	 */
 	private HashMap<String, Multimap<String, Double>> shuffling;
+	/**
+	 * an arraylist to add to in order to manage having multiple threads - to avoid synchronization
+	 * issues related to adding to a hashmap simultaneously from different threads
+	 */
 	private ArrayList<HashMap<String, Multimap<String, Double>>> combinedShuffling;
+	/**
+	 * FDR p-values
+	 */
 	private HashMap<String, HashMap<String, Double>> adjustedResults;
+	
 	
 	private CytoscapeUtils utils;
 	private String lengthOption;
@@ -84,7 +107,18 @@ public class AlgorithmTask implements Task {
 	//copy hotnet cytoscape plugin visual styles for generate networks
 	//in Results JTable, only show most correlated if find most (both <0.05) (maybe?)
 
-
+	/**
+	 * constructor
+	 * @param currNetwork
+	 * @param nShuffled
+	 * @param lengthOption
+	 * @param expandOption
+	 * @param statTest
+	 * @param sampleValues
+	 * @param clinicalValues
+	 * @param otherValues
+	 * @param utils
+	 */
 
 	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String lengthOption, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){
 		this.utils = utils;
@@ -139,6 +173,12 @@ public class AlgorithmTask implements Task {
 		this.clinicalValues = sortedClinicals;
 	}
 	
+	/**
+	 * First, we run the algorithm to get the original test results. Then, we split up the 
+	 * shuffling into all possible cores, and run the algorithm that many times after shuffling the gene-sample
+	 * associations each time. Then, we calculate the FDR p-values based on the randomized results, and
+	 * pass all the information into the results panel.
+	 */
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
 		this.interrupted = false;
@@ -232,6 +272,9 @@ public class AlgorithmTask implements Task {
 		System.out.println("Time to run: " + timeToRun + " seconds");
 	}
 	
+	/**
+	 * removes duplicates of gene names in each module (this wasn't done earlier in order to improve running time)
+	 */
 	private void fixOriginalResults(){
 		HashMap<String, HashMap<String, Double>> newOriginal = new HashMap<String, HashMap<String, Double>>();
 		for (String s : this.originalResults.keySet()){
@@ -257,6 +300,7 @@ public class AlgorithmTask implements Task {
 		
 	}
 	
+	
 	private int getShuffleSize(){
 		int c = 0;
 		for (String s : shuffling.keySet()){
@@ -267,6 +311,9 @@ public class AlgorithmTask implements Task {
 		
 	}
 	
+	/**
+	 * formats the shuffle data
+	 */
 	private void moveShuffled(){
 		shuffling = new HashMap<String, Multimap<String, Double>>();
 		HashMap<String, Multimap<String, Double>> lastCore = combinedShuffling.get(combinedShuffling.size()-1);
@@ -292,6 +339,9 @@ public class AlgorithmTask implements Task {
 		}
 	}
 	
+	/**
+	 * performs the FDR adjustment
+	 */
 	private void adjustResults(){
 		adjustedResults = new HashMap<String, HashMap<String, Double>>();
 		for (String s : originalResults.keySet()){
@@ -301,6 +351,10 @@ public class AlgorithmTask implements Task {
 		}
 	}
 	
+	/**
+	 * formats/concatenates the results into one object to pass to results panel
+	 * @return
+	 */
 	private HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> resultsFormat(){
 		HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults = new HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>>();
 		for (String s : adjustedResults.keySet()){
@@ -316,7 +370,9 @@ public class AlgorithmTask implements Task {
 		return allResults;
 	}
 	
-
+	/**
+	 * cancels the task (eg if it is taking too long)
+	 */
 	@Override
 	public void cancel() {
 		this.interrupted = true;
