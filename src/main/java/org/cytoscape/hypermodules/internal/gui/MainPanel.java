@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanelComponent;
@@ -24,6 +25,8 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.hypermodules.internal.task.AlgorithmTask;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.events.NetworkAddedListener;
+import org.cytoscape.model.events.NetworkDestroyedListener;
 import org.cytoscape.util.swing.FileChooserFilter;
 import org.cytoscape.util.swing.FileUtil;
 import org.cytoscape.work.TaskIterator;
@@ -233,11 +236,15 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		add(runPanel, BorderLayout.SOUTH);
 		runPanel.setLayout(new GridBagLayout());
-	}
+	} 
 	
 	public void makeComponents(){	
 		
 		netSelect = new NetworkSelectionPanel(this.utils);
+		
+		//register network listeners:
+		utils.serviceRegistrar.registerService(netSelect, NetworkAddedListener.class, new Properties());
+		utils.serviceRegistrar.registerService(netSelect, NetworkDestroyedListener.class, new Properties());
 		
 		mainPanel = new JPanel();
 
@@ -367,6 +374,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
     	filters.add(new FileChooserFilter("CSV", "csv"));
     	filters.add(new FileChooserFilter("MAF", "maf"));
     	filters.add(new FileChooserFilter("MAF.TXT", "maf.txt"));
+    	filters.add(new FileChooserFilter("TXT", "txt"));
     	return filters;
 	}
 	
@@ -529,7 +537,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	            String st = brd.readLine();
 	            
 	            	while (st!=null) {
-	            			OneRow = st.split(",|\\s|;");
+	            			OneRow = st.split(",|\\s|;|\t");
 	            			Rs.add(OneRow);
 	            			//System.out.println (Arrays.toString(OneRow));
 	            			st = brd.readLine();

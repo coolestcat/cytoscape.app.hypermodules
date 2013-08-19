@@ -158,7 +158,7 @@ public class OriginalTest {
 			}
 			
 			System.out.println("allSeeds size: " + nameAndNode.size());
-			
+			tm.setTitle("Running HyperModules Algorithm");
 			int k=1;
 			for (String runSeed : nameAndNode.keySet()){
 				tm.setTitle("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
@@ -167,6 +167,7 @@ public class OriginalTest {
 				k++;
 			}
 			
+			tm.setTitle("Testing on Random Permutations");
 			System.out.println("finished running.");
 		}
 		
@@ -185,7 +186,7 @@ public class OriginalTest {
 		
 		HashMap<String, Double> returnMap = new HashMap<String, Double>();
 		
-		this.tm.setStatusMessage("finding this_true");
+		//this.tm.setStatusMessage("finding this_true");
 		this.tm.setProgress(0.001);
 		FindPaths pathfinder = new FindPaths(this.network, 2);
 		

@@ -264,8 +264,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				
 				fout.write("Most Correlated Results:" + lineSep + lineSep);
 				
+				fout.write("Module" + "\t" + "Statistical Test P-Value" + "\t" + "FDR P-Value" + lineSep);
 				for (String s : mostCorrelated.keySet()){
-					fout.write(s + "-" + mostCorrelated.get(s) + "-" + mostCorrelatedFDR.get(s) + lineSep);
+					fout.write(s + " - " + mostCorrelated.get(s) + " - " + mostCorrelatedFDR.get(s) + lineSep);
 				}
 
 			}
@@ -399,7 +400,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					fout.write("True Results: " + lineSep);
 					for (ArrayList<HashMap<String, Double>> conv : allResults.get(key).keySet()){
 						for (String nodes : conv.get(0).keySet()){
-							fout.write(nodes + " - " + conv.get(0).get(nodes) + lineSep);
+							fout.write(nodes + "\t" + conv.get(0).get(nodes) + lineSep);
 						}
 					}
 
@@ -407,14 +408,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					fout.write("AdjustedResults: " + lineSep);
 					for (ArrayList<HashMap<String, Double>> conv : allResults.get(key).keySet()){
 						for (String nodes : conv.get(1).keySet()){
-							fout.write(nodes + " - " + conv.get(1).get(nodes) + lineSep);
+							fout.write(nodes + "\t" + conv.get(1).get(nodes) + lineSep);
 						}
 					}
 					fout.write(lineSep);
 					fout.write("Random Results: " + lineSep);
 					for (ArrayList<HashMap<String, Double>> conv : allResults.get(key).keySet()){
 						for (String nodes : allResults.get(key).get(conv).keySet())
-							fout.write(nodes + " - " + allResults.get(key).get(conv).get(nodes)  + lineSep);
+							fout.write(nodes + "\t" + allResults.get(key).get(conv).get(nodes)  + lineSep);
 					}
 					fout.write(lineSep);
 				}

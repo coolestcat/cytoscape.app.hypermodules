@@ -93,6 +93,8 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 			
 			System.out.println("allSeeds size: " + nameAndNode.size());
 			
+			tm.setTitle("Testing on Random Permutations");
+			
 			int k=1;
 			for (String runSeed : nameAndNode.keySet()){
 				tm.setTitle("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
@@ -123,7 +125,7 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 		Multimap<String, Double> returnMap = ArrayListMultimap.create();
 		
     	for (int x = 0; x < this.nShuffled; x++){
-        	tm.setStatusMessage("finding this_rand: iteration " + (x+1));
+        	tm.setStatusMessage("Iteration " + (x+1));
         	ha.shuffleLabels();
         	ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
         	HashMap<String, Double> shuffledAnswer = ha.mineHublets(compress);

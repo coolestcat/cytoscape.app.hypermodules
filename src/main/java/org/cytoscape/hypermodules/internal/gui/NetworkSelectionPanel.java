@@ -87,6 +87,7 @@ public class NetworkSelectionPanel extends JPanel implements NetworkAddedListene
 	 */
 	@Override
 	public void handleEvent(NetworkDestroyedEvent nde) {
+		System.out.println("network destroyed!");
 		updateNetworkList();
 	}
 
@@ -95,6 +96,7 @@ public class NetworkSelectionPanel extends JPanel implements NetworkAddedListene
 	 */
 	@Override
 	public void handleEvent(NetworkAddedEvent nae) {
+		System.out.println("network added!");
 		updateNetworkList();
 	}
 
