@@ -170,7 +170,6 @@ public class OriginalTest {
 			tm.setTitle("Testing on Random Permutations");
 			System.out.println("finished running.");
 		}
-		
 		return rt;
 	}
 	/**

@@ -136,6 +136,11 @@ public class HypermodulesHeuristicAlgorithm {
 	 * Used to count the number of times logRankTest or CoxPh is run - diagnostic only
 	 */
 	private int numberTests;
+	/**
+	 * global p-Value repository
+	 */
+	private HashMap<HashSet<String>, Double> globalRepository;
+	
 	
 	/**
 	 * constructor
@@ -153,10 +158,20 @@ public class HypermodulesHeuristicAlgorithm {
 		this.network = network;
 	}
 
+	public void reinitializeGlobalRepository(){
+		this.globalRepository.clear();
+	}
+	
+	
+	
 	/**
 	 * Initializes many of the private fields of the class by extracting data from sampleValues, clinicalValues, and otherValues
 	 */
 	public void initialize(){
+		
+		
+		globalRepository = new HashMap<HashSet<String>, Double>();
+		
 		this.numberTests = 0;
 		if (!otherValues.isEmpty()){
 			initOther();
@@ -461,12 +476,13 @@ public class HypermodulesHeuristicAlgorithm {
     		}
 
     		String key7;
-    		Double value7;
+    		Double value7 = null;
     		//System.out.println("concatenatedNetwork :");
     		
     		String minKey = null;
     		Double minVal=Double.valueOf(2);
     		
+			HashSet<String> hs = new HashSet<String>();
     		for (String[] key6 : pairwise.keySet()){
     			//TODO: got rid of concatenate network... why does it still work?
     			key7 = key6[0] + ":" + key6[1];
@@ -475,13 +491,21 @@ public class HypermodulesHeuristicAlgorithm {
     				value7 = repository.get(key7);
     			}
     			else{
-    				//if (testClassification(key6[0], key6[1])){
+    				hs.clear();
+    				String[] a = key7.split(":");
+    				for (int i=0; i<a.length; i++){
+    					hs.add(a[i]);
+    				}
+    				
+    				if (globalRepository.get(hs)==null){
             			value7 = testModuleClinical(key7, 1, false);
             			repository.put(key7, value7);
-    				//}
-    				//else{
-    				//	value7 = 2.0;
-    				//}
+            			globalRepository.put(hs, value7);
+    				}
+    				else{
+    					value7 = globalRepository.get(hs);
+    					repository.put(key7,  value7);
+    				}
     			}
 
     			if (value7 < pairwise.get(key6)[0] && value7 < pairwise.get(key6)[1]){
