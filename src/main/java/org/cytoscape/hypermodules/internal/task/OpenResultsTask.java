@@ -27,17 +27,19 @@ public class OpenResultsTask implements Task {
 	private CytoscapeUtils utils;
 	private CyNetwork network;
 	private HashMap<String, String> parameters;
+	private ArrayList<String[]> sampleValues;
 	
-	public OpenResultsTask(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network){
+	public OpenResultsTask(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues){
 		this.utils = utils;
 		this.allResults = allResults;
 		this.network = network;
 		this.parameters = parameters;
+		this.sampleValues = sampleValues;
 	}
 	
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
-		ResultsPanel resultsPanel = new ResultsPanel(parameters, utils, allResults, network);
+		ResultsPanel resultsPanel = new ResultsPanel(parameters, utils, allResults, network, sampleValues);
 		utils.serviceRegistrar.registerService(resultsPanel, CytoPanelComponent.class, new Properties());
 		CytoPanel eastPanel = utils.getCytoPanelEast();
 		eastPanel.setState(CytoPanelState.DOCK);

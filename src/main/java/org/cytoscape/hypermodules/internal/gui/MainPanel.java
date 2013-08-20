@@ -451,6 +451,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	}
         	 NewModel.AddCSVData(genes2samplesvalues);
         	 allGeneSamples.setModel(NewModel);
+        	 otherValues = new ArrayList<String[]>();
 		}
 		
 		if (ae.getSource()==loadSurvivalData){

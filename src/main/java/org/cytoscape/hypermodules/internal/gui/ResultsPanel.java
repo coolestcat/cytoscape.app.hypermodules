@@ -99,6 +99,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * length, expandOption, stat, nShuffled - obtained from user input in main panel
 	 */
 	private HashMap<String, String> parameters;
+	/**
+	 * genes2samples
+	 */
+	private ArrayList<String[]> sampleValues;
+	
+	
+	
+	
 	
 	/**
 	 * constructor
@@ -107,11 +115,12 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * @param allResults
 	 * @param network
 	 */
-	public ResultsPanel(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network){
+	public ResultsPanel(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues){
 		this.utils = utils;
 		this.allResults = allResults;
 		this.network = network;
 		this.parameters = parameters;
+		this.sampleValues = sampleValues;
 		makeComponents();
 		makeLayout();
 

@@ -31,7 +31,6 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 	private ArrayList<String[]> otherValues;
 	private CyNetwork network;
 	private int nShuffled;
-	private HashMap<String, Multimap<String, Double>> rt;
 	
 	public ShuffleTestCall(String lengthOption, int nShuffled, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CyNetwork network){
 		this.lengthOption = lengthOption;
@@ -45,7 +44,7 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 	}
 	@Override
 	public HashMap<String, Multimap<String, Double>> call() throws Exception {
-		rt = new HashMap<String, Multimap<String, Double>>();
+		HashMap<String, Multimap<String, Double>> rt = new HashMap<String, Multimap<String, Double>>();
 		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		ha.initialize();
 		
@@ -63,15 +62,12 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 				seedNames.add(seedName);
 				expands.add(seedExpand);
 			}
-			for (int i=0; i<nShuffled; i++){
-	        	ha.shuffleLabels();
-				for (int k=0; k<seedNames.size(); k++){
-					HashMap<String, Double> oneResult = testSeed(ha, seedNames.get(k), expands.get(k));
-					addResult(seedNames.get(k), oneResult);
-					ha.reinitializeGlobalRepository();
-				}
+			
+			for (int k=0; k<seedNames.size(); k++){
+				Multimap<String, Double> oneResult = testSeed(ha, seedNames.get(k), expands.get(k));
+				rt.put(seedName, oneResult);
 			}
-
+			
 		}
 		
 		else if (this.expandOption.equals("findMost")){
@@ -92,16 +88,12 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 			System.out.println("allSeeds size: " + nameAndNode.size());
 			
 			int k=1;
-			for (int i=0; i<nShuffled; i++){
-				ha.shuffleLabels();
-				for (String runSeed : nameAndNode.keySet()){
-					HashMap<String, Double> oneResult = testSeed(ha, runSeed, nameAndNode.get(runSeed));
-					addResult(runSeed, oneResult);
-					ha.reinitializeGlobalRepository();
-					k++;
-				}
+			for (String runSeed : nameAndNode.keySet()){
+				Multimap<String, Double> oneResult = testSeed(ha, runSeed, nameAndNode.get(runSeed));
+				rt.put(runSeed, oneResult);
+				k++;
 			}
-
+			
 			System.out.println("finished running.");
 		}
 		
@@ -109,22 +101,7 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 		return rt;
 	}
 	
-	public void addResult(String seed, HashMap<String, Double> result){
-		if (rt.get(seed)==null){
-			Multimap<String, Double> m = ArrayListMultimap.create();
-			for (String s : result.keySet()){
-				m.put(s, result.get(s));
-			}
-			rt.put(seed, m);
-		}
-		else{
-			for (String s : result.keySet()){
-				rt.get(seed).put(s,  result.get(s));
-			}
-		}
-	}
-	
-	public HashMap<String, Double> testSeed (HypermodulesHeuristicAlgorithm ha, String seedName, CyNode seedExpand){
+	public Multimap<String, Double> testSeed (HypermodulesHeuristicAlgorithm ha, String seedName, CyNode seedExpand){
 
 		FindPaths pathfinder = new FindPaths(this.network, 2);
 		HashSet<String> allPaths = new HashSet<String>();
@@ -134,11 +111,18 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 		else{
 			allPaths = pathfinder.getAllPaths2(seedExpand);
 		}
-
 		
-        ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
-        HashMap<String, Double> shuffledAnswer = ha.mineHublets(compress);
+		Multimap<String, Double> returnMap = ArrayListMultimap.create();
+		
+    	for (int x = 0; x < this.nShuffled; x++){
+        	ha.shuffleLabels();
+        	ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
+        	HashMap<String, Double> shuffledAnswer = ha.mineHublets(compress);
+        	for (String s : shuffledAnswer.keySet()){
+        		returnMap.put(s, shuffledAnswer.get(s));
+        	}
+    	}
 
-		return shuffledAnswer;
+		return returnMap;
 	}
 }
