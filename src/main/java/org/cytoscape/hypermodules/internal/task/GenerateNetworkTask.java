@@ -12,6 +12,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.vizmap.VisualStyle;
 import org.cytoscape.view.vizmap.mappings.PassthroughMapping;
@@ -33,11 +34,20 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	private CyNetwork runNetwork;
 	private CyNetwork generated;
 	private CytoscapeUtils utils;
+	private ArrayList<String[]> sampleValues;
+	private HashSet<String> allSeeds;
 	
-	public GenerateNetworkTask(HashMap<String, String> generation, CyNetwork originalNetwork, CytoscapeUtils utils){
+	public GenerateNetworkTask(HashMap<String, String> generation, CyNetwork originalNetwork, CytoscapeUtils utils, ArrayList<String[]> sampleValues){
 		this.generation = generation;
 		this.runNetwork = originalNetwork;
 		this.utils = utils;
+		this.sampleValues = sampleValues;
+		this.allSeeds = new HashSet<String>();
+		for (int i=0; i<sampleValues.size(); i++){
+			if (!sampleValues.get(i)[1].equals("no_sample")){
+				allSeeds.add(sampleValues.get(i)[0]);
+			}
+		}
 	}
 	
 	@Override
@@ -64,8 +74,19 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 		String ctrAttrName1 = "name";
 		PassthroughMapping<String, ?> pMapping = (PassthroughMapping<String, ?>) utils.vmfFactoryP.createVisualMappingFunction(ctrAttrName1, String.class, BasicVisualLexicon.NODE_LABEL);
 		vs.addVisualMappingFunction(pMapping);
-		vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
+		//vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
 		
+		for (CyNode c : generated.getNodeList()){
+			if (allSeeds.contains(generated.getRow(c).get(CyNetwork.NAME, String.class))){
+				View<CyNode> v = myView.getNodeView(c);
+				v.setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.red);
+				System.out.println("red!");
+			}
+			else{
+				View<CyNode> v = myView.getNodeView(c);
+				v.setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
+			}
+		}
 		utils.vmmServiceRef.addVisualStyle(vs);
 		
 		vs.apply(myView);

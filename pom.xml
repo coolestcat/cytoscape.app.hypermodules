@@ -75,7 +75,7 @@
 						<Export-Package>!${bundle.namespace}.*</Export-Package>
 						<Private-Package>${bundle.namespace}.*</Private-Package>
 						<Bundle-Activator>${bundle.namespace}.CyActivator</Bundle-Activator>
-						<Embed-Dependency>trove,colt,RserveEngine,REngine,guava,javastat;inline=true</Embed-Dependency>
+						<Embed-Dependency>xchart,trove,colt,RserveEngine,REngine,guava,javastat;inline=true</Embed-Dependency>
                     	<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
@@ -84,6 +84,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+    		<groupId>com.xeiam.xchart</groupId>
+    		<artifactId>xchart</artifactId>
+   			<version>2.2.1</version>
+		</dependency>
 		<dependency>
     		<groupId>gnu</groupId>
     		<artifactId>trove</artifactId>

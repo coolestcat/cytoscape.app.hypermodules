@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.util.List;
 
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
+import org.cytoscape.hypermodules.internal.ChartDisplay;
 import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.hypermodules.internal.task.GenerateNetworkTask;
 import org.cytoscape.model.CyEdge;
@@ -90,6 +93,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * button panel
 	 */
 	private JPanel buttonPanel;
+	private JPanel buttonPanel2;
 	/**
 	 * the network that the algorithm was run on (may not be current selected network)
 	 */
@@ -104,10 +108,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 */
 	private ArrayList<String[]> sampleValues;
 	
+	private ArrayList<String[]> clinicalValues;
 	
 	
-	
-	
+	private ArrayList<String[]> addToTable;
 	/**
 	 * constructor
 	 * @param parameters
@@ -115,12 +119,13 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * @param allResults
 	 * @param network
 	 */
-	public ResultsPanel(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues){
+	public ResultsPanel(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues){
 		this.utils = utils;
 		this.allResults = allResults;
 		this.network = network;
 		this.parameters = parameters;
 		this.sampleValues = sampleValues;
+		this.clinicalValues = clinicalValues;
 		makeComponents();
 		makeLayout();
 
@@ -142,10 +147,12 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		buttonPanel.setLayout(new GridBagLayout());
 		buttonPanel.add(export);
 		buttonPanel.add(exportMostCorrelated);
-		buttonPanel.add(generate);
-		buttonPanel.add(discard);
+		buttonPanel2 = new JPanel();
+		buttonPanel2.setLayout(new GridBagLayout());
+		buttonPanel2.add(generate);
+		buttonPanel2.add(discard);
 		Model tab = new Model();
-		ArrayList<String[]> addToTable = new ArrayList<String[]>();
+		addToTable = new ArrayList<String[]>();
 		
 		for (String key : allResults.keySet()){
 			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
@@ -170,6 +177,19 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		}
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable(tab);
+		final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
+
+		resultsTable.addMouseListener(new MouseAdapter() {
+			  public void mouseClicked(MouseEvent e) {
+			    if (e.getClickCount() == 2) {
+			      JTable target = (JTable)e.getSource();
+			      int row = target.getSelectedRow();
+			      if (!addToTable.get(row)[1].equals("none")){
+			    	  cd.display(addToTable.get(row)[1]);
+			      }
+			    }
+			  }
+			});
 		viewer = new JScrollPane(resultsTable);
 		
 	}
@@ -178,10 +198,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * set layout
 	 */
 	public void makeLayout(){
-		this.setPreferredSize(new Dimension(500, 350));
+		this.setPreferredSize(new Dimension(500, 450));
 		add(viewer);
-		viewer.setPreferredSize(new Dimension(450, 300));
+		viewer.setPreferredSize(new Dimension(450, 275));
 		add(buttonPanel);
+		add(buttonPanel2);
 	}
 	
 	/**
@@ -492,7 +513,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		if (ae.getSource()==generate){
 			HashMap<String, String> sas = seedAndString();
-			this.utils.taskMgr.execute(new TaskIterator(new GenerateNetworkTask(sas, this.network, utils)));
+
+			this.utils.taskMgr.execute(new TaskIterator(new GenerateNetworkTask(sas, this.network, utils, sampleValues)));
 			
 		}
 		

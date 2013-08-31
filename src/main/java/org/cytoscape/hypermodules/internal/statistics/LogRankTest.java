@@ -361,10 +361,10 @@ public class LogRankTest {
 		}
 		
 		if (d<c){
-			return true;
+			return false;
 		}
 		else{
-			return false;
+			return true;
 		}
 	}
 
