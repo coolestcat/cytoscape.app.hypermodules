@@ -1,6 +1,7 @@
 package org.cytoscape.hypermodules.internal.task;
 
 import java.awt.Color;
+import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	private CytoscapeUtils utils;
 	private ArrayList<String[]> sampleValues;
 	private HashSet<String> allSeeds;
+	private HashMap<String, Double> allSamplesMap;
 	
 	public GenerateNetworkTask(HashMap<String, String> generation, CyNetwork originalNetwork, CytoscapeUtils utils, ArrayList<String[]> sampleValues){
 		this.generation = generation;
@@ -47,6 +49,13 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 			if (!sampleValues.get(i)[1].equals("no_sample")){
 				allSeeds.add(sampleValues.get(i)[0]);
 			}
+		}
+		this.allSamplesMap = new HashMap<String, Double>();
+		for (int i=0; i<sampleValues.size(); i++){
+			String d = sampleValues.get(i)[0];
+			String s = sampleValues.get(i)[1];
+			String[] st = s.split(":");
+			allSamplesMap.put(d, (double) st.length);
 		}
 	}
 	
@@ -75,20 +84,21 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 		PassthroughMapping<String, ?> pMapping = (PassthroughMapping<String, ?>) utils.vmfFactoryP.createVisualMappingFunction(ctrAttrName1, String.class, BasicVisualLexicon.NODE_LABEL);
 		vs.addVisualMappingFunction(pMapping);
 		//vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
-		
 		for (CyNode c : generated.getNodeList()){
 			if (allSeeds.contains(generated.getRow(c).get(CyNetwork.NAME, String.class))){
 				View<CyNode> v = myView.getNodeView(c);
-				v.setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.red);
-				System.out.println("red!");
+				v.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.red);
+				double d = 50.0;
+				if (allSamplesMap.get(generated.getRow(c).get(CyNetwork.NAME, String.class))!=null){
+					v.setLockedValue(BasicVisualLexicon.NODE_SIZE, (d + 2*allSamplesMap.get(generated.getRow(c).get(CyNetwork.NAME, String.class))));
+				}
 			}
 			else{
 				View<CyNode> v = myView.getNodeView(c);
-				v.setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
+				v.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
 			}
 		}
 		utils.vmmServiceRef.addVisualStyle(vs);
-		
 		vs.apply(myView);
 		myView.updateView();
 		

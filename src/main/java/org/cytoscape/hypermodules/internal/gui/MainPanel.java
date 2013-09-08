@@ -78,7 +78,6 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	 */
 	private JPanel mainPanel;
 				private JPanel expandOptionPanel;
-				private JPanel pathPanel;
 				private JPanel testPanel;
 		private JPanel shufflePanel;
 		private JPanel samplePanel;
@@ -124,10 +123,6 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	 * log rank test for comparing survival curves
 	 */
 	private JRadioButton logRank;
-	/**
-	 * cox proportional hazards model
-	 */
-	private JRadioButton CoxPh;
 	/**
 	 * fisher's test (Size 2xC) for discrete clinical variable
 	 */
@@ -203,27 +198,18 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		add(mainPanel, BorderLayout.CENTER);
 		expandOptionPanel.setLayout(new BoxLayout(expandOptionPanel, BoxLayout.Y_AXIS));
 		expandOptionPanel.setBorder(BorderFactory.createTitledBorder("Expand Option:"));
-		expandOptionPanel.setMinimumSize(new Dimension(350, 70));
-		expandOptionPanel.setMaximumSize(new Dimension(350, 70));
-		expandOptionPanel.setPreferredSize(new Dimension(350, 70));
+		expandOptionPanel.setMinimumSize(new Dimension(350, 75));
+		expandOptionPanel.setMaximumSize(new Dimension(350, 75));
+		expandOptionPanel.setPreferredSize(new Dimension(350, 75));
 		expandOptionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
 		findMost.setSelected(true);
-		
-		pathPanel.setLayout(new BoxLayout(pathPanel, BoxLayout.Y_AXIS));
-		pathPanel.setBorder(BorderFactory.createTitledBorder("Path Length:"));
-		pathPanel.setPreferredSize(new Dimension(350, 70));
-		pathPanel.setMinimumSize(new Dimension(350, 70));
-		pathPanel.setMaximumSize(new Dimension(350, 70));
-		pathPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		
-		two.setSelected(true);
 
 		testPanel.setLayout(new BoxLayout(testPanel, BoxLayout.Y_AXIS));
 		testPanel.setBorder(BorderFactory.createTitledBorder("Statistical Test:"));
-		testPanel.setPreferredSize(new Dimension(350, 100));
-		testPanel.setMinimumSize(new Dimension(350, 100));
-		testPanel.setMaximumSize(new Dimension(350, 100));
+		testPanel.setPreferredSize(new Dimension(350, 75));
+		testPanel.setMinimumSize(new Dimension(350, 75));
+		testPanel.setMaximumSize(new Dimension(350, 75));
 		testPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
 
@@ -257,26 +243,14 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		expandOptionPanel.add(expand);
 		expandOptionPanel.add(findMost);
 		
-		pathPanel = new JPanel();
-		one = new JRadioButton("1");
-		two = new JRadioButton("2");
-		lengthOptions = new ButtonGroup();
-		lengthOptions.add(one);
-		lengthOptions.add(two);
-		pathPanel.add(one);
-		pathPanel.add(two);
-		
 		
 		testPanel = new JPanel();
 		logRank = new JRadioButton("Log Rank Test");
-		CoxPh = new JRadioButton("Cox Proportional Hazards Model");
 		fisher = new JRadioButton("Fisher's Exact Test (Discrete)");
 		statTest = new ButtonGroup();
 		statTest.add(logRank);
-		statTest.add(CoxPh);
 		statTest.add(fisher);
 		testPanel.add(logRank);
-		testPanel.add(CoxPh);
 		testPanel.add(fisher);
 		
 		
@@ -291,7 +265,6 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		shufflePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		mainPanel.add(expandOptionPanel);
-		mainPanel.add(pathPanel);
 		mainPanel.add(testPanel);
 		mainPanel.add(shufflePanel);
 
@@ -487,21 +460,10 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				else if (findMost.isSelected()){
 					expandOption = "findMost";
 				}
-				
-				String lengthOption = "default";
-				if (one.isSelected()){
-					lengthOption = "1";
-				}
-				else{
-					lengthOption = "2";
-				}
 
 				String stat = "default";
 				if (logRank.isSelected()){
 					stat = "logRank";
-				}
-				else if (CoxPh.isSelected()){
-					stat = "CoxPh";
 				}
 				else if (fisher.isSelected()){
 					stat = "fisher";
@@ -510,7 +472,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			//	AlgorithmTaskFactory algtaskfac = new AlgorithmTaskFactory(number, lengthOption, expandOption, stat, genes2samplesvalues, clinicalValues, otherValues, utils);
 			//	algtaskfac.createTaskIterator();
 				CyNetwork currNet = netSelect.getSelectedNetwork();
-				utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number, lengthOption, expandOption, stat, genes2samplesvalues, clinicalValues, otherValues, utils)));
+				utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, genes2samplesvalues, clinicalValues, otherValues, utils)));
 				//utils.taskMgr.execute(new TaskIterator(new AlgorithmTask3(number, expandOption, stat, genes2samplesvalues, clinicalValues, otherValues, utils)));
 				//utils.taskMgr.execute(new TaskIterator(new ImprovedAlgorithmTask(number, expandOption, stat, genes2samplesvalues, clinicalValues, utils)));
 			}

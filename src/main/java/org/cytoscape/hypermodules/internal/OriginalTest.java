@@ -23,10 +23,6 @@ public class OriginalTest {
 	 */
 	private CytoscapeUtils utils;
 	/**
-	 * 1 - paths of length 1, 2 - paths of length 2
-	 */
-	private String lengthOption;
-	/**
 	 * either find most correlated among all seed genes, or find most correlated among selected seed genes
 	 */
 	private String expandOption;
@@ -67,9 +63,8 @@ public class OriginalTest {
 	 * @param tm
 	 * @param network
 	 */
-	public OriginalTest(String lengthOption, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils, TaskMonitor tm, CyNetwork network){
+	public OriginalTest(String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils, TaskMonitor tm, CyNetwork network){
 		this.utils = utils;
-		this.lengthOption = lengthOption;
 		this.expandOption = expandOption;
 		this.statTest = statTest;
 		this.sampleValues = sampleValues;
@@ -190,12 +185,7 @@ public class OriginalTest {
 		FindPaths pathfinder = new FindPaths(this.network, 2);
 		
 		HashSet<String> allPaths = new HashSet<String>();
-		if (this.lengthOption.equals("1")){
-			allPaths = pathfinder.getAllPaths1(seedExpand);
-		}
-		else{
-			allPaths = pathfinder.getAllPaths2(seedExpand);
-		}
+		allPaths = pathfinder.getAllPaths2(seedExpand);
 		
 		System.out.println("ALL PATHS SIZE: " + allPaths.size());
 		

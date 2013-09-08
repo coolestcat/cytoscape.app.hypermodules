@@ -21,7 +21,6 @@ import com.google.common.collect.Multimap;
  */
 public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<String, Double>>> {
 
-	private String lengthOption;
 	private String expandOption;
 	private String statTest;
 	private ArrayList<String[]> sampleValues;
@@ -31,10 +30,8 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 	private TaskMonitor tm;
 	private int nShuffled;
 	private int nCores;
-	private HashMap<String, Multimap<String, Double>> rt;
 	
-	public ShuffleTestTMCall(String lengthOption, int nCores, int nShuffled, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, TaskMonitor tm, CyNetwork network){
-		this.lengthOption = lengthOption;
+	public ShuffleTestTMCall(int nCores, int nShuffled, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, TaskMonitor tm, CyNetwork network){
 		this.expandOption = expandOption;
 		this.statTest = statTest;
 		this.sampleValues = sampleValues;
@@ -48,7 +45,7 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 	
 	@Override
 	public HashMap<String, Multimap<String, Double>> call() throws Exception {
-		rt = new HashMap<String, Multimap<String, Double>>();
+		HashMap<String, Multimap<String, Double>> rt = new HashMap<String, Multimap<String, Double>>();
 		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		ha.initialize();
 		
@@ -67,17 +64,11 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 				expands.add(seedExpand);
 			}
 			
-			for (int i=0; i<nShuffled; i++){
-	        	ha.shuffleLabels();
-				tm.setTitle("Iteration: " + i+1);
-				for (int k=0; k<seedNames.size(); k++){
-					tm.setStatusMessage("Running Algorithm on Seed: " + seedNames.get(k) + " ( " + k + " of " + seedNames.size() + " )");
-					HashMap<String, Double> oneResult = testSeed(ha, seedNames.get(k), expands.get(k));
-					addResult(seedNames.get(k), oneResult);
-				}
-				tm.setProgress((i+1)/(double) nShuffled);
+			for (int k=0; k<seedNames.size(); k++){
+				tm.setTitle("Running Algorithm on Seed: " + seedNames.get(k));
+				Multimap<String, Double> oneResult = testSeed(ha, seedNames.get(k), expands.get(k));
+				rt.put(seedName, oneResult);
 			}
-
 			
 			System.out.println("numberTests/4: " + ha.getNumberTests());
 			
@@ -103,63 +94,42 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 			tm.setTitle("Testing on Random Permutations");
 			
 			int k=1;
-			for (int i=0; i<nShuffled; i++){
-				ha.shuffleLabels();
-				tm.setTitle("Iteration: " + (i+1));
-				for (String runSeed : nameAndNode.keySet()){
-					tm.setStatusMessage("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
-					HashMap<String, Double> oneResult = testSeed(ha, runSeed, nameAndNode.get(runSeed));
-					addResult(runSeed, oneResult);
-					k++;
-				}
-				k = 1;
-				tm.setProgress((i+1)/(double) nShuffled);
+			for (String runSeed : nameAndNode.keySet()){
+				tm.setTitle("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
+				Multimap<String, Double> oneResult = testSeed(ha, runSeed, nameAndNode.get(runSeed));
+				rt.put(runSeed, oneResult);
+				k++;
 			}
-
 			
-			System.out.println("numberTests/nCores: " + ha.getNumberTests());
-			int[] g = ha.getNumberGenes();
-			for (int i=0; i<50; i++){
-				System.out.println(i + " - " + g[i]);
-			}
+			System.out.println("numberTests/4: " + ha.getNumberTests());
 		}
 		
 		
 		return rt;
 	}
 	
-	public void addResult(String seed, HashMap<String, Double> result){
-		if (rt.get(seed)==null){
-			Multimap<String, Double> m = ArrayListMultimap.create();
-			for (String s : result.keySet()){
-				m.put(s, result.get(s));
-			}
-			rt.put(seed, m);
-		}
-		else{
-			for (String s : result.keySet()){
-				rt.get(seed).put(s,  result.get(s));
-			}
-		}
-	}
-	
-	public HashMap<String, Double> testSeed (HypermodulesHeuristicAlgorithm ha, String seedName, CyNode seedExpand){
+	public Multimap<String, Double> testSeed (HypermodulesHeuristicAlgorithm ha, String seedName, CyNode seedExpand){
 
 		FindPaths pathfinder = new FindPaths(this.network, 2);
 		HashSet<String> allPaths = new HashSet<String>();
-		if (this.lengthOption.equals("1")){
-			allPaths = pathfinder.getAllPaths1(seedExpand);
-		}
-		else{
-			allPaths = pathfinder.getAllPaths2(seedExpand);
-		}
+		allPaths = pathfinder.getAllPaths2(seedExpand);
+
 		
 		
-        ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
-        HashMap<String, Double> shuffledAnswer = ha.mineHublets(compress);
+		Multimap<String, Double> returnMap = ArrayListMultimap.create();
+		
+    	for (int x = 0; x < this.nShuffled; x++){
+        	tm.setStatusMessage("Iteration " + (x+1));
+        	ha.shuffleLabels();
+        	ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
+        	HashMap<String, Double> shuffledAnswer = ha.mineHublets(compress);
+        	for (String s : shuffledAnswer.keySet()){
+        		returnMap.put(s, shuffledAnswer.get(s));
+        	}
+        	tm.setProgress((x+1)/ (double) nShuffled);
+    	}
 
-
-		return shuffledAnswer;
+		return returnMap;
 	}
 
 }

@@ -137,14 +137,9 @@ public class HypermodulesHeuristicAlgorithm {
 	 */
 	private int numberTests;
 	/**
-	 * global p-Value repository
+	 * global repository
 	 */
-	private HashMap<HashSet<String>, Double> globalRepository;
-	/**
-	 * numberofgenes/tests array for histogram
-	 */
-	private int[] numberGenes;
-	
+	private HashMap<String, Double> repository;
 	
 	/**
 	 * constructor
@@ -162,24 +157,10 @@ public class HypermodulesHeuristicAlgorithm {
 		this.network = network;
 	}
 
-	public void reinitializeGlobalRepository(){
-		this.globalRepository.clear();
-	}
-	
-	public int[] getNumberGenes(){
-		return this.numberGenes;
-	}
-	
 	/**
 	 * Initializes many of the private fields of the class by extracting data from sampleValues, clinicalValues, and otherValues
 	 */
 	public void initialize(){
-		
-		
-		globalRepository = new HashMap<HashSet<String>, Double>();
-		numberGenes = new int[500];
-		
-		
 		this.numberTests = 0;
 		if (!otherValues.isEmpty()){
 			initOther();
@@ -247,7 +228,7 @@ public class HypermodulesHeuristicAlgorithm {
 			allGenes.add(key);
 			allSamples.add(allGeneSamplesMap.get(key));
 		}
-		
+		repository = new HashMap<String, Double>();
 		initializeSurvivalClassification();
 	}
 	
@@ -435,7 +416,6 @@ public class HypermodulesHeuristicAlgorithm {
 	public HashMap<String, Double> mineHublets(ArrayList<String> compressedList){
 		
 		HashMap<String, Double> hubletsTested = new HashMap<String, Double>();
-		HashMap<String, Double> repository = new HashMap<String, Double>();
 		
 		String key5;
 		Double value5;
@@ -484,13 +464,12 @@ public class HypermodulesHeuristicAlgorithm {
     		}
 
     		String key7;
-    		Double value7 = null;
+    		Double value7;
     		//System.out.println("concatenatedNetwork :");
     		
     		String minKey = null;
     		Double minVal=Double.valueOf(2);
     		
-			HashSet<String> hs = new HashSet<String>();
     		for (String[] key6 : pairwise.keySet()){
     			//TODO: got rid of concatenate network... why does it still work?
     			key7 = key6[0] + ":" + key6[1];
@@ -499,23 +478,9 @@ public class HypermodulesHeuristicAlgorithm {
     				value7 = repository.get(key7);
     			}
     			else{
-    				hs.clear();
-    				String[] a = key7.split(":");
-    				for (int i=0; i<a.length; i++){
-    					hs.add(a[i]);
-    				}
-    				
-    				if (globalRepository.get(hs)==null){
             			value7 = testModuleClinical(key7, 1, false);
             			repository.put(key7, value7);
-            			globalRepository.put(hs, value7);
-            			int g = hs.size();
-            			this.numberGenes[g]++;
-    				}
-    				else{
-    					value7 = globalRepository.get(hs);
-    					repository.put(key7,  value7);
-    				}
+
     			}
 
     			if (value7 < pairwise.get(key6)[0] && value7 < pairwise.get(key6)[1]){
@@ -833,7 +798,6 @@ public class HypermodulesHeuristicAlgorithm {
 		}
 
 		String[] genes = thisNetwork.split(":");
-		
 		HashSet<String> truePatients = new HashSet<String>();
 		String[] thesePatients;
 		
@@ -1033,8 +997,7 @@ public class HypermodulesHeuristicAlgorithm {
 				}
 			}
 		}
-		
-		
+		/*
 		String seedClassification = survivalClassification.get(seedName);
 		//System.out.println(seedClassification);
 
@@ -1077,11 +1040,14 @@ public class HypermodulesHeuristicAlgorithm {
 				}
 			}
 		}
-		
 		else{
 			for (String list : allPatients.keySet()){
 				compress.add(allPatients.get(list));
 			}
+		}
+		*/
+		for (String list : allPatients.keySet()){
+			compress.add(allPatients.get(list));
 		}
 
 		return compress;

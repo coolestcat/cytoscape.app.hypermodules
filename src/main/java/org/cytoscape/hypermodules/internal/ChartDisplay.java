@@ -98,10 +98,12 @@ public class ChartDisplay {
 			}
 			
 		}
+		/*
 		System.out.println("censor: ");
 		for (int i=0; i<censor.length; i++){
 			System.out.println(censor[i]);
 		}
+		*/
 	}
 	
 	public void display(String s){
@@ -140,6 +142,7 @@ public class ChartDisplay {
 				y++;
 			}
 		}
+		/*
 		System.out.println("time1: ");
 		for (int i=0; i<time1.length; i++){
 			System.out.println(time1[i]);
@@ -156,6 +159,7 @@ public class ChartDisplay {
 		for (int i=0; i<censor2.length; i++){
 			System.out.println(censor2[i]);
 		}
+		*/
 		
 		
 		ArrayList<Double> xData1 = new ArrayList<Double>();

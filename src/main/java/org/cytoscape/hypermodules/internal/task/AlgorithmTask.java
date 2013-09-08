@@ -56,7 +56,6 @@ public class AlgorithmTask implements Task {
 	
 	
 	private CytoscapeUtils utils;
-	private String lengthOption;
 	private String expandOption;
 	private String statTest;
 	private ArrayList<String[]> sampleValues;
@@ -120,9 +119,8 @@ public class AlgorithmTask implements Task {
 	 * @param utils
 	 */
 
-	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String lengthOption, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){
+	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){
 		this.utils = utils;
-		this.lengthOption = lengthOption;
 		this.expandOption = expandOption;
 		this.statTest = statTest;
 		this.sampleValues = sampleValues;
@@ -183,7 +181,7 @@ public class AlgorithmTask implements Task {
 	public void run(TaskMonitor taskMonitor) throws Exception {
 		this.interrupted = false;
 		long before = System.nanoTime();
-		OriginalTest ot = new OriginalTest(this.lengthOption, this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.utils, taskMonitor, this.network);
+		OriginalTest ot = new OriginalTest(this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.utils, taskMonitor, this.network);
 		int nCores = Runtime.getRuntime().availableProcessors();
 		this.originalResults = ot.callTest();
 		
@@ -204,21 +202,21 @@ public class AlgorithmTask implements Task {
 		List<Future<HashMap<String, Multimap<String, Double>>>> list = new ArrayList<Future<HashMap<String, Multimap<String, Double>>>>();
 		
 		
-		ShuffleTestTMCall sttm = new ShuffleTestTMCall(this.lengthOption, nCores,(int) nShuffled/nCores , this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, taskMonitor, this.network);
+		ShuffleTestTMCall sttm = new ShuffleTestTMCall(nCores,(int) nShuffled/nCores , this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, taskMonitor, this.network);
 		Future<HashMap<String, Multimap<String, Double>>> submit = executor.submit(sttm);
 		list.add(submit);
 		shuffleCount += (int) nShuffled/nCores;
 		
 		for (int i=1; i<nCores-1; i++){
 			//reinitializeVariables();
-			ShuffleTestCall st = new ShuffleTestCall(this.lengthOption, (int) nShuffled/nCores, this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
+			ShuffleTestCall st = new ShuffleTestCall((int) nShuffled/nCores, this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 			Future<HashMap<String, Multimap<String, Double>>> submitPool = executor.submit(st);
 			list.add(submitPool);
 			shuffleCount += (int) nShuffled/nCores;
 		}
 
 		//reinitializeVariables();
-		ShuffleTestCall st = new ShuffleTestCall(this.lengthOption, nShuffled-shuffleCount, this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
+		ShuffleTestCall st = new ShuffleTestCall(nShuffled-shuffleCount, this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		Future<HashMap<String, Multimap<String, Double>>> submitPool = executor.submit(st);
 		list.add(submitPool);
 
@@ -259,7 +257,7 @@ public class AlgorithmTask implements Task {
 		
 		HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults = resultsFormat();
 		HashMap<String, String> parameters = new HashMap<String, String>();
-		parameters.put("length", this.lengthOption);
+		parameters.put("length", "2");
 		parameters.put("expand", this.expandOption);
 		parameters.put("nShuffled", String.valueOf(this.nShuffled));
 		parameters.put("stat", this.statTest);
@@ -291,7 +289,9 @@ public class AlgorithmTask implements Task {
 					newString = newString + u + ":";
 				}
 				newString = newString.substring(0, newString.length()-1);
-				newHash.put(newString, this.originalResults.get(s).get(t));
+				Double d = this.originalResults.get(s).get(t);
+				//d = (double)Math.round(d * 10000) / 10000;
+				newHash.put(newString, d);
 			}
 			newOriginal.put(s,  newHash);
 		}

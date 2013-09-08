@@ -71,7 +71,6 @@ public class FDRAdjust {
 				randomResultDoubles[k]=getDouble;
 				k++;
 			}
-			
 		}
 
 		double[] toAdjust = new double[resultDoubles.size()];
@@ -84,7 +83,6 @@ public class FDRAdjust {
 		System.out.println(randomResultDoubles.length);
 		System.out.println(lengthWhich(resultDoubles.get(0), randomResultDoubles));
 		
-
 		System.out.println("toAdjust for Java: ");
 		for (int i=0; i<toAdjust.length; i++){
 			System.out.println(toAdjust[i]);
@@ -106,7 +104,9 @@ public class FDRAdjust {
         }
 
 		for (int i=0; i<adjustedDoubles.length; i++){
-			adjustedResults.put(reversedResults.get(resultDoubles.get(i)), adjustedDoubles[i]);
+			Double d = adjustedDoubles[i];
+			//d = (double)Math.round(d * 10000) / 10000;
+			adjustedResults.put(reversedResults.get(resultDoubles.get(i)), d);
 		}
 		
 		return adjustedResults;

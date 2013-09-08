@@ -87,7 +87,7 @@ public class SwingWrapper {
       public void run() {
 
         // Create and set up the window.
-        JFrame frame = new JFrame("XChart");
+        JFrame frame = new JFrame("Kaplan-Meier Survival Curve Comparison");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel chartPanel = new XChartPanel(charts.get(0));
         frame.add(chartPanel);
@@ -112,8 +112,8 @@ public class SwingWrapper {
       public void run() {
 
         // Create and set up the window.
-        JFrame frame = new JFrame("XChart");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame = new JFrame("Kaplan-Meier Survival Curve Comparison");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new GridLayout(numRows, numColumns));
 
         for (Chart chart : charts) {

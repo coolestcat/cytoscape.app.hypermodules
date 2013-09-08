@@ -36,12 +36,14 @@ import org.cytoscape.work.TaskIterator;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -67,7 +69,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	/**
 	 * export all the hypermodules algorithm data 
 	 */
-	private JButton export;
+	//private JButton export;
 	/**
 	 * export the most correlated modules according to the algorithm
 	 */
@@ -93,7 +95,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * button panel
 	 */
 	private JPanel buttonPanel;
-	private JPanel buttonPanel2;
+	//private JPanel buttonPanel2;
+	
+	private JButton setCutoff;
+	private JTextField cutoff;
+	private JPanel panel3;
 	/**
 	 * the network that the algorithm was run on (may not be current selected network)
 	 */
@@ -110,8 +116,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	
 	private ArrayList<String[]> clinicalValues;
 	
-	
 	private ArrayList<String[]> addToTable;
+
+	private double pValueCutoff;
 	/**
 	 * constructor
 	 * @param parameters
@@ -128,29 +135,39 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		this.clinicalValues = clinicalValues;
 		makeComponents();
 		makeLayout();
-
 	}
 
 	/**
 	 * make components
 	 */
 	public void makeComponents(){
-		export  = new JButton("export");
-		export.addActionListener(this);
-		exportMostCorrelated = new JButton("export most correlated");
+		//export  = new JButton("export");
+		//export.addActionListener(this);
+		exportMostCorrelated = new JButton("export results");
 		exportMostCorrelated.addActionListener(this);
-		generate = new JButton("visualize networks");
+		generate = new JButton("visualize");
 		generate.addActionListener(this);
 		discard = new JButton("discard results");
 		discard.addActionListener(this);
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridBagLayout());
-		buttonPanel.add(export);
+		//buttonPanel.add(export);
 		buttonPanel.add(exportMostCorrelated);
-		buttonPanel2 = new JPanel();
-		buttonPanel2.setLayout(new GridBagLayout());
-		buttonPanel2.add(generate);
-		buttonPanel2.add(discard);
+		buttonPanel.add(generate);
+		buttonPanel.add(discard);
+		setCutoff = new JButton("Set P-Value Cutoff");
+		setCutoff.addActionListener(this);
+		cutoff = new JTextField("0.05");
+		panel3 = new JPanel();
+		panel3.setLayout(new GridBagLayout());
+		panel3.add(setCutoff);
+		panel3.add(cutoff);
+		this.pValueCutoff = 0.05;
+		setUpTable();
+
+	}
+	private void redoTable(){
 		Model tab = new Model();
 		addToTable = new ArrayList<String[]>();
 		
@@ -160,8 +177,12 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					String[] newEntry = new String[5];
 					newEntry[0]=key;
 					newEntry[1] = genes;
-					newEntry[2]=String.valueOf(set.get(0).get(genes));
-					newEntry[3]=String.valueOf(set.get(1).get(genes));
+					newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
+					Double b = set.get(1).get(genes);
+					if (b!=null){
+						b = (double)Math.round(b * 100000) / 100000;
+					}
+					newEntry[3]=String.valueOf(b);
 					if (set.get(2).get(genes)==1){
 						newEntry[4] = "HIGH";
 					}
@@ -171,12 +192,80 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					else{
 						newEntry[4] = "NA";
 					}
-					addToTable.add(newEntry);
+					if (b!=null){
+						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
+							addToTable.add(newEntry);
+						}
+					}
+					else{
+						if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
+							addToTable.add(newEntry);
+						}
+					}
 				}
 			}
 		}
 		tab.AddCSVData(addToTable);
-		resultsTable = new JTable(tab);
+		resultsTable.setModel(tab);
+		final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
+
+		resultsTable.addMouseListener(new MouseAdapter() {
+			  public void mouseClicked(MouseEvent e) {
+			    if (e.getClickCount() == 2) {
+			      JTable target = (JTable)e.getSource();
+			      int row = target.getSelectedRow();
+			      if (!addToTable.get(row)[1].equals("none")){
+			    	  cd.display(addToTable.get(row)[1]);
+			      }
+			    }
+			  }
+			});
+		viewer.setViewportView(resultsTable);
+		System.out.println("new viewer!");
+	}
+	
+	
+	private void setUpTable(){
+		Model tab = new Model();
+		addToTable = new ArrayList<String[]>();
+		
+		for (String key : allResults.keySet()){
+			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
+				for (String genes : set.get(0).keySet()){
+					String[] newEntry = new String[5];
+					newEntry[0]=key;
+					newEntry[1] = genes;
+					newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
+					Double b = set.get(1).get(genes);
+					if (b!=null){
+						b = (double)Math.round(b * 100000) / 100000;
+					}
+					newEntry[3]=String.valueOf(b);
+					if (set.get(2).get(genes)==1){
+						newEntry[4] = "HIGH";
+					}
+					else if (set.get(2).get(genes)==0){
+						newEntry[4] = "LOW";
+					}
+					else{
+						newEntry[4] = "NA";
+					}
+					if (b!=null){
+						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
+							addToTable.add(newEntry);
+						}
+					}
+					else{
+						if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
+							addToTable.add(newEntry);
+						}
+					}
+				}
+			}
+		}
+		tab.AddCSVData(addToTable);
+		resultsTable = new JTable();
+		resultsTable.setModel(tab);
 		final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
 
 		resultsTable.addMouseListener(new MouseAdapter() {
@@ -191,7 +280,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			  }
 			});
 		viewer = new JScrollPane(resultsTable);
-		
+		//viewer.setViewportView(resultsTable);
+
 	}
 
 	/**
@@ -200,9 +290,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	public void makeLayout(){
 		this.setPreferredSize(new Dimension(500, 450));
 		add(viewer);
-		viewer.setPreferredSize(new Dimension(450, 275));
+		viewer.setPreferredSize(new Dimension(400, 225));
 		add(buttonPanel);
-		add(buttonPanel2);
+		add(panel3);
 	}
 	
 	/**
@@ -222,7 +312,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				HashMap<String, Double> adjusted = ahhs.get(1);
 				for (String set : original.keySet()){
 					if (adjusted.containsKey(set)){
-						if (original.get(set)<0.05 && adjusted.get(set)<0.05){
+						if (original.get(set)<this.pValueCutoff && adjusted.get(set)<this.pValueCutoff){
 							mostCorrelated.put(set, original.get(set));
 							mostCorrelatedFDR.put(set, adjusted.get(set));
 						}
@@ -251,7 +341,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				HashMap<String, Double> adjusted = ahhs.get(1);
 				for (String set : original.keySet()){
 					if (adjusted.containsKey(set)){
-						if (original.get(set)<0.05 && adjusted.get(set)<0.05){
+						if (original.get(set)<this.pValueCutoff && adjusted.get(set)<this.pValueCutoff){
 							hss.put(s, set);
 						}
 					}
@@ -502,9 +592,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
+		/*
 		if (ae.getSource()==export){
 			exportResults();
 		}
+		*/
 		
 		if (ae.getSource()==exportMostCorrelated){
 			//exportCorrelatedNetworks();
@@ -513,13 +605,22 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		if (ae.getSource()==generate){
 			HashMap<String, String> sas = seedAndString();
-
 			this.utils.taskMgr.execute(new TaskIterator(new GenerateNetworkTask(sas, this.network, utils, sampleValues)));
-			
 		}
 		
 		if (ae.getSource()==discard){
 			utils.discardResults(this);
+		}
+		
+		if (ae.getSource()==setCutoff){
+			if (Double.valueOf(cutoff.getText())>1 || Double.valueOf(cutoff.getText())<0){
+				System.out.println("Please enter a pValue between 0 and 1.");
+			}
+			else{
+				this.pValueCutoff = Double.valueOf(cutoff.getText());
+				System.out.println(this.pValueCutoff);
+				redoTable();
+			}
 		}
 	}
 	
@@ -532,7 +633,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	  private class Model extends AbstractTableModel {
 		 	 
 			private static final long serialVersionUID = 1L;
-			private String[] columnNames = {"Seed", "Genes", "Real P-Values", "Adjusted P-values", "Classification"};
+			private String[] columnNames = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "Classification"};
 			private ArrayList<String[]> data =  new ArrayList<String[]>();
 	    // private Class[] columnTypes = {String.class, String.class, Integer.class, String.class};
 			
