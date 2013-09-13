@@ -36,14 +36,15 @@ public class SwingWrapper {
   private List<Chart> charts = new ArrayList<Chart>();
   private int numRows;
   private int numColumns;
+  private double d;
 
   /**
    * Constructor
    * 
    * @param chart
    */
-  public SwingWrapper(Chart chart) {
-
+  public SwingWrapper(Chart chart, Double d) {
+	this.d = d;
     this.charts.add(chart);
   }
 
@@ -87,7 +88,7 @@ public class SwingWrapper {
       public void run() {
 
         // Create and set up the window.
-        JFrame frame = new JFrame("Kaplan-Meier Survival Curve Comparison");
+        JFrame frame = new JFrame("Kaplan-Meier Survival Curve Comparison - pValue: " + String.valueOf(d));
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel chartPanel = new XChartPanel(charts.get(0));
         frame.add(chartPanel);
@@ -112,7 +113,7 @@ public class SwingWrapper {
       public void run() {
 
         // Create and set up the window.
-        JFrame frame = new JFrame("Kaplan-Meier Survival Curve Comparison");
+        JFrame frame = new JFrame("Kaplan-Meier Survival Curve Comparison - pValue: " + String.valueOf(d));
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new GridLayout(numRows, numColumns));
 

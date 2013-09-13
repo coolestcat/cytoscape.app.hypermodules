@@ -1,6 +1,7 @@
 package org.cytoscape.hypermodules.internal;
 
 import java.awt.Color;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +14,8 @@ import com.xeiam.xchart.ChartBuilder;
 import com.xeiam.xchart.Series;
 import com.xeiam.xchart.SeriesMarker;
 import com.xeiam.xchart.StyleManager.ChartTheme;
+
+import org.cytoscape.hypermodules.internal.statistics.LogRankTest;
 
 public class ChartDisplay {
 	
@@ -27,6 +30,8 @@ public class ChartDisplay {
 	private double[] followupDays;
 	private double[] age;
 	private double[] censor;
+	
+	private LogRankTest lrt;
 	
 	public ChartDisplay(ArrayList<String[]> clinicalValues, ArrayList<String[]> sampleValues, CyNetwork network){
 		this.clinicalValues = clinicalValues;
@@ -49,13 +54,13 @@ public class ChartDisplay {
 			}
 		}
 		initClinicals();
+		lrt = new LogRankTest(this.followupDays);
+		
+		
 	}	
 	
 	public void initClinicals(){
 		//have a "load (String/Double) Column" method?
-
-		
-		System.out.println(this.clinicalValues.size());
 		allPatients = new String[5];
 		allPatients = new String[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
@@ -142,6 +147,26 @@ public class ChartDisplay {
 				y++;
 			}
 		}
+		
+		ArrayDeque<Double> sortedTime1 = new ArrayDeque<Double>();
+		ArrayDeque<Double> sortedTime2 = new ArrayDeque<Double>();
+		ArrayDeque<Double> sortedCensor1 = new ArrayDeque<Double>();
+		ArrayDeque<Double> sortedCensor2 = new ArrayDeque<Double>();
+		
+		for (int i=0; i<time1.length; i++){
+			//allTimeHash.add(time1[i]);
+			sortedTime1.add(time1[i]);
+			sortedCensor1.add(censor1[i]);
+		}
+		
+		for (int i=0; i<time2.length; i++){
+			//allTimeHash.add(time2[i]);
+			sortedTime2.add(time2[i]);
+			sortedCensor2.add(censor2[i]);
+		}
+		
+		Double[] lrvalue = lrt.logRank(sortedTime1, sortedTime2, sortedCensor1, sortedCensor2);
+		
 		/*
 		System.out.println("time1: ");
 		for (int i=0; i<time1.length; i++){
@@ -230,9 +255,11 @@ public class ChartDisplay {
 			yd2[i] = yData2.get(i);
 		}
 		
-		
+
 	    Chart chart = new ChartBuilder().width(800).height(600).theme(ChartTheme.GGPlot2).build();
-	    chart.setChartTitle("Survival Curve Comparison");
+	    chart.setChartTitle("Kaplan-Meier Survival Analysis");
+	    chart.setXAxisTitle("Time");
+	    chart.setYAxisTitle("Survival Probability");
 	    Series series = chart.addSeries("Patients with mutation in module", xd1, yd1);
 	    Series series2 = chart.addSeries("Other patients", xd2, yd2);
 	    series.setLineColor(Color.RED);
@@ -242,7 +269,7 @@ public class ChartDisplay {
 	    series2.setMarker(SeriesMarker.TRIANGLE_UP);
 	    series2.setMarkerColor(Color.BLACK);
 	    
-	    new SwingWrapper(chart).displayChart();
+	    new SwingWrapper(chart, lrvalue[2]).displayChart();
 	}
 	
 	

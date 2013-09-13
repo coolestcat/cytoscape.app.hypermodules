@@ -43,6 +43,7 @@ public class LogRankTest {
 		}
 		Collections.sort(uniqueTimes);
 	}
+
 	/**
 	 * The main test method
 	 * @param time1 - first set of times, already sorted into ascending order

@@ -31,7 +31,7 @@ import org.cytoscape.work.TaskMonitor;
  */
 public class GenerateNetworkTask extends AbstractTask implements Task{
 
-	private HashMap<String, String> generation;
+	private String[] sas;
 	private CyNetwork runNetwork;
 	private CyNetwork generated;
 	private CytoscapeUtils utils;
@@ -39,8 +39,8 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	private HashSet<String> allSeeds;
 	private HashMap<String, Double> allSamplesMap;
 	
-	public GenerateNetworkTask(HashMap<String, String> generation, CyNetwork originalNetwork, CytoscapeUtils utils, ArrayList<String[]> sampleValues){
-		this.generation = generation;
+	public GenerateNetworkTask(String[] sas, CyNetwork originalNetwork, CytoscapeUtils utils, ArrayList<String[]> sampleValues){
+		this.sas = sas;
 		this.runNetwork = originalNetwork;
 		this.utils = utils;
 		this.sampleValues = sampleValues;
@@ -61,19 +61,14 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
-		int x = 1;
 		this.generated = utils.networkFactory.createNetwork();
-		for (String s : generation.keySet()){
-			visualize(s, generation.get(s));
-			taskMonitor.setProgress(x/(double) generation.size());
-			x++;
-		}
+		visualize(sas[0], sas[1]);
 		applyVisualStyle();
 	}
 	
 	public void applyVisualStyle(){
 		
-		generated.getDefaultNetworkTable().getRow(generated.getSUID()).set("name", this.utils.networkNaming.getSuggestedNetworkTitle("Visualization"));
+		generated.getDefaultNetworkTable().getRow(generated.getSUID()).set("name", this.utils.networkNaming.getSuggestedNetworkTitle(sas[1]));
 		this.utils.netMgr.addNetwork(generated);
 		CyNetworkView myView = this.utils.netViewFactory.createNetworkView(generated);
 		this.utils.netViewMgr.addNetworkView(myView);
