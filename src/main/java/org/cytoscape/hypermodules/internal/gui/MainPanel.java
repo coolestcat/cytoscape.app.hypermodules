@@ -41,6 +41,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -98,6 +99,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	/**
 	 * expand from selected seeds
 	 */
+	private JComboBox expandComboBox;
+	
 	private JRadioButton expand;
 	/**
 	 * find most correlated modules among all seeds
@@ -235,13 +238,20 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		mainPanel = new JPanel();
 
 		expandOptionPanel = new JPanel();
+		expandComboBox = new JComboBox();
+		expandComboBox.addItem("Expand From All Seeds");
+		expandComboBox.addItem("Expand From Selected Seeds");
+		expandComboBox.setSelectedItem("Expand From All Seeds");
+		expandOptionPanel.add(expandComboBox, BorderLayout.CENTER);
+		
+		
 		expand = new JRadioButton("Expand from Selected Seeds");
 		findMost = new JRadioButton("Find Most Correlated Module");
 		options = new ButtonGroup();
 		options.add(expand);
 		options.add(findMost);
-		expandOptionPanel.add(expand);
-		expandOptionPanel.add(findMost);
+		//expandOptionPanel.add(expand);
+		//expandOptionPanel.add(findMost);
 		
 		
 		testPanel = new JPanel();
@@ -454,10 +464,10 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			if (genes2samplesvalues!=null && clinicalValues!=null){
 				
 				String expandOption = "default";
-				if (expand.isSelected()){
+				if (expandComboBox.getSelectedItem().equals("Expand From Selected Seeds")){
 					expandOption = "expand";
 				}
-				else if (findMost.isSelected()){
+				else{
 					expandOption = "findMost";
 				}
 
