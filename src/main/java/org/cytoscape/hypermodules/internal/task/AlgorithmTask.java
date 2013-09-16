@@ -269,7 +269,7 @@ public class AlgorithmTask implements Task {
 		//printShuffling();
 		System.out.println("Shuffled size: " + getShuffleSize());
 		adjustResults();
-		adjustWithR();
+		//adjustWithR();
 		System.out.println("Finished Adjusting");
 		
 		HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults = resultsFormat();
@@ -364,7 +364,9 @@ public class AlgorithmTask implements Task {
 		for (String s : originalResults.keySet()){
 			FDRAdjust fdr = new FDRAdjust(originalResults.get(s), shuffling.get(s));
 			HashMap<String, Double> adjusted = fdr.fdrAdjust();
+			System.out.println(adjusted.size());
 			adjustedResults.put(s, adjusted);
+			
 		}
 		/*
 		for (String s : adjustedResults.keySet()){
@@ -396,7 +398,7 @@ public class AlgorithmTask implements Task {
 			ah.add(originalResults.get(s));
 			ah.add(adjustedResults.get(s));
 			ah.add(classification.get(s));
-			ah.add(adjustedWithR.get(s));
+			//ah.add(adjustedWithR.get(s));
 			HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>> hah = new HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>();
 			hah.put(ah,  shuffling.get(s));
 			allResults.put(s, hah);

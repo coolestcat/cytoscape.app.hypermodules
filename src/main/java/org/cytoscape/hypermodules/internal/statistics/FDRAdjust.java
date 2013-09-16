@@ -39,20 +39,23 @@ public class FDRAdjust {
 		
 		HashMap<String, Double> adjustedResults = new HashMap<String, Double>();
 		
-		HashMap<Double, String> reversedResults = new HashMap<Double, String>();
-		Multimap<Double, String> reversedRandomResults = ArrayListMultimap.create();
+		Multimap<Double, String> reversedResults = ArrayListMultimap.create();
+		//Multimap<Double, String> reversedRandomResults = ArrayListMultimap.create();
+		
 		
 		
 		for (String reverse : this_true.keySet()){
 			reversedResults.put(this_true.get(reverse), reverse);
 		}
 		
+		
+		/*
 		for (String reverse : this_rand.keySet()){
 			for (Double doubleAdd : this_rand.get(reverse)){
 				reversedRandomResults.put(doubleAdd, reverse);
 			}
 		}
-
+		 */
 		
 		ArrayList<Double> resultDoubles = new ArrayList<Double>();
 		
@@ -107,21 +110,23 @@ public class FDRAdjust {
                 min = mkprk;
             }
             adjustedDoubles[i - 1] = Double.parseDouble(min.toString());
-
         }
 
 		for (int i=0; i<adjustedDoubles.length; i++){
 			Double d = adjustedDoubles[i];
 			//d = (double)Math.round(d * 10000) / 10000;
-			adjustedResults.put(reversedResults.get(resultDoubles.get(i)), d);
+			for (String s : reversedResults.get(resultDoubles.get(i))){
+				adjustedResults.put(s, d);
+			}
 		}
 		
-		
+		/*
 		for (int i=0; i<adjustedDoubles.length; i++){
 			System.out.println(adjustedDoubles[i]);
 		}
+		*/
 		
-		
+		System.out.println(adjustedResults.size());
 		return adjustedResults;
 		
 	}

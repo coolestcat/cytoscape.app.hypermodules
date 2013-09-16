@@ -187,9 +187,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 						b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
-					Double c = set.get(3).get(genes);
-					newEntry[4] = String.valueOf(c);
-					/*
+					
 					if (set.get(2).get(genes)==1){
 						newEntry[4] = "HIGH";
 					}
@@ -199,7 +197,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					else{
 						newEntry[4] = "NA";
 					}
-					*/
+					
 					if (b!=null){
 						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
 							addToTable.add(newEntry);
@@ -267,9 +265,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 						b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
-					Double c = set.get(3).get(genes);
-					newEntry[4] = String.valueOf(c);
-					/*
+					
 					if (set.get(2).get(genes)==1){
 						newEntry[4] = "HIGH";
 					}
@@ -279,7 +275,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					else{
 						newEntry[4] = "NA";
 					}
-					*/
+					
 					if (b!=null){
 						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
 							addToTable.add(newEntry);
