@@ -1,6 +1,7 @@
 package org.cytoscape.hypermodules.internal.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -39,6 +40,8 @@ public class NetworkSelectionPanel extends JPanel implements NetworkAddedListene
 		//comboBox.setPreferredSize(new java.awt.Dimension(comboBox.getPreferredSize().width, 
 		//		comboBox.getPreferredSize().height));
 		add(comboBox, BorderLayout.CENTER);
+		comboBox.setPreferredSize(new Dimension(200, 23));
+		comboBox.setMaximumSize(new Dimension(200, 23));
 		updateNetworkList();
 	}
 	

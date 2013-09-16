@@ -1,6 +1,7 @@
 package org.cytoscape.hypermodules.internal.statistics;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -9,6 +10,9 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 /**
  * 
  * A class used for testing the validity of my implementation of the statistical tests - log rank, coxph,
@@ -25,12 +29,12 @@ public class ConnectR {
 	private double[] group;
 	private double[] age;
 	
-	private HashMap<HashSet<String>, Double> this_true;
-	private HashMap<HashSet<String>, Double> this_rand;
+	private HashMap<String, Double> this_true;
+	private Multimap<String, Double> this_rand;
 	
 	private int[][] contingencyTable;
 	
-	public ConnectR(HashMap<HashSet<String>, Double> this_true, HashMap<HashSet<String>, Double> this_rand){
+	public ConnectR(HashMap<String, Double> this_true, Multimap<String, Double> this_rand){
 		this.this_true = this_true;
 		this.this_rand = this_rand;
 	}
@@ -94,9 +98,9 @@ public class ConnectR {
 
 	}
 	
-	public HashMap<HashSet<String>, Double> fdrAdjust() throws REngineException, REXPMismatchException{
+	public HashMap<String, Double> fdrAdjust() throws REngineException, REXPMismatchException{
 		
-		HashMap<HashSet<String>, Double> adjustedResults = new HashMap<HashSet<String>, Double>();
+		HashMap<String, Double> adjustedResults = new HashMap<String, Double>();
 		RConnection c;
 		try {
 			c = new RConnection();
@@ -105,37 +109,44 @@ public class ConnectR {
 			System.out.println(x.asString());
 			
 			
-			HashMap<Double, HashSet<String>> reversedResults = new HashMap<Double, HashSet<String>>();
-			HashMap<Double, HashSet<String>> reversedRandomResults = new HashMap<Double, HashSet<String>>();
+			HashMap<Double, String> reversedResults = new HashMap<Double, String>();
+			Multimap<Double, String> reversedRandomResults = ArrayListMultimap.create();
 			
 			
-			for (HashSet<String> reverse : this_true.keySet()){
+			for (String reverse : this_true.keySet()){
 				reversedResults.put(this_true.get(reverse), reverse);
 			}
 			
-			for (HashSet<String> reverse : this_rand.keySet()){
-				reversedRandomResults.put(this_rand.get(reverse), reverse);
+			for (String reverse : this_rand.keySet()){
+				for (Double doubleAdd : this_rand.get(reverse)){
+					reversedRandomResults.put(doubleAdd, reverse);
+				}
 			}
 			
-			
 			double[] resultDoubles = new double[this_true.size()];
-			double[] randomResultDoubles = new double[this_rand.size()];
+			ArrayList<Double> randomResultDoubles = new ArrayList<Double>();
+
 			
 			int k=0;
-			for (HashSet<String> result : this_true.keySet()){
+			for (String result : this_true.keySet()){
 				resultDoubles[k]=Double.valueOf(this_true.get(result));
 				k++;
 			}
 			
-			k=0;
-			for(HashSet<String> result : this_rand.keySet()){
-				randomResultDoubles[k]=Double.valueOf(this_rand.get(result));
-				k++;
+
+			for(String result : this_rand.keySet()){
+				for (Double d : this_rand.get(result)){
+					randomResultDoubles.add(d);
+				}
 			}
 			
+			double[] randomz = new double[randomResultDoubles.size()];
+			for (int i=0; i<randomResultDoubles.size(); i++){
+				randomz[i] = randomResultDoubles.get(i);
+			}
 			
 			c.assign("this_true", resultDoubles);
-			c.assign("this_rand", randomResultDoubles);
+			c.assign("this_rand", randomz);
 			/*
 			double[] toAdjust = c.eval("sapply(this_true, function(x) length(which(x>=this_rand))/length(this_rand))").asDoubles();
 			double lengthOfRand = c.eval("length(this_rand)").asDouble();

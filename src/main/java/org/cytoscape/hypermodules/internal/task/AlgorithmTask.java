@@ -16,10 +16,13 @@ import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.hypermodules.internal.OriginalTest;
 import org.cytoscape.hypermodules.internal.ShuffleTestCall;
 import org.cytoscape.hypermodules.internal.ShuffleTestTMCall;
+import org.cytoscape.hypermodules.internal.statistics.ConnectR;
 import org.cytoscape.hypermodules.internal.statistics.FDRAdjust;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -53,6 +56,8 @@ public class AlgorithmTask implements Task {
 	 * FDR p-values
 	 */
 	private HashMap<String, HashMap<String, Double>> adjustedResults;
+	
+	private HashMap<String, HashMap<String, Double>> adjustedWithR;
 	
 	
 	private CytoscapeUtils utils;
@@ -132,14 +137,25 @@ public class AlgorithmTask implements Task {
 		Multimap<Double, Integer> followupDaysPosition = ArrayListMultimap.create();
 		
 		for (int k=0; k<clinicalValues.size(); k++){
-			followupDaysPosition.put(Double.valueOf(clinicalValues.get(k)[2]), Integer.valueOf(k));
+			boolean b = true;
+			try{
+				Double d = Double.valueOf(clinicalValues.get(k)[2]);
+			}
+			catch (NumberFormatException e){
+				b = false;
+			}
+			finally{
+				if (b){
+					followupDaysPosition.put(Double.valueOf(clinicalValues.get(k)[2]), Integer.valueOf(k));
+				}
+			}
 		}
 		
 		ArrayList<Double> sortedTime = new ArrayList<Double>();
 		ArrayList<Integer> sortedPositions = new ArrayList<Integer>();
 		
-		for (int k=0; k<clinicalValues.size(); k++){
-			sortedTime.add(Double.valueOf(clinicalValues.get(k)[2]));
+		for (Double d : followupDaysPosition.keySet()){
+			sortedTime.add(d);
 		}
 		
 		Collections.sort(sortedTime);
@@ -253,6 +269,7 @@ public class AlgorithmTask implements Task {
 		//printShuffling();
 		System.out.println("Shuffled size: " + getShuffleSize());
 		adjustResults();
+		adjustWithR();
 		System.out.println("Finished Adjusting");
 		
 		HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults = resultsFormat();
@@ -349,6 +366,23 @@ public class AlgorithmTask implements Task {
 			HashMap<String, Double> adjusted = fdr.fdrAdjust();
 			adjustedResults.put(s, adjusted);
 		}
+		/*
+		for (String s : adjustedResults.keySet()){
+			System.out.println(s);
+			for (String d : adjustedResults.get(s).keySet()){
+				System.out.println(d + " : " + adjustedResults.get(s).get(d));
+			}
+		}
+		*/
+	}
+	
+	private void adjustWithR() throws REngineException, REXPMismatchException{
+		adjustedWithR = new HashMap<String, HashMap<String, Double>>();
+		for (String s : originalResults.keySet()){
+			ConnectR cr = new ConnectR(originalResults.get(s), shuffling.get(s));
+			HashMap<String, Double> adjusted = cr.fdrAdjust();
+			adjustedWithR.put(s, adjusted);
+		}
 	}
 	
 	/**
@@ -362,6 +396,7 @@ public class AlgorithmTask implements Task {
 			ah.add(originalResults.get(s));
 			ah.add(adjustedResults.get(s));
 			ah.add(classification.get(s));
+			ah.add(adjustedWithR.get(s));
 			HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>> hah = new HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>();
 			hah.put(ah,  shuffling.get(s));
 			allResults.put(s, hah);

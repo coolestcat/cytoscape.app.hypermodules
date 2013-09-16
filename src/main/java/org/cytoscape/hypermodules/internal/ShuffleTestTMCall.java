@@ -126,7 +126,7 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
         	for (String s : shuffledAnswer.keySet()){
         		returnMap.put(s, shuffledAnswer.get(s));
         	}
-        	tm.setProgress((x+1)/ (double) nShuffled);
+        	tm.setProgress((x+1)*nCores/ (double) nShuffled*nCores);
     	}
 
 		return returnMap;

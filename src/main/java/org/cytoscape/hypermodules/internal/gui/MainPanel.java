@@ -274,15 +274,13 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		shufflePanel.setMaximumSize(new Dimension(350, 40));
 		shufflePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+		
 		mainPanel.add(expandOptionPanel);
 		mainPanel.add(testPanel);
 		mainPanel.add(shufflePanel);
-
-		
 		
 		samplePanel = new JPanel();
 		samplePanelScrollPane = new JScrollPane();
-		
 		
 		samplePanel.setLayout(new BoxLayout(samplePanel, BoxLayout.Y_AXIS));
 		loadSamples = new JButton("Load Sample Data");
@@ -293,9 +291,13 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		loadSamplePanel = new CollapsiblePanel("Samples");
 		allGeneSamples = new JTable(new MyModel1());   
 		sampleScrollPane = new JScrollPane(allGeneSamples);
-		sampleScrollPane.setPreferredSize(new Dimension(250, 175));
+		sampleScrollPane.setPreferredSize(new Dimension(300, 240));
+		sampleScrollPane.setMaximumSize(new Dimension(300, 240));
 		loadSamplePanel.getContentPane().add(sampleScrollPane, BorderLayout.NORTH);
-		samplePanel.setPreferredSize(new Dimension(250, 175));
+		loadSamplePanel.setPreferredSize(new Dimension(3000, 280));
+		loadSamplePanel.setMaximumSize(new Dimension(3000, 280));
+		samplePanel.setPreferredSize(new Dimension(300, 300));
+		samplePanel.setMaximumSize(new Dimension(300, 300));
 		samplePanel.add(loadSamplePanel);
 		
 		samplePanelScrollPane.setViewportView(samplePanel);
@@ -310,13 +312,13 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		loadSurvivalData.setPreferredSize(new Dimension(150, 23));
 		clinicalPanel.add(loadSurvivalData);
 
-
 		loadClinicalPanel = new CollapsiblePanel("Clinical Survival Data");
 		survivalTable = new JTable(new MyModel2());
 		survivalScrollPane = new JScrollPane(survivalTable);
 		loadClinicalPanel.getContentPane().add(survivalScrollPane, BorderLayout.NORTH);
 		loadClinicalPanel.setPreferredSize(new Dimension(250, 175));
 		clinicalPanel.add(loadClinicalPanel);
+		
 		clinicalPanelScrollPane.setViewportView(clinicalPanel);
 		clinicalPanelScrollPane.setPreferredSize(new Dimension(350, 200));
 		
@@ -425,6 +427,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		
 		if (ae.getSource()==loadSamples){
+			
         	File DataFile = utils.fileUtil.getFile(utils.swingApp.getJFrame(), "Load Samples", FileUtil.LOAD, getFilters());
         	CSVFile Rd = new CSVFile();
         	MyModel1 NewModel = new MyModel1();
@@ -432,6 +435,17 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	if (genes2samplesvalues.get(0)[0].equals("Hugo_Symbol")){
         		extractDataFromMaf();
         	}
+        	
+        	if (!genes2samplesvalues.get(0)[1].equals("no_sample")){
+        		if (genes2samplesvalues.get(0)[1].length()<5){
+            		genes2samplesvalues.remove(0);
+        		}
+        		else if (!genes2samplesvalues.get(0)[1].substring(0,4).equals("TCGA")) {
+            		genes2samplesvalues.remove(0);
+        		}
+
+        	}
+        	
         	 NewModel.AddCSVData(genes2samplesvalues);
         	 allGeneSamples.setModel(NewModel);
         	 otherValues = new ArrayList<String[]>();
@@ -442,6 +456,12 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	CSVFile Rd2 = new CSVFile();
         	MyModel2 NewModel2 = new MyModel2();
         	clinicalValues = Rd2.ReadCSVfile(DataFile2);
+        	try{
+        		double d = Double.valueOf(clinicalValues.get(0)[2]);
+        	}
+        	catch(NumberFormatException e){
+        		clinicalValues.remove(0);
+        	}
         	 NewModel2.AddCSVData(clinicalValues);
         	 survivalTable.setModel(NewModel2);
 		}

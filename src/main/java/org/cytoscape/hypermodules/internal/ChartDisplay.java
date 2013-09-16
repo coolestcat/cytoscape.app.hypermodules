@@ -260,6 +260,8 @@ public class ChartDisplay {
 	    chart.setChartTitle("Kaplan-Meier Survival Analysis");
 	    chart.setXAxisTitle("Time");
 	    chart.setYAxisTitle("Survival Probability");
+	    chart.getStyleManager().setYAxisMin(0.0);
+	    chart.getStyleManager().setYAxisMax(1);
 	    Series series = chart.addSeries("Patients with mutation in module", xd1, yd1);
 	    Series series2 = chart.addSeries("Other patients", xd2, yd2);
 	    series.setLineColor(Color.RED);
@@ -268,7 +270,6 @@ public class ChartDisplay {
 	    series2.setLineColor(Color.BLACK);
 	    series2.setMarker(SeriesMarker.TRIANGLE_UP);
 	    series2.setMarkerColor(Color.BLACK);
-	    
 	    new SwingWrapper(chart, lrvalue[2]).displayChart();
 	}
 	

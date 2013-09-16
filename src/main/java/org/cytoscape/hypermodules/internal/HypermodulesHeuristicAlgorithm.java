@@ -920,7 +920,7 @@ public class HypermodulesHeuristicAlgorithm {
 		
 		status = new boolean[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
-			if (clinicalValues.get(k)[1].equals("DECEASED")){
+			if (clinicalValues.get(k)[1].toUpperCase().equals("DECEASED")){
 				status[k]=true;
 			}
 			else{

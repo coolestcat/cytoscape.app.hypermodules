@@ -63,7 +63,7 @@ public class AboutDialog extends JDialog {
 					  "Version 1.0 by Alvin Leung, McGill University<BR>" +
 
 					  "If you use this app in your research, please cite:<BR>" +
-					  "Bader GD, Riemand J " +
+					  "Reimand J, Bader GD" +
 					  "<a href='http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3564258/'>Systematic analysis of somatic mutations in phosphorylation signaling<BR>" + 
 					  "predicts novel cancer drivers<BR>" +
 					  "</P></body></html>";
