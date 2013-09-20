@@ -476,25 +476,30 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		FileWriter fout = null;
 
 		try {
-			File file = utils.fileUtil.getFile(utils.swingApp.getJFrame(), "Export Most Correlated Results (Sorted) in Text File", FileUtil.SAVE, getFilters());
-
+			File file = utils.fileUtil.getFile(utils.swingApp.getJFrame(), "Export Most Correlated Results in CSV File", FileUtil.SAVE, getFilters());
+			
+			
 			if (file!=null){
 				fileName = file.getAbsolutePath();
-				fout = new FileWriter(file);
-				fout.write("HyperModules Results" + lineSep);
-				fout.write("Date: " + DateFormat.getDateTimeInstance().format(new Date()) + lineSep + lineSep);
-				
-				fout.write("Length Option: " + parameters.get("length") + lineSep);
-				fout.write("Expand Option: " + parameters.get("expand") + lineSep);
-				fout.write("Shuffle Number: " + parameters.get("nShuffled") + lineSep);
-				fout.write("Statistical Test: " + parameters.get("stat") + lineSep + lineSep);
-				
-				fout.write("Most Correlated Results:" + lineSep + lineSep);
-				
-				fout.write("Module" + "\t" + "Statistical Test P-Value" + "\t" + "FDR P-Value" + lineSep);
-				for (String s : mostCorrelated.keySet()){
-					fout.write(s + " - " + mostCorrelated.get(s) + " - " + mostCorrelatedFDR.get(s) + lineSep);
+				if (!fileName.substring(fileName.length()-4,fileName.length()).equals(".csv")){
+					fileName = fileName + ".csv";
 				}
+				fout = new FileWriter(fileName);
+				
+				
+				fout.write("Module" + ',' + "Statistical Test P-Value" + ',' + "FDR P-Value" + lineSep);
+				for (String s : mostCorrelated.keySet()){
+					fout.write(s + ',' + mostCorrelated.get(s) + ',' + mostCorrelatedFDR.get(s) + lineSep);
+				}
+				fout.write(lineSep);
+			
+				fout.write("HyperModules Results" + lineSep);
+				fout.write("Date: " + ',' + DateFormat.getDateTimeInstance().format(new Date()) + lineSep + lineSep);
+				
+				fout.write("Length Option: " + ','+ parameters.get("length") + lineSep);
+				fout.write("Expand Option: " + ',' + parameters.get("expand") + lineSep);
+				fout.write("Shuffle Number: "+ ',' + parameters.get("nShuffled") + lineSep);
+				fout.write("Statistical Test: " + ','+ parameters.get("stat") + lineSep + lineSep);
 
 			}
 		} 
@@ -608,7 +613,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * test results, and the FDR test results.
 	 */
 	public void exportResults(){
-		System.out.println("hello");
+		//System.out.println("hello");
 
 		final String lineSep = System.getProperty("line.separator");
 		String fileName = null;
