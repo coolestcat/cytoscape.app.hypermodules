@@ -133,6 +133,9 @@ public class AlgorithmTask implements Task {
 		this.nShuffled = nShuffled;
 		this.network = currNetwork;
 		
+		if (statTest.equals("logRank")){
+			
+		
 		ArrayList<String[]> sortedClinicals = new ArrayList<String[]>();
 		Multimap<Double, Integer> followupDaysPosition = ArrayListMultimap.create();
 		
@@ -176,15 +179,20 @@ public class AlgorithmTask implements Task {
 		}
 		
 		for (int k=0; k<sortedPositions.size(); k++){
-			String[] thisString = new String[4];
+			String[] thisString = new String[3];
 			thisString[0]=clinicalValues.get(sortedPositions.get(k))[0];
 			thisString[1]=clinicalValues.get(sortedPositions.get(k))[1];
 			thisString[2]=clinicalValues.get(sortedPositions.get(k))[2];
-			thisString[3]=clinicalValues.get(sortedPositions.get(k))[3];
+			//thisString[3]=clinicalValues.get(sortedPositions.get(k))[3];
 			sortedClinicals.add(thisString);
 			
 		}
 		this.clinicalValues = sortedClinicals;
+		}
+		
+		else{
+			this.clinicalValues = clinicalValues;
+		}
 	}
 	
 	/**
@@ -203,7 +211,9 @@ public class AlgorithmTask implements Task {
 		
 		fixOriginalResults();
 		
-		this.classification = ot.testHighOrLow(this.originalResults);
+		if (statTest.equals("logRank")){
+			this.classification = ot.testHighOrLow(this.originalResults);
+		}
 		
 		combinedShuffling = new ArrayList<HashMap<String, Multimap<String, Double>>>();
 		//create/initialize algorithm here, pass in to each callable
@@ -397,7 +407,9 @@ public class AlgorithmTask implements Task {
 			ArrayList<HashMap<String, Double>> ah = new ArrayList<HashMap<String, Double>> ();
 			ah.add(originalResults.get(s));
 			ah.add(adjustedResults.get(s));
-			ah.add(classification.get(s));
+			if (this.statTest.equals("logRank")){
+				ah.add(classification.get(s));
+			}
 			//ah.add(adjustedWithR.get(s));
 			HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>> hah = new HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>();
 			hah.put(ah,  shuffling.get(s));

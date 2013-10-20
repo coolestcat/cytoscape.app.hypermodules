@@ -168,10 +168,21 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		panel3.add(setCutoff);
 		panel3.add(cutoff);
 		this.pValueCutoff = 0.05;
-		setUpTable();
+		if (parameters.get("stat").equals("logRank")){
+			setUpTableLogRank();
+		}
+		else if (parameters.get("stat").equals("fisher")){
+			setUpTableFisher();
+		}
 
 	}
-	private void redoTable(){
+	
+	
+	public void setUpTableFisher(){
+		viewer = new JScrollPane(new JTable());
+	}
+	
+	public void redoLrTable(){
 		Model tab = new Model();
 		addToTable = new ArrayList<String[]>();
 		
@@ -247,7 +258,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	}
 	
 	
-	private void setUpTable(){
+	public void setUpTableLogRank(){
 		Model tab = new Model();
 		this.sas = new String[2];
 		sas[0] = "none";
@@ -266,16 +277,16 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					}
 					newEntry[3]=String.valueOf(b);
 					
-					if (set.get(2).get(genes)==1){
-						newEntry[4] = "HIGH";
-					}
-					else if (set.get(2).get(genes)==0){
-						newEntry[4] = "LOW";
-					}
-					else{
-						newEntry[4] = "NA";
-					}
-					
+						if (set.get(2).get(genes)==1){
+							newEntry[4] = "HIGH";
+						}
+						else if (set.get(2).get(genes)==0){
+							newEntry[4] = "LOW";
+						}
+						else{
+							newEntry[4] = "NA";
+						}
+
 					if (b!=null){
 						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
 							addToTable.add(newEntry);
@@ -293,7 +304,6 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
 		final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-		
 
 		resultsTable.addMouseListener(new MouseAdapter() {
 			  public void mouseClicked(MouseEvent e) {
@@ -702,6 +712,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		return "HyperModules Results";
 	}
 
+	public void redoFisherTable(){
+		
+		
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		/*
@@ -736,7 +751,12 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			else{
 				this.pValueCutoff = Double.valueOf(cutoff.getText());
 				System.out.println(this.pValueCutoff);
-				redoTable();
+				if (parameters.get("stat").equals("logRank")){
+					redoLrTable();
+				}
+				else{
+					redoFisherTable();
+				}
 			}
 		}
 	}

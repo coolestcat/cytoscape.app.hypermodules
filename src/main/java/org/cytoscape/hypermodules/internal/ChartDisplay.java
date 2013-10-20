@@ -26,9 +26,9 @@ public class ChartDisplay {
 	
 	private String[] allPatients;
 	private boolean[] status;
-	private double[] daysFromBirth;
+	//private double[] daysFromBirth;
 	private double[] followupDays;
-	private double[] age;
+	//private double[] age;
 	private double[] censor;
 	
 	private LogRankTest lrt;
@@ -69,7 +69,10 @@ public class ChartDisplay {
 		
 		status = new boolean[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
-			if (clinicalValues.get(k)[1].equals("DECEASED")){
+			if (clinicalValues.get(k)[1].toUpperCase().equals("DECEASED") || 
+					clinicalValues.get(k)[1].toUpperCase().equals("NO") ||
+					clinicalValues.get(k)[1].toUpperCase().equals("N") ||
+					clinicalValues.get(k)[1].equals("1")){
 				status[k]=true;
 			}
 			else{
@@ -82,6 +85,7 @@ public class ChartDisplay {
 			followupDays[k] = Double.valueOf(clinicalValues.get(k)[2]);
 		}
 		
+		/*
 		daysFromBirth = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			daysFromBirth[k] = Double.valueOf(clinicalValues.get(k)[3]);
@@ -91,7 +95,7 @@ public class ChartDisplay {
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			age[k]=(-1*daysFromBirth[k]+followupDays[k]);
 		}
-		
+		*/
 
 		censor = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){

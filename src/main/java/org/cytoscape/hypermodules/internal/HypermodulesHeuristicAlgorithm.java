@@ -66,11 +66,11 @@ public class HypermodulesHeuristicAlgorithm {
 	/**
 	 * patient days from birth
 	 */
-	private double[] daysFromBirth;
+	//private double[] daysFromBirth;
 	/**
 	 * patient age (- days from birth + days followup)
 	 */
-	private double[] age;
+	//private double[] age;
 	/**
 	 * patient censor values - 0 means alive (censored), 1 means deceased;
 	 */
@@ -162,13 +162,15 @@ public class HypermodulesHeuristicAlgorithm {
 	 */
 	public void initialize(){
 		this.numberTests = 0;
-		if (!otherValues.isEmpty()){
+		if (statTest.equals("fisher")){
 			initOther();
 		}
-		initClinicals();
-		logRankObject = new LogRankTest(this.followupDays);
-		coxModel = new CoxPh(this.followupDays.length, this.followupDays, this.censor, this.age);
-		coxModel.coxInit();
+		else if (statTest.equals("logRank")){
+			initClinicals();
+			logRankObject = new LogRankTest(this.followupDays);
+		}
+		//coxModel = new CoxPh(this.followupDays.length, this.followupDays, this.censor, this.age);
+		//coxModel.coxInit();
 
 		allGeneSamplesMap = new HashMap<String, String>();
 		
@@ -199,9 +201,17 @@ public class HypermodulesHeuristicAlgorithm {
 		}
 		
 		HashSet<String> clinicalSamples = new HashSet<String>();
-		for (String[] s : clinicalValues){
-			clinicalSamples.add(s[0]);
+		if (statTest.equals("logRank")){
+			for (String[] s : clinicalValues){
+				clinicalSamples.add(s[0]);
+			}
 		}
+		else if (statTest.equals("fisher")){
+			for (String[] s : otherValues){
+				clinicalSamples.add(s[0]);
+			}
+		}
+
 		
 		for (String s : g2sSamples){
 			if (!clinicalSamples.contains(s)){
@@ -229,7 +239,7 @@ public class HypermodulesHeuristicAlgorithm {
 			allSamples.add(allGeneSamplesMap.get(key));
 		}
 		repository = new HashMap<String, Double>();
-		initializeSurvivalClassification();
+		//initializeSurvivalClassification();
 	}
 	
 	/**
@@ -920,7 +930,10 @@ public class HypermodulesHeuristicAlgorithm {
 		
 		status = new boolean[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
-			if (clinicalValues.get(k)[1].toUpperCase().equals("DECEASED")){
+			if (clinicalValues.get(k)[1].toUpperCase().equals("DECEASED") || 
+				clinicalValues.get(k)[1].toUpperCase().equals("NO") ||
+				clinicalValues.get(k)[1].toUpperCase().equals("N") ||
+				clinicalValues.get(k)[1].equals("1")){
 				status[k]=true;
 			}
 			else{
@@ -933,16 +946,21 @@ public class HypermodulesHeuristicAlgorithm {
 			followupDays[k] = Double.valueOf(clinicalValues.get(k)[2]);
 		}
 		
+		/*
 		daysFromBirth = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			daysFromBirth[k] = Double.valueOf(clinicalValues.get(k)[3]);
 		}
+		*/
 		
+		
+		/*
 		age = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			age[k]=(-1*daysFromBirth[k]+followupDays[k]);
 			//System.out.println(age[k]);
 		}
+		*/
 		
 
 		censor = new double[this.clinicalValues.size()];

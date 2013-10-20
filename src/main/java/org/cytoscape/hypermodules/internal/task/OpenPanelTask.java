@@ -10,6 +10,7 @@ import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.hypermodules.internal.gui.MainPanel;
+import org.cytoscape.hypermodules.internal.gui.NewMainPanel;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
