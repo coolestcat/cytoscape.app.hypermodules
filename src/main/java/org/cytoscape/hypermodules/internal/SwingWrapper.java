@@ -75,6 +75,28 @@ public class SwingWrapper {
     this.numColumns = numColumns;
   }
 
+  
+  public void displayFisherChart(){
+
+	    // Schedule a job for the event-dispatching thread:
+	    // creating and showing this application's GUI.
+	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+	      @Override
+	      public void run() {
+
+	        // Create and set up the window.
+	        JFrame frame = new JFrame("Fisher's Exact Test Observed vs Expected");
+	        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	        JPanel chartPanel = new XChartPanel(charts.get(0));
+	        frame.add(chartPanel);
+
+	        // Display the window.
+	        frame.pack();
+	        frame.setVisible(true);
+	      }
+	    });
+  }
   /**
    * Display the chart in a Swing JFrame
    */
@@ -113,7 +135,7 @@ public class SwingWrapper {
       public void run() {
 
         // Create and set up the window.
-        JFrame frame = new JFrame("Kaplan-Meier Survival Curve Comparison - pValue: " + String.valueOf(d));
+        JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new GridLayout(numRows, numColumns));
 

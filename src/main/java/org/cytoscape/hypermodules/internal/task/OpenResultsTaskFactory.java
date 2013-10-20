@@ -19,19 +19,21 @@ public class OpenResultsTaskFactory implements TaskFactory {
 	private HashMap<String, String> parameters;
 	private ArrayList<String[]> sampleValues;
 	private ArrayList<String[]> clinicalValues;
+	private ArrayList<String[]> otherValues;
 	
-	public OpenResultsTaskFactory(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues){
+	public OpenResultsTaskFactory(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues){
 		this.utils = utils;
 		this.allResults = allResults;
 		this.network = network;
 		this.parameters = parameters;
 		this.sampleValues = sampleValues;
 		this.clinicalValues = clinicalValues;
+		this.otherValues = otherValues;
 	}
 	
 	@Override
 	public TaskIterator createTaskIterator() {
-		return (new TaskIterator(new OpenResultsTask(parameters, utils, allResults, network, sampleValues, clinicalValues)));
+		return (new TaskIterator(new OpenResultsTask(parameters, utils, allResults, network, sampleValues, clinicalValues, otherValues)));
 	}
 
 	@Override

@@ -29,19 +29,21 @@ public class OpenResultsTask implements Task {
 	private HashMap<String, String> parameters;
 	private ArrayList<String[]> sampleValues;
 	private ArrayList<String[]> clinicalValues;
+	private ArrayList<String[]> otherValues;
 	
-	public OpenResultsTask(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues){
+	public OpenResultsTask(HashMap<String, String> parameters, CytoscapeUtils utils, HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> allResults, CyNetwork network, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues){
 		this.utils = utils;
 		this.allResults = allResults;
 		this.network = network;
 		this.parameters = parameters;
 		this.sampleValues = sampleValues;
 		this.clinicalValues = clinicalValues;
+		this.otherValues = otherValues;
 	}
 	
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
-		ResultsPanel resultsPanel = new ResultsPanel(parameters, utils, allResults, network, sampleValues, clinicalValues);
+		ResultsPanel resultsPanel = new ResultsPanel(parameters, utils, allResults, network, sampleValues, clinicalValues, otherValues);
 		utils.serviceRegistrar.registerService(resultsPanel, CytoPanelComponent.class, new Properties());
 		CytoPanel eastPanel = utils.getCytoPanelEast();
 		eastPanel.setState(CytoPanelState.DOCK);

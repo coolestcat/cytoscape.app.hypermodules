@@ -288,7 +288,7 @@ public class AlgorithmTask implements Task {
 		parameters.put("expand", this.expandOption);
 		parameters.put("nShuffled", String.valueOf(this.nShuffled));
 		parameters.put("stat", this.statTest);
-		OpenResultsTaskFactory resultsTaskFac = new OpenResultsTaskFactory(parameters, utils, allResults, this.network, this.sampleValues, this.clinicalValues);
+		OpenResultsTaskFactory resultsTaskFac = new OpenResultsTaskFactory(parameters, utils, allResults, this.network, this.sampleValues, this.clinicalValues, this.otherValues);
 		utils.taskMgr.execute(resultsTaskFac.createTaskIterator());
 		
 		
