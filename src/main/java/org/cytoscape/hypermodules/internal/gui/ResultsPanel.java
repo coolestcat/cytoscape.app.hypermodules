@@ -195,10 +195,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					String[] newEntry = new String[4];
 					newEntry[0]=key;
 					newEntry[1] = genes;
-					newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
+					newEntry[2] = String.valueOf(set.get(0).get(genes));
+					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
 					Double b = set.get(1).get(genes);
 					if (b!=null){
-						b = (double)Math.round(b * 100000) / 100000;
+						//b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
 
@@ -327,7 +328,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					String[] newEntry = new String[5];
 					newEntry[0]=key;
 					newEntry[1] = genes;
-					newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
+					newEntry[2] = String.valueOf(set.get(0).get(genes));
+					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
 					Double b = set.get(1).get(genes);
 					if (b!=null){
 						b = (double)Math.round(b * 100000) / 100000;

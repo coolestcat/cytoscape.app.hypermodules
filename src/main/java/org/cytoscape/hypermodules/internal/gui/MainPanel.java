@@ -265,7 +265,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		shufflePanel = new JPanel();
 		shuffle = new JLabel("Shuffle Number:");
-		nShuffled = new JTextField("0", 5);
+		nShuffled = new JTextField("100", 5);
 		shufflePanel.add(shuffle, BorderLayout.WEST);
 		shufflePanel.add(nShuffled, BorderLayout.EAST);
 		shufflePanel.setPreferredSize(new Dimension(350, 40));
@@ -291,7 +291,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		buttonheader.setMaximumSize( new Dimension (300, 30));
 		
 		//samplePanel.add(loadSamples);
-		headers = new JCheckBox("CSV Headers");
+		headers = new JCheckBox("CSV has Headers");
 		//samplePanel.add(headers);
 		headers.setSelected(true);
 		headers.addActionListener(this);
@@ -332,7 +332,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		loadClinicalData.addActionListener(this);
 		loadClinicalData.setPreferredSize(new Dimension(150, 23));
 		//clinicalPanel.add(loadClinicalData);
-		clinicalheaders = new JCheckBox("CSV Headers");
+		clinicalheaders = new JCheckBox("CSV has Headers");
 		//clinicalPanel.add(clinicalheaders);
 		clinicalheaders.setSelected(true);
 		clinicalheaders.addActionListener(this);
@@ -493,7 +493,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		
 		//clinicalPanel.add(loadClinicalData);
-		clinicalheaders = new JCheckBox("CSV Headers");
+		clinicalheaders = new JCheckBox("CSV has Headers");
 		//clinicalPanel.add(clinicalheaders);
 		if (header){
 			clinicalheaders.setSelected(true);
@@ -602,7 +602,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		headerplusbutton.setMaximumSize(new Dimension(300, 30));
 		
 		//clinicalPanel.add(loadClinicalData);
-		clinicalheaders = new JCheckBox("CSV Headers");
+		clinicalheaders = new JCheckBox("CSV has Headers");
 		//clinicalPanel.add(clinicalheaders);
 		if (header){
 			clinicalheaders.setSelected(true);
