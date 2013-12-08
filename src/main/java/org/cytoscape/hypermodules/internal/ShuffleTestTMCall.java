@@ -95,9 +95,10 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 			
 			int k=1;
 			for (String runSeed : nameAndNode.keySet()){
-				tm.setTitle("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
+				tm.setStatusMessage("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
 				Multimap<String, Double> oneResult = testSeed(ha, runSeed, nameAndNode.get(runSeed));
 				rt.put(runSeed, oneResult);
+				tm.setProgress(k/(double) nameAndNode.size());
 				k++;
 			}
 			
@@ -119,14 +120,14 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 		Multimap<String, Double> returnMap = ArrayListMultimap.create();
 		
     	for (int x = 0; x < this.nShuffled; x++){
-        	tm.setStatusMessage("Iteration " + (x+1));
+        	//tm.setStatusMessage("Iteration " + (x+1));
         	ha.shuffleLabels();
         	ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
         	HashMap<String, Double> shuffledAnswer = ha.mineHublets(compress);
         	for (String s : shuffledAnswer.keySet()){
         		returnMap.put(s, shuffledAnswer.get(s));
         	}
-        	tm.setProgress((x+1)*nCores/ (double) nShuffled*nCores);
+        	//tm.setProgress((x+1)*nCores/ (double) nShuffled*nCores);
     	}
 
 		return returnMap;
