@@ -126,6 +126,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	private double pValueCutoff;
 	
 	private String[] sas;
+	
+	private JButton chart;
+	
+	private double selectedP;
 	/**
 	 * constructor
 	 * @param parameters
@@ -157,11 +161,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		generate.addActionListener(this);
 		discard = new JButton("discard results");
 		discard.addActionListener(this);
+		chart = new JButton("display chart");
+		chart.addActionListener(this);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridBagLayout());
 		//buttonPanel.add(export);
 		buttonPanel.add(exportMostCorrelated);
+		buttonPanel.add(chart);
 		buttonPanel.add(generate);
 		buttonPanel.add(discard);
 		setCutoff = new JButton("Set P-Value Cutoff");
@@ -219,7 +226,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
-		final ChartDisplayFisher cd = new ChartDisplayFisher(this.otherValues, this.sampleValues, this.network);
+		final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
 
 		resultsTable.addMouseListener(new MouseAdapter() {
 			  public void mouseClicked(MouseEvent e) {
@@ -228,6 +235,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			      sas = new String[2];
 			      sas[0] = addToTable.get(row)[0];
 			      sas[1] = addToTable.get(row)[1];
+			      selectedP = Double.valueOf(addToTable.get(row)[2]);
 			      if (e.getClickCount() == 2) {
 			    	  if (!addToTable.get(row)[1].equals("none")){
 			    	  cd.display(addToTable.get(row)[1]);
@@ -291,6 +299,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			    sas = new String[2];
 			    sas[0] = addToTable.get(row)[0];
 			    sas[1] = addToTable.get(row)[1];
+			    selectedP = Double.valueOf(addToTable.get(row)[2]);
 			    if (e.getClickCount() == 2) {
 			      //JTable target = (JTable)e.getSource();
 			      //int row = target.getSelectedRow();
@@ -371,6 +380,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			      sas = new String[2];
 			      sas[0] = addToTable.get(row)[0];
 			      sas[1] = addToTable.get(row)[1];
+			      selectedP = Double.valueOf(addToTable.get(row)[2]);
 			      if (e.getClickCount() == 2) {
 			    	  if (!addToTable.get(row)[1].equals("none")){
 			    	  cd.display(addToTable.get(row)[1]);
@@ -440,6 +450,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				      sas = new String[2];
 				      sas[0] = newTableAdd.get(row)[0];
 				      sas[1] = newTableAdd.get(row)[1];
+				      selectedP = Double.valueOf(newTableAdd.get(row)[2]);
 				    if (e.getClickCount() == 2) {
 				      if (!newTableAdd.get(row)[1].equals("none")){
 				    	  cd.display(newTableAdd.get(row)[1]);
@@ -784,10 +795,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					String[] newEntry = new String[4];
 					newEntry[0]=key;
 					newEntry[1] = genes;
-					newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
+					newEntry[2] = String.valueOf(set.get(0).get(genes));
+					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
 					Double b = set.get(1).get(genes);
 					if (b!=null){
-						b = (double)Math.round(b * 100000) / 100000;
+						//b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
 					
@@ -807,7 +819,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
-		final ChartDisplayFisher cd = new ChartDisplayFisher(this.otherValues, this.sampleValues, this.network);
+		final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
 
 		resultsTable.addMouseListener(new MouseAdapter() {
 			  public void mouseClicked(MouseEvent e) {
@@ -816,6 +828,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			    sas = new String[2];
 			    sas[0] = addToTable.get(row)[0];
 			    sas[1] = addToTable.get(row)[1];
+			    selectedP = Double.valueOf(addToTable.get(row)[2]);
 			    if (e.getClickCount() == 2) {
 			      //JTable target = (JTable)e.getSource();
 			      //int row = target.getSelectedRow();
@@ -853,6 +866,17 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		if (ae.getSource()==discard){
 			utils.discardResults(this);
+		}
+		
+		if (ae.getSource()==chart){
+			if (parameters.get("stat").equals("logRank")){
+				ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
+				cd.display(sas[1]);
+			}
+			else{ //fisher
+				ChartDisplayFisher cdf = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
+				cdf.display(sas[1]);
+			}
 		}
 		
 		if (ae.getSource()==setCutoff){

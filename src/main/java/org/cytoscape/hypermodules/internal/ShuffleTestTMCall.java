@@ -75,7 +75,7 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 				l++;
 			}
 			
-			System.out.println("numberTests/4: " + ha.getNumberTests());
+			//System.out.println("numberTests/4: " + ha.getNumberTests());
 			
 		}
 		
@@ -94,7 +94,7 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 				}
 			}
 			
-			System.out.println("allSeeds size: " + nameAndNode.size());
+			//System.out.println("allSeeds size: " + nameAndNode.size());
 			
 			tm.setTitle("Testing on Random Permutations");
 			
@@ -107,7 +107,7 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 				k++;
 			}
 			
-			System.out.println("numberTests/4: " + ha.getNumberTests());
+			//System.out.println("numberTests/4: " + ha.getNumberTests());
 		}
 		
 		

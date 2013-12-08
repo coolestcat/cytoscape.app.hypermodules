@@ -232,7 +232,7 @@ public class ChartDisplay {
 		
 		survival = 1;
 		numPeopleLeft = allPatients.length-alpha;
-		System.out.println("numPeopleLeft: " + numPeopleLeft);
+		//System.out.println("numPeopleLeft: " + numPeopleLeft);
 		
 		for(int i=0; i<censor2.length; i++){
 			if (censor2[i]==1){
@@ -241,7 +241,7 @@ public class ChartDisplay {
 				yData2.add(survival);
 				numPeopleLeft--;
 				survival = numPeopleLeft/ (double) (allPatients.length-alpha);
-				System.out.println("new survival: " + survival);
+				//System.out.println("new survival: " + survival);
 				yData2.add(survival);	
 			}
 			else{
@@ -269,7 +269,7 @@ public class ChartDisplay {
 		
 
 	    Chart chart = new ChartBuilder().width(800).height(600).theme(ChartTheme.GGPlot2).build();
-	    chart.setChartTitle("Kaplan-Meier Survival Analysis");
+	    chart.setChartTitle("Kaplan-Meier Survival Analysis - pValue: " + lrvalue[2]);
 	    chart.setXAxisTitle("Time");
 	    chart.setYAxisTitle("Survival Probability");
 	    chart.getStyleManager().setYAxisMin(0.0);

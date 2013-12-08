@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.cytoscape.hypermodules.internal.statistics.FishersExactTest;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
@@ -29,11 +30,13 @@ public class ChartDisplayFisher {
 	private ArrayList<String> allVariableNames;
 	private Multimap<String, String> variable2patients;
 	double[] percentages;
+	double selectedP;
 	
-	public ChartDisplayFisher(ArrayList<String[]> otherValues, ArrayList<String[]> sampleValues, CyNetwork network){
+	public ChartDisplayFisher(Double selectedP, ArrayList<String[]> otherValues, ArrayList<String[]> sampleValues, CyNetwork network){
 		this.otherValues = otherValues;
 		this.sampleValues = sampleValues;
 		this.network = network;
+		this.selectedP = selectedP;
 		
 		allGeneSamplesMap = new HashMap<String, String>();
 		
@@ -98,10 +101,12 @@ public class ChartDisplayFisher {
 	
 	public void display(String s){
 		
+		/*
 		System.out.println("allVariableNames: ");
 		for (int h=0; h<allVariableNames.size(); h++){
 			System.out.println(allVariableNames.get(h));
 		}
+		*/
 		
 		String[] genes = s.split(":");
 
@@ -138,10 +143,12 @@ public class ChartDisplayFisher {
 			matrix.put(x, 0);
 		}
 		
+		/*
 		System.out.println("Before");
 		for (String r : matrix.keySet()){
 			System.out.println(r + " : " + matrix.get(r));
 		}
+		*/
 		
 		for (int k=0; k<otherValues.size(); k++){
 			if (var2patients[k]==true){
@@ -155,10 +162,12 @@ public class ChartDisplayFisher {
 			}
 		}
 		
+		/*
 		System.out.println("After");
 		for (String r : matrix.keySet()){
 			System.out.println(r + " : " + matrix.get(r));
 		}
+		*/
 		
 		ArrayList<Number> observed = new ArrayList<Number>();
 		for (int i=0; i<allVariableNames.size(); i++){
@@ -170,6 +179,7 @@ public class ChartDisplayFisher {
 			expected.add((double) percentages[i] * alpha);
 		}
 		
+		/*
 		System.out.println("Observed: " );
 		for (int h = 0; h< observed.size(); h++){
 			System.out.println(observed.get(h));
@@ -179,14 +189,14 @@ public class ChartDisplayFisher {
 		for (int h = 0; h< observed.size(); h++){
 			System.out.println(observed.get(h));
 		}
-		
+		*/
 		
 		String[] toChart = new String[allVariableNames.size()];
 		for (int y = allVariableNames.size()-1; y>=0; y--){
 			toChart[y] = allVariableNames.get(y);
 		}
-	
-		Chart chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected").xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
+		
+		Chart chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - PValue: " + selectedP).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
 		chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(toChart)), observed);
 		chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(toChart)), expected);
 

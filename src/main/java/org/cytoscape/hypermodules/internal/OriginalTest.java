@@ -192,20 +192,20 @@ public class OriginalTest {
 		HashSet<String> allPaths = new HashSet<String>();
 		allPaths = pathfinder.getAllPaths2(seedExpand);
 		
-		System.out.println("ALL PATHS SIZE: " + allPaths.size());
+		//System.out.println("ALL PATHS SIZE: " + allPaths.size());
 		
 		//this.tm.setProgress(0.3);
 		
 		ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
 		
-		System.out.println("COMPRESSED SIZE: " + compress.size());
+		//System.out.println("COMPRESSED SIZE: " + compress.size());
 		
 		//this.tm.setProgress(0.8);
 		
 		HashMap<String, Double> answer = ha.mineHublets(compress);
 		returnMap = answer;
 		
-		System.out.println("FINAL SIZE: " + returnMap.size());
+		//System.out.println("FINAL SIZE: " + returnMap.size());
 		//this.tm.setProgress(1.0);
 		return returnMap;
 	}

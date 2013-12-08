@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -174,6 +175,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	private JComboBox fpatients;
 	private JComboBox fvariable;
 	
+	private JButton sort;
+	
+	
 	/**
 	 * constructor
 	 * @param swingApp
@@ -285,18 +289,21 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		loadSamples.setPreferredSize(new Dimension(150, 23));
 		
 		JPanel buttonheader = new JPanel();
-		buttonheader.setLayout(new GridLayout(1,2));
+		buttonheader.setLayout(new GridLayout(1,3));
 		buttonheader.setPreferredSize( new Dimension (300, 30));
 		buttonheader.setMaximumSize( new Dimension (300, 30));
 		
 		//samplePanel.add(loadSamples);
 		headers = new JCheckBox("CSV has Headers");
 		//samplePanel.add(headers);
-		headers.setSelected(true);
+		//headers.setSelected(true);
 		headers.addActionListener(this);
 		
+		sort = new JButton("sort");
+		sort.addActionListener(this);
 		buttonheader.add(loadSamples);
 		buttonheader.add(headers);
+		buttonheader.add(sort);
 
 		samplePanel.add(buttonheader);
 		loadSamplePanel = new CollapsiblePanel("Samples");
@@ -333,7 +340,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		//clinicalPanel.add(loadClinicalData);
 		clinicalheaders = new JCheckBox("CSV has Headers");
 		//clinicalPanel.add(clinicalheaders);
-		clinicalheaders.setSelected(true);
+		//clinicalheaders.setSelected(true);
 		clinicalheaders.addActionListener(this);
 		
 		headerplusbutton.add(loadClinicalData);
@@ -1013,6 +1020,48 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	 //otherValues = new ArrayList<String[]>();
 		}
 		
+		if (ae.getSource()==sort){
+			if (genes2samplesvalues!=null){
+				Multimap<String, String> reference = ArrayListMultimap.create();
+				for (int i=0; i<genes2samplesvalues.size(); i++){
+					reference.put(genes2samplesvalues.get(i)[0], genes2samplesvalues.get(i)[1]);
+				}
+				
+				ArrayList<String> keys = new ArrayList<String>();
+				for (int i=0; i<genes2samplesvalues.size(); i++){
+					keys.add(genes2samplesvalues.get(i)[0]);
+				}
+				
+				Collections.sort(keys);
+				
+				ArrayList<String[]> newGeneTable = new ArrayList<String[]>();
+				for (int i=0; i<keys.size(); i++){
+					for (String value : reference.get(keys.get(i))){
+						String[] entry = new String[2];
+						entry[0] = keys.get(i);
+						entry[1] = value;
+						newGeneTable.add(entry);
+					}
+				}
+				
+				
+				MyModel NewModel = null;
+	        	if (headers.isSelected()){
+	        		NewModel = new MyModel(header);
+	        	}
+	        	else{
+	        		String[] c = { "genes", "samples"};
+	        		NewModel = new MyModel(c);
+	        	}
+	        	
+	        	 NewModel.AddCSVData(newGeneTable);
+	        	 allGeneSamples = new JTable();
+	        	 allGeneSamples.setModel(NewModel);
+	        	 resetSamplePanel(allGeneSamples);
+				
+			}
+			
+		}
 		
 		if (ae.getSource() == run){
 
