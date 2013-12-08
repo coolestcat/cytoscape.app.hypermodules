@@ -188,7 +188,6 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		makeLayout();
 	}
 	
-	
 
 	public void makeLayout(){
 		
@@ -972,6 +971,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			else if (fisher.isSelected()){
 				setClinicalPanelFisher(clinicalheaders.isSelected());
 			}
+			loadClinicalPanel.setCollapsed(false);
 		}
 		
 		if (ae.getSource() == loadSamples){
@@ -1009,6 +1009,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	 allGeneSamples = new JTable();
         	 allGeneSamples.setModel(NewModel);
         	 resetSamplePanel(allGeneSamples);
+        	 loadSamplePanel.setCollapsed(false);
         	 //otherValues = new ArrayList<String[]>();
 		}
 		

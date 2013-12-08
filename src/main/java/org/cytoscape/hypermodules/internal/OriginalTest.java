@@ -129,10 +129,14 @@ public class OriginalTest {
 				expands.add(seedExpand);
 			}
 			
+			tm.setTitle("Testing on Original Network");
+			int l = 1;
 			for (int k=0; k<seedNames.size(); k++){
-				tm.setTitle("Running Algorithm on Seed: " + seedNames.get(k));
+				tm.setStatusMessage("Running Algorithm on Seed: " + seedNames.get(k));
 				HashMap<String, Double> oneResult = testSeed(ha, seedNames.get(k), expands.get(k));
 				rt.put(seedName, oneResult);
+				tm.setProgress(l/(double) seedNames.size());
+				l++;
 			}
 			
 		}
@@ -153,12 +157,13 @@ public class OriginalTest {
 			}
 			
 			System.out.println("allSeeds size: " + nameAndNode.size());
-			tm.setTitle("Running HyperModules Algorithm");
+			tm.setTitle("Testing on Original Network");
 			int k=1;
 			for (String runSeed : nameAndNode.keySet()){
-				tm.setTitle("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
+				tm.setStatusMessage("Running Algorithm on Seed: " + runSeed + " ( " + k + " of " + nameAndNode.size() + " )");
 				HashMap<String, Double> oneResult = testSeed(ha, runSeed, nameAndNode.get(runSeed));
 				rt.put(runSeed, oneResult);
+				tm.setProgress(k/(double)nameAndNode.size());
 				k++;
 			}
 			
@@ -181,7 +186,7 @@ public class OriginalTest {
 		HashMap<String, Double> returnMap = new HashMap<String, Double>();
 		
 		//this.tm.setStatusMessage("finding this_true");
-		this.tm.setProgress(0.001);
+		//this.tm.setProgress(0.001);
 		FindPaths pathfinder = new FindPaths(this.network, 2);
 		
 		HashSet<String> allPaths = new HashSet<String>();
@@ -189,19 +194,19 @@ public class OriginalTest {
 		
 		System.out.println("ALL PATHS SIZE: " + allPaths.size());
 		
-		this.tm.setProgress(0.3);
+		//this.tm.setProgress(0.3);
 		
 		ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
 		
 		System.out.println("COMPRESSED SIZE: " + compress.size());
 		
-		this.tm.setProgress(0.8);
+		//this.tm.setProgress(0.8);
 		
 		HashMap<String, Double> answer = ha.mineHublets(compress);
 		returnMap = answer;
 		
 		System.out.println("FINAL SIZE: " + returnMap.size());
-		this.tm.setProgress(1.0);
+		//this.tm.setProgress(1.0);
 		return returnMap;
 	}
 }

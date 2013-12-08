@@ -626,7 +626,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		}
 		
 		Collections.sort(toSort2);
-		System.out.println("hello");
+		//System.out.println("hello");
 
 		final String lineSep = System.getProperty("line.separator");
 		String fileName = null;

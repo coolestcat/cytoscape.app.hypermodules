@@ -38,7 +38,15 @@ public class ChartDisplayFisher {
 		allGeneSamplesMap = new HashMap<String, String>();
 		
 		for (int i=0; i<sampleValues.size(); i++){
+			if (allGeneSamplesMap.get(sampleValues.get(i)[0])!=null){
+				String sti = allGeneSamplesMap.get(sampleValues.get(i)[0]);
+				sti = sti + ":" + sampleValues.get(i)[1];
+				allGeneSamplesMap.put(sampleValues.get(i)[0], sti);
+			}
+			else{
+			//System.out.println(sampleValues.get(i)[1]);
 			allGeneSamplesMap.put(sampleValues.get(i)[0], sampleValues.get(i)[1]);
+			}
 		}
 		
 		for (CyNode cynode : this.network.getNodeList()){
@@ -89,6 +97,12 @@ public class ChartDisplayFisher {
 	}
 	
 	public void display(String s){
+		
+		System.out.println("allVariableNames: ");
+		for (int h=0; h<allVariableNames.size(); h++){
+			System.out.println(allVariableNames.get(h));
+		}
+		
 		String[] genes = s.split(":");
 
 		ArrayList<String> patients = new ArrayList<String>();
@@ -124,10 +138,15 @@ public class ChartDisplayFisher {
 			matrix.put(x, 0);
 		}
 		
+		System.out.println("Before");
+		for (String r : matrix.keySet()){
+			System.out.println(r + " : " + matrix.get(r));
+		}
+		
 		for (int k=0; k<otherValues.size(); k++){
 			if (var2patients[k]==true){
 				for (int i=0; i<allVariableNames.size(); i++){
-					if (otherValues.get(i)[1].equals(allVariableNames.get(i))){
+					if (otherValues.get(k)[1].equals(allVariableNames.get(i))){
 						//System.out.println(allVariableNames.get(i));
 						int c = matrix.get(allVariableNames.get(i));
 						matrix.put(allVariableNames.get(i), c+1);
@@ -136,6 +155,7 @@ public class ChartDisplayFisher {
 			}
 		}
 		
+		System.out.println("After");
 		for (String r : matrix.keySet()){
 			System.out.println(r + " : " + matrix.get(r));
 		}
@@ -150,8 +170,19 @@ public class ChartDisplayFisher {
 			expected.add((double) percentages[i] * alpha);
 		}
 		
+		System.out.println("Observed: " );
+		for (int h = 0; h< observed.size(); h++){
+			System.out.println(observed.get(h));
+		}
+		
+		System.out.println("Expected: ");
+		for (int h = 0; h< observed.size(); h++){
+			System.out.println(observed.get(h));
+		}
+		
+		
 		String[] toChart = new String[allVariableNames.size()];
-		for (int y =0; y<allVariableNames.size(); y++){
+		for (int y = allVariableNames.size()-1; y>=0; y--){
 			toChart[y] = allVariableNames.get(y);
 		}
 	

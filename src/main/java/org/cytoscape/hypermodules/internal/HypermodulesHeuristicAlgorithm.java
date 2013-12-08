@@ -175,7 +175,15 @@ public class HypermodulesHeuristicAlgorithm {
 		allGeneSamplesMap = new HashMap<String, String>();
 		
 		for (int i=0; i<sampleValues.size(); i++){
+			if (allGeneSamplesMap.get(sampleValues.get(i)[0])!=null){
+				String sti = allGeneSamplesMap.get(sampleValues.get(i)[0]);
+				sti = sti + ":" + sampleValues.get(i)[1];
+				allGeneSamplesMap.put(sampleValues.get(i)[0], sti);
+			}
+			else{
+			//System.out.println(sampleValues.get(i)[1]);
 			allGeneSamplesMap.put(sampleValues.get(i)[0], sampleValues.get(i)[1]);
+			}
 		}
 		
 		for (CyNode cynode : this.network.getNodeList()){
@@ -738,9 +746,21 @@ public class HypermodulesHeuristicAlgorithm {
 				}
 			}
 		}
+		int c = 0;
+		for (int i=0; i<otherValues.size(); i++){
+			if (otherValues.get(i)[1].equals(hashArray.get(0))){
+				c++;
+			}
+		}
 		
-		FishersExact fe = new FishersExact(matrix);
-		return fe.fisher2c();
+		if (clinicalVariableHash.size()==2){
+			org.cytoscape.hypermodules.internal.statistics.FishersExactTest fet = new org.cytoscape.hypermodules.internal.statistics.FishersExactTest(otherValues.size(), c, alpha, matrix[0][0]);
+			return fet.getResult();
+		}
+		else{
+			FishersExact fe = new FishersExact(matrix);
+			return fe.fisher2c();
+		}
 	}
 	
 	

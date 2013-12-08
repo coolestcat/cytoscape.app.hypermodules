@@ -41,7 +41,15 @@ public class ChartDisplay {
 		allGeneSamplesMap = new HashMap<String, String>();
 		
 		for (int i=0; i<sampleValues.size(); i++){
+			if (allGeneSamplesMap.get(sampleValues.get(i)[0])!=null){
+				String sti = allGeneSamplesMap.get(sampleValues.get(i)[0]);
+				sti = sti + ":" + sampleValues.get(i)[1];
+				allGeneSamplesMap.put(sampleValues.get(i)[0], sti);
+			}
+			else{
+			//System.out.println(sampleValues.get(i)[1]);
 			allGeneSamplesMap.put(sampleValues.get(i)[0], sampleValues.get(i)[1]);
+			}
 		}
 		
 		for (CyNode cynode : this.network.getNodeList()){

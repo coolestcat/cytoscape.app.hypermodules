@@ -1,13 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ClassPath: .,xchart-2.2.1.jar,trove-3.0.3.jar,colt-1.2.0.jar,Rs
- erveEngine-1.0.0.jar,REngine-1.0.0.jar,guava-12.0.jar
+ erveEngine-1.0.0.jar,REngine-1.0.0.jar,guava-12.0.jar,javastat-1.4.ja
+ r
 Built-By: user
 Tool: Bnd-1.15.0
 Bundle-Name: HyperModules
 Created-By: Apache Maven Bundle Plugin
 Build-Jdk: 1.7.0_09
 Bundle-Version: 3.0.2
-Bnd-LastModified: 1386528112673
+Bnd-LastModified: 1386537574724
 Bundle-ManifestVersion: 2
 Bundle-Activator: org.cytoscape.hypermodules.internal.CyActivator
 Bundle-SymbolicName: HyperModules
@@ -16,25 +17,27 @@ Import-Package: EDU.oswego.cs.dl.util.concurrent;resolution:=optional,
  nal,javax.imageio.metadata;resolution:=optional,javax.imageio.stream;
  resolution:=optional,javax.swing;resolution:=optional,javax.swing.bor
  der;resolution:=optional,javax.swing.event;resolution:=optional,javax
- .swing.filechooser;resolution:=optional,javax.swing.table;resolution:
- =optional,javax.swing.text;resolution:=optional,javax.swing.text.html
- ;resolution:=optional,org.cytoscape.application;resolution:=optional;
- version="[3.0,4)",org.cytoscape.application.swing;resolution:=optiona
- l;version="[3.0,4)",org.cytoscape.event;resolution:=optional;version=
- "[3.0,4)",org.cytoscape.model;resolution:=optional;version="[3.0,4)",
- org.cytoscape.model.events;resolution:=optional;version="[3.0,4)",org
- .cytoscape.model.subnetwork;resolution:=optional;version="[3.0,4)",or
- g.cytoscape.service.util;resolution:=optional;version="[3.0,4)",org.c
- ytoscape.session;resolution:=optional;version="[3.0,4)",org.cytoscape
- .util.swing;resolution:=optional;version="[3.0,4)",org.cytoscape.view
- .layout;resolution:=optional;version="[3.0,4)",org.cytoscape.view.mod
- el;resolution:=optional;version="[3.0,4)",org.cytoscape.view.presenta
- tion.property;resolution:=optional;version="[3.0,4)",org.cytoscape.vi
- ew.vizmap;resolution:=optional;version="[3.0,4)",org.cytoscape.view.v
- izmap.mappings;resolution:=optional;version="[3.0,4)",org.cytoscape.w
- ork;resolution:=optional;version="[3.0,4)",org.osgi.framework;resolut
- ion:=optional;version="[1.5,2)",org.w3c.dom;resolution:=optional,sun.
- misc;resolution:=optional
+ .swing.filechooser;resolution:=optional,javax.swing.plaf;resolution:=
+ optional,javax.swing.plaf.basic;resolution:=optional,javax.swing.tabl
+ e;resolution:=optional,javax.swing.text;resolution:=optional,javax.sw
+ ing.text.html;resolution:=optional,org.cytoscape.application;resoluti
+ on:=optional;version="[3.0,4)",org.cytoscape.application.swing;resolu
+ tion:=optional;version="[3.0,4)",org.cytoscape.event;resolution:=opti
+ onal;version="[3.0,4)",org.cytoscape.model;resolution:=optional;versi
+ on="[3.0,4)",org.cytoscape.model.events;resolution:=optional;version=
+ "[3.0,4)",org.cytoscape.model.subnetwork;resolution:=optional;version
+ ="[3.0,4)",org.cytoscape.service.util;resolution:=optional;version="[
+ 3.0,4)",org.cytoscape.session;resolution:=optional;version="[3.0,4)",
+ org.cytoscape.util.swing;resolution:=optional;version="[3.0,4)",org.c
+ ytoscape.view.layout;resolution:=optional;version="[3.0,4)",org.cytos
+ cape.view.model;resolution:=optional;version="[3.0,4)",org.cytoscape.
+ view.presentation.property;resolution:=optional;version="[3.0,4)",org
+ .cytoscape.view.presentation.property.values;resolution:=optional;ver
+ sion="[3.0,4)",org.cytoscape.view.vizmap;resolution:=optional;version
+ ="[3.0,4)",org.cytoscape.view.vizmap.mappings;resolution:=optional;ve
+ rsion="[3.0,4)",org.cytoscape.work;resolution:=optional;version="[3.0
+ ,4)",org.osgi.framework;resolution:=optional;version="[1.5,2)",org.w3
+ c.dom;resolution:=optional,sun.misc;resolution:=optional
 Embed-Dependency: xchart,trove,colt,RserveEngine,REngine,guava,javasta
- t;inline=true
+ t,jsc;inline=true
 

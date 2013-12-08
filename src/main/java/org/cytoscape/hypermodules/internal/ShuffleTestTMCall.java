@@ -64,10 +64,15 @@ public class ShuffleTestTMCall implements Callable<HashMap<String, Multimap<Stri
 				expands.add(seedExpand);
 			}
 			
+			tm.setTitle("Testing on Random Permutations");
+			
+			int l = 1;
 			for (int k=0; k<seedNames.size(); k++){
-				tm.setTitle("Running Algorithm on Seed: " + seedNames.get(k));
+				tm.setStatusMessage("Running Algorithm on Seed: " + seedNames.get(k));
 				Multimap<String, Double> oneResult = testSeed(ha, seedNames.get(k), expands.get(k));
 				rt.put(seedName, oneResult);
+				tm.setProgress(l/(double)seedNames.size());
+				l++;
 			}
 			
 			System.out.println("numberTests/4: " + ha.getNumberTests());

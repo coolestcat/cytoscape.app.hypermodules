@@ -15,6 +15,7 @@ import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.view.vizmap.VisualStyle;
 import org.cytoscape.view.vizmap.mappings.PassthroughMapping;
 import org.cytoscape.work.AbstractTask;
@@ -80,6 +81,10 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 		vs.addVisualMappingFunction(pMapping);
 		//vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
 		for (CyNode c : generated.getNodeList()){
+			if (generated.getRow(c).get(CyNetwork.NAME,  String.class).equals(sas[0])){
+				View<CyNode> v = myView.getNodeView(c);
+				v.setLockedValue(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.DIAMOND);
+			}
 			if (allSeeds.contains(generated.getRow(c).get(CyNetwork.NAME, String.class))){
 				View<CyNode> v = myView.getNodeView(c);
 				v.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.red);
