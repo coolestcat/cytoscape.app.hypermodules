@@ -122,6 +122,7 @@ public class CyActivator extends AbstractCyActivator {
 		
 		registerService(bc, openAboutFactory, TaskFactory.class, openAboutFactoryProps);
 		
+		/*
 		OpenVisualizeTaskFactory openVisualizeFactory = new OpenVisualizeTaskFactory(utils);
 		Properties openVisualizeProps = new Properties();
 		openVisualizeProps.setProperty("preferredMenu", "Apps.HyperModules");
@@ -129,6 +130,7 @@ public class CyActivator extends AbstractCyActivator {
 		openVisualizeProps.setProperty("menuGravity", "4.0");
 		
 		registerService(bc, openVisualizeFactory, TaskFactory.class, openVisualizeProps);
+		*/
 	}
 
 }

@@ -8,7 +8,7 @@ Bundle-Name: HyperModules
 Created-By: Apache Maven Bundle Plugin
 Build-Jdk: 1.7.0_09
 Bundle-Version: 3.0.2
-Bnd-LastModified: 1386545807365
+Bnd-LastModified: 1387059686232
 Bundle-ManifestVersion: 2
 Bundle-Activator: org.cytoscape.hypermodules.internal.CyActivator
 Bundle-SymbolicName: HyperModules

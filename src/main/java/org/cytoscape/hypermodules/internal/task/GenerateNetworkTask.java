@@ -95,14 +95,16 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 			}
 			else{
 				View<CyNode> v = myView.getNodeView(c);
-				v.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.orange);
+				v.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, Color.gray);
 			}
 		}
 		utils.vmmServiceRef.addVisualStyle(vs);
 		vs.apply(myView);
 		myView.updateView();
 		
-		CyLayoutAlgorithm layout = utils.cyLayoutManager.getLayout("attribute-circle");
+		//CyLayoutAlgorithm layout = utils.cyLayoutManager.getLayout("attribute-circle");
+
+		CyLayoutAlgorithm layout = utils.cyLayoutManager.getLayout("force-directed");
 		String layoutAttribute = null;
 		insertTasksAfterCurrentTask(layout.createTaskIterator(myView, layout.createLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, layoutAttribute));
 		

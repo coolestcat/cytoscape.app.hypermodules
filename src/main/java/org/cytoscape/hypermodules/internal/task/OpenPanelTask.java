@@ -47,13 +47,15 @@ public class OpenPanelTask implements Task{
 				MainPanel mainPanel = new MainPanel(swingApp, utils);
 				utils.serviceRegistrar.registerService(mainPanel, CytoPanelComponent.class, new Properties());
 				mainPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+				
+				//pop up on open?
+				CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.WEST);
+				int index = cytoPanel.indexOfComponent(mainPanel);
+				cytoPanel.setSelectedIndex(index);
+				
 			}
+
 			
-			/*
-			CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.WEST);
-			int index = cytoPanel.indexOfComponent(mainPanel);
-			cytoPanel.setSelectedIndex(index);
-			*/
 		}
 	}
 

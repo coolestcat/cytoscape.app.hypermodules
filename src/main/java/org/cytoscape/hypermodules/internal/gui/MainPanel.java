@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -54,7 +56,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
-public class MainPanel extends JPanel implements CytoPanelComponent, ActionListener{
+public class MainPanel extends JPanel implements CytoPanelComponent, ActionListener, MouseListener{
 	/**
 	 * cytoscape utilities
 	 */
@@ -175,7 +177,10 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	private JComboBox fpatients;
 	private JComboBox fvariable;
 	
-	private JButton sort;
+	private int state;
+	private ArrayList<String[]> newGeneTable;
+	private ArrayList<String[]> genes2samplesvaluescopy;
+	//private JButton sort;
 	
 	
 	/**
@@ -190,6 +195,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		this.clinicalValues = null;
 		makeComponents();		
 		makeLayout();
+		state = 0;
 	}
 	
 
@@ -299,11 +305,11 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		//headers.setSelected(true);
 		headers.addActionListener(this);
 		
-		sort = new JButton("sort");
-		sort.addActionListener(this);
+		//sort = new JButton("sort");
+		//sort.addActionListener(this);
 		buttonheader.add(loadSamples);
 		buttonheader.add(headers);
-		buttonheader.add(sort);
+		//buttonheader.add(sort);
 
 		samplePanel.add(buttonheader);
 		loadSamplePanel = new CollapsiblePanel("Samples");
@@ -367,7 +373,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		lrvitalstatus.setPreferredSize(new Dimension(150, 23));
 		lrvitalstatus.setMaximumSize(new Dimension(150, 23));
 		
-		JLabel lrdflabel = new JLabel("days followup: ");
+		JLabel lrdflabel = new JLabel("followup times: ");
 		//clinicalPanel.add(lrdflabel, BorderLayout.WEST);
 		lrdaysfollowup = new JComboBox();
 		//clinicalPanel.add(lrdaysfollowup, BorderLayout.EAST);
@@ -410,7 +416,22 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		runPanel.add(run);
 	}
 	
+	/*
+	resultsTable.getTableHeader().addMouseListener(new MouseAdapter() {
+	    @Override
+	    public void mouseClicked(MouseEvent e) {
+	        int col = resultsTable.columnAtPoint(e.getPoint());
+	        String name = resultsTable.getColumnName(col);
+	        System.out.println(col);
+	        sortTable(col, addToTable);
+	    }
+	});
+	*/
+	
 	public void resetSamplePanel(JTable table){
+		if (allGeneSamples!=null){
+			allGeneSamples.getTableHeader().addMouseListener(this);
+		}
 		sampleScrollPane.setViewportView(table);
 	}
 	
@@ -483,7 +504,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		 this.genes2samplesvalues = newgenesamples;
 	}
 	
-	public void setClinicalPanelLogRank(Boolean header){
+	public void setClinicalPanelLogRank(Boolean header, int flag){
 		
 		clinicalPanel = new JPanel();
 		clinicalPanel.setLayout(new BoxLayout(clinicalPanel, BoxLayout.Y_AXIS));
@@ -531,7 +552,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		lrvitalstatus.setPreferredSize(new Dimension(150, 23));
 		lrvitalstatus.setMaximumSize(new Dimension(150, 23));
 		
-		JLabel lrdflabel = new JLabel("days followup: ");
+		JLabel lrdflabel = new JLabel("followup times: ");
 		//clinicalPanel.add(lrdflabel, BorderLayout.WEST);
 		lrdaysfollowup = new JComboBox();
 
@@ -550,7 +571,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		clinicalPanel.add(dropdowns);
 
-		
+		if (flag==1){
 		for (String h : columnIndices.keySet()){
 			System.out.println(h);
 			lrpatients.addItem(h);
@@ -569,6 +590,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				lrdaysfollowup.setSelectedItem(h);
 			}
 		}
+		}
 		
 		loadClinicalPanel = new CollapsiblePanel("Clinical Data");
 		clinicalScrollPane = new JScrollPane();
@@ -583,6 +605,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		clinicalPanelScrollPane.setViewportView(clinicalPanel);
 		
+		
+		if (flag==1){
 		int col1 = columnIndices.get(lrpatients.getSelectedItem());
 		int col2 = columnIndices.get(lrvitalstatus.getSelectedItem());
 		int col3 = columnIndices.get(lrdaysfollowup.getSelectedItem());
@@ -591,10 +615,11 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		lrpatients.addActionListener(this);
 		lrvitalstatus.addActionListener(this);
 		lrdaysfollowup.addActionListener(this);
+		}
 
 	}
 	
-	public void setClinicalPanelFisher(Boolean header){
+	public void setClinicalPanelFisher(Boolean header, int flag){
 
 		clinicalPanel = new JPanel();
 		clinicalPanel.setLayout(new BoxLayout(clinicalPanel, BoxLayout.Y_AXIS));
@@ -643,7 +668,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		clinicalPanel.add(drops);
 		
-
+		
+		if (flag==1){
 		for (String h : columnIndices.keySet()){
 			fpatients.addItem(h);
 			fvariable.addItem(h);
@@ -656,6 +682,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			if (columnIndices.get(h)==1){
 				fvariable.setSelectedItem(h);
 			}
+		}
 		}
 		
 		loadClinicalPanel = new CollapsiblePanel("Clinical Data");
@@ -671,12 +698,14 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		clinicalPanelScrollPane.setViewportView(clinicalPanel);
 		
+		if (flag==1){
 		int col1 = columnIndices.get(fpatients.getSelectedItem());
 		int col2 = columnIndices.get(fvariable.getSelectedItem());
 		setfishertable(col1, col2);
 		
 		fpatients.addActionListener(this);
 		fvariable.addActionListener(this);
+		}
 		
 	}
 
@@ -707,7 +736,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			clinicalValues.add(add);
 		}
 		
-		String[] h = {"Patient ID", "Vital", "Days Followup"};
+		String[] h = {"Patient ID", "Vital", "Followup Times"};
 		MyModel nm = new MyModel(h);
 		nm.AddCSVData(clinicalValues);
 		clinicalTable = new JTable();
@@ -732,14 +761,25 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		}
 		
 		if (ae.getSource() == logRank){
-			if (allClinicalData!=null){
-				setClinicalPanelLogRank(clinicalheaders.isSelected());
+			if (allClinicalData!=null && allClinicalData.get(0).length>=3){
+				setClinicalPanelLogRank(clinicalheaders.isSelected(), 1);
+			}
+			else if (allClinicalData!=null && allClinicalData.get(0).length < 3){
+				//TODO: JDialog popup
+				System.out.println("Not enough columns for log rank!");
+				fisher.setSelected(true);
+			}
+			else{
+				setClinicalPanelLogRank(clinicalheaders.isSelected(), 0);
 			}
 		}
 		
 		if (ae.getSource() == fisher){
 			if (allClinicalData!=null){
-				setClinicalPanelFisher(clinicalheaders.isSelected());
+				setClinicalPanelFisher(clinicalheaders.isSelected(), 1);
+			}
+			else{
+				setClinicalPanelFisher(clinicalheaders.isSelected(), 0);
 			}
 		}
 		
@@ -881,7 +921,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 							
 							columnIndices = new HashMap<String, Integer>();
 							for (int u=0; u<allClinicalData.get(0).length; u++){
-								columnIndices.put("Column " + u, u);
+								columnIndices.put("Column " + (u+1), u);
 							}
 							
 							for (String s : columnIndices.keySet()){
@@ -920,7 +960,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 							
 							columnIndices = new HashMap<String, Integer>();
 							for (int u = 0; u<allClinicalData.get(0).length; u++){
-								columnIndices.put("Column " + u, u);
+								columnIndices.put("Column " + (u+1), u);
 							}
 							
 							for (String s : columnIndices.keySet()){
@@ -956,6 +996,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			allClinicalData = Rd.ReadCSVfile(DataFile);
 			columnIndices = new HashMap<String, Integer>();
 			if (allClinicalData.get(0).length<3 && logRank.isSelected()){
+				//TODO: JDialog popup
 				System.out.println("Not enough columns!");
 				return;
 			}
@@ -968,15 +1009,15 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			}
 			else{
 				for (int y = 0; y<allClinicalData.get(0).length; y++){
-					columnIndices.put("Column " + y, y);
+					columnIndices.put("Column " + (y+1), y);
 				}
 			}
 			
 			if (logRank.isSelected()){
-				setClinicalPanelLogRank(clinicalheaders.isSelected());
+				setClinicalPanelLogRank(clinicalheaders.isSelected(), 1);
 			}
 			else if (fisher.isSelected()){
-				setClinicalPanelFisher(clinicalheaders.isSelected());
+				setClinicalPanelFisher(clinicalheaders.isSelected(), 1);
 			}
 			loadClinicalPanel.setCollapsed(false);
 		}
@@ -1012,6 +1053,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	}
         	*/
         	
+        	
+        	
         	 NewModel.AddCSVData(genes2samplesvalues);
         	 allGeneSamples = new JTable();
         	 allGeneSamples.setModel(NewModel);
@@ -1019,7 +1062,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	 loadSamplePanel.setCollapsed(false);
         	 //otherValues = new ArrayList<String[]>();
 		}
-		
+		/*
 		if (ae.getSource()==sort){
 			if (genes2samplesvalues!=null){
 				Multimap<String, String> reference = ArrayListMultimap.create();
@@ -1062,7 +1105,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			}
 			
 		}
-		
+		*/
 		if (ae.getSource() == run){
 
 			String shuffleNumber = nShuffled.getText();
@@ -1092,28 +1135,39 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				}
 				
 				CyNetwork currNet = netSelect.getSelectedNetwork();
-				handleSampleValues();
-			if (stat.equals("logRank") && genes2samplesvalues!=null && clinicalValues!=null){
+				
+				
+				
+				if (genes2samplesvalues!=null){
+					genes2samplesvaluescopy = new ArrayList<String[]>();
+					for (int i=0; i<genes2samplesvalues.size(); i++){
+						genes2samplesvaluescopy.add(genes2samplesvalues.get(i));
+					}
+					handleSampleValues(genes2samplesvaluescopy);
+				}
+				
+			if (stat.equals("logRank") && genes2samplesvaluescopy!=null && clinicalValues!=null){
 				if (handleSurvivalExceptions()){
-					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, genes2samplesvalues, clinicalValues, otherValues, utils)));
+					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
 				}
 			}
-			else if (stat.equals("fisher") && genes2samplesvalues!=null && otherValues!=null){
+			else if (stat.equals("fisher") && genes2samplesvaluescopy!=null && otherValues!=null){
 				if (handleClinicalVariableExceptions()){
-					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, genes2samplesvalues, clinicalValues, otherValues, utils)));
+					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
 				}
 			}
 			else{
+				//popup JDialog
 				System.out.println("Load Table!");
 			}
 		}
 	}
 	
-	public void handleSampleValues(){
-		for (int i=0; i<genes2samplesvalues.size(); i++){
-			if (genes2samplesvalues.get(i)[1]!=null){
-				if (genes2samplesvalues.get(i)[1].equals(" "))
-				genes2samplesvalues.get(i)[1] = "no_sample";
+	public void handleSampleValues(ArrayList<String[]> samples){
+		for (int i=0; i<samples.size(); i++){
+			if (samples.get(i)[1]!=null){
+				if (samples.get(i)[1].equals(" "))
+				samples.get(i)[1] = "no_sample";
 			}
 		}
 		
@@ -1147,7 +1201,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			}
 		}
 		if (valid == false){
-			System.out.println("INPUT ERROR: All days followup entries must be a number");
+			System.out.println("INPUT ERROR: All followup times entries must be a number");
 		}
 		return valid;
 	}
@@ -1255,5 +1309,129 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	      {
 	          return data.get(row)[col];
 	      } 
+	}
+
+
+
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+
+	    int col = allGeneSamples.columnAtPoint(arg0.getPoint());
+	    
+	    if (genes2samplesvalues!=null && col==0 && state ==2 ){
+			MyModel NewModel = null;
+        	if (headers.isSelected()){
+        		NewModel = new MyModel(header);
+        	}
+        	else{
+        		String[] c = { "genes", "samples"};
+        		NewModel = new MyModel(c);
+        	}
+        	
+        	 NewModel.AddCSVData(genes2samplesvalues);
+        	 allGeneSamples = new JTable();
+        	 allGeneSamples.setModel(NewModel);
+        	 resetSamplePanel(allGeneSamples);
+        	 
+        	 state = 0;
+	    }
+	    
+	    
+	    if (genes2samplesvalues!=null && col==0 && state ==1 ){
+	    	ArrayList<String[]> newGeneTableReversed = new ArrayList<String[]>();
+	    	for (int i= newGeneTable.size()-1; i>=0; i--){
+	    		newGeneTableReversed.add(newGeneTable.get(i));
+	    	}
+	    	
+			MyModel NewModel = null;
+        	if (headers.isSelected()){
+        		NewModel = new MyModel(header);
+        	}
+        	else{
+        		String[] c = { "genes", "samples"};
+        		NewModel = new MyModel(c);
+        	}
+        	
+        	 NewModel.AddCSVData(newGeneTableReversed);
+        	 allGeneSamples = new JTable();
+        	 allGeneSamples.setModel(NewModel);
+        	 resetSamplePanel(allGeneSamples);
+        	 
+        	 state = 2;
+	    	
+	    }
+	    
+		if (genes2samplesvalues!=null && col==0 && state ==0){
+			Multimap<String, String> reference = ArrayListMultimap.create();
+			for (int i=0; i<genes2samplesvalues.size(); i++){
+				reference.put(genes2samplesvalues.get(i)[0], genes2samplesvalues.get(i)[1]);
+			}
+			
+			ArrayList<String> keys = new ArrayList<String>();
+			for (int i=0; i<genes2samplesvalues.size(); i++){
+				keys.add(genes2samplesvalues.get(i)[0]);
+			}
+			
+			Collections.sort(keys);
+			
+			newGeneTable = new ArrayList<String[]>();
+			for (int i=0; i<keys.size(); i++){
+				for (String value : reference.get(keys.get(i))){
+					String[] entry = new String[2];
+					entry[0] = keys.get(i);
+					entry[1] = value;
+					newGeneTable.add(entry);
+				}
+			}
+			
+			
+			MyModel NewModel = null;
+        	if (headers.isSelected()){
+        		NewModel = new MyModel(header);
+        	}
+        	else{
+        		String[] c = { "genes", "samples"};
+        		NewModel = new MyModel(c);
+        	}
+        	
+        	 NewModel.AddCSVData(newGeneTable);
+        	 allGeneSamples = new JTable();
+        	 allGeneSamples.setModel(NewModel);
+        	 resetSamplePanel(allGeneSamples);
+        	 
+        	 state = 1;
+			
+		}
+		
+		
+	}
+
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
