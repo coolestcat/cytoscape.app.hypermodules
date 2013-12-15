@@ -747,6 +747,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	
 	@Override
 	public void actionPerformed(ActionEvent ae) {
+		
 		if (ae.getSource() == lrpatients || ae.getSource() == lrvitalstatus || ae.getSource() == lrdaysfollowup){
 			int col1 = columnIndices.get(lrpatients.getSelectedItem());
 			int col2 = columnIndices.get(lrvitalstatus.getSelectedItem());
@@ -765,7 +766,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				setClinicalPanelLogRank(clinicalheaders.isSelected(), 1);
 			}
 			else if (allClinicalData!=null && allClinicalData.get(0).length < 3){
-				//TODO: JDialog popup
+				ErrorDialog ed = new ErrorDialog(utils, "There are not enough columns in the CSV for log rank test.");
+				ed.setLocationRelativeTo(null);
+				ed.setVisible(true);
 				System.out.println("Not enough columns for log rank!");
 				fisher.setSelected(true);
 			}
@@ -996,7 +999,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			allClinicalData = Rd.ReadCSVfile(DataFile);
 			columnIndices = new HashMap<String, Integer>();
 			if (allClinicalData.get(0).length<3 && logRank.isSelected()){
-				//TODO: JDialog popup
+				ErrorDialog ed = new ErrorDialog(utils, "There are not enough columns in the CSV for log rank test.");
+				ed.setLocationRelativeTo(null);
+				ed.setVisible(true);
 				System.out.println("Not enough columns!");
 				return;
 			}
@@ -1157,7 +1162,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				}
 			}
 			else{
-				//popup JDialog
+				ErrorDialog ed = new ErrorDialog(utils, "Load mutation table AND clinical table before running the algorithm.");
+				ed.setLocationRelativeTo(null);
+				ed.setVisible(true);
 				System.out.println("Load Table!");
 			}
 		}
@@ -1186,6 +1193,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			
 			//System.out.println(clinicalValues.get(i)[1]);
 			if (vitals.size() > 2){
+				ErrorDialog ed = new ErrorDialog(utils, "INPUT ERROR: Vital Status must be either DECEASED or ALIVE");
+				ed.setLocationRelativeTo(null);
+				ed.setVisible(true);
 				System.out.println("INPUT ERROR: Vital Status must be either DECEASED or ALIVE");
 				return false;
 			}
@@ -1201,6 +1211,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			}
 		}
 		if (valid == false){
+			ErrorDialog ed = new ErrorDialog(utils, "INPUT ERROR: All followup times entries must be a number");
+			ed.setLocationRelativeTo(null);
+			ed.setVisible(true);
 			System.out.println("INPUT ERROR: All followup times entries must be a number");
 		}
 		return valid;
@@ -1221,6 +1234,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			}
 
 			if (variables.size() > 5){
+				ErrorDialog ed = new ErrorDialog(utils, "INPUT ERROR: Please pick a clinical variable with fewer categories");
+				ed.setLocationRelativeTo(null);
+				ed.setVisible(true);
 				System.out.println("INPUT ERROR: Please pick a clinical variable with fewer categories");
 				return false;
 			}

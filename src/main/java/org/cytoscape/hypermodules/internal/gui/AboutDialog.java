@@ -107,9 +107,6 @@ public class AboutDialog extends JDialog {
 		return buttonPanel;
 	}
 	
-	
-	
-	
 	private class HyperlinkAction implements HyperlinkListener {
 		@Override
 		public void hyperlinkUpdate(HyperlinkEvent event) {

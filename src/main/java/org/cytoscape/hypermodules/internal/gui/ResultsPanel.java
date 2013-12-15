@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,6 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 
 /**
  * 
@@ -53,7 +55,7 @@ import javax.swing.table.AbstractTableModel;
  * @author alvinleung
  *
  */
-public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionListener {
+public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionListener, MouseListener {
 	
 	/**
 	 * all results from AlgorithmTask.
@@ -120,8 +122,6 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	private ArrayList<String[]> otherValues;
 	
 	private ArrayList<String[]> addToTable;
-	
-	private ArrayList<String[]> newTableAdd;
 
 	private double pValueCutoff;
 	
@@ -130,6 +130,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	private JButton chart;
 	
 	private double selectedP;
+	
+	private JTableHeader tableHeader;
 	/**
 	 * constructor
 	 * @param parameters
@@ -188,6 +190,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 
 	}
 	
+	public void sortTable(int colNumber){
+		
+		
+		
+		
+		
+	}
+	
 	
 	public void setUpTableFisher(){
 		String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value"};
@@ -223,26 +233,13 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				}
 			}
 		}
+		
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
-		final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
+		//final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
 
-		resultsTable.addMouseListener(new MouseAdapter() {
-			  public void mouseClicked(MouseEvent e) {
-			      JTable target = (JTable)e.getSource();
-			      int row = target.getSelectedRow();
-			      sas = new String[2];
-			      sas[0] = addToTable.get(row)[0];
-			      sas[1] = addToTable.get(row)[1];
-			      selectedP = Double.valueOf(addToTable.get(row)[2]);
-			      if (e.getClickCount() == 2) {
-			    	  if (!addToTable.get(row)[1].equals("none")){
-			    	  cd.display(addToTable.get(row)[1]);
-			      }
-			    }
-			  }
-			});
+		resultsTable.addMouseListener(this);
 		viewer = new JScrollPane(resultsTable);
 	}
 	
@@ -290,25 +287,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
-		final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-
-		resultsTable.addMouseListener(new MouseAdapter() {
-			  public void mouseClicked(MouseEvent e) {
-				JTable target = (JTable)e.getSource();
-				int row = target.getSelectedRow();
-			    sas = new String[2];
-			    sas[0] = addToTable.get(row)[0];
-			    sas[1] = addToTable.get(row)[1];
-			    selectedP = Double.valueOf(addToTable.get(row)[2]);
-			    if (e.getClickCount() == 2) {
-			      //JTable target = (JTable)e.getSource();
-			      //int row = target.getSelectedRow();
-			      if (!addToTable.get(row)[1].equals("none")){
-			    	  cd.display(addToTable.get(row)[1]);
-			      }
-			    }
-			  }
-			});
+		//final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
+		resultsTable.addMouseListener(this);
 		viewer.setViewportView(resultsTable);
 		/*
 		resultsTable.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -371,8 +351,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
-		final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-
+		//final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
+		resultsTable.addMouseListener(this);
+		/*
 		resultsTable.addMouseListener(new MouseAdapter() {
 			  public void mouseClicked(MouseEvent e) {
 			      JTable target = (JTable)e.getSource();
@@ -388,6 +369,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			    }
 			  }
 			});
+		*/
 		viewer = new JScrollPane(resultsTable);
 		//viewer.setViewportView(resultsTable);
 		
@@ -405,71 +387,6 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		*/
 
 	}
-
-	public void sortTable(int col, ArrayList<String[]> addToTable){
-		String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "Classification"};
-		Model tab = new Model(c);
-		newTableAdd = new ArrayList<String[]>();
-		ArrayList<Double> toSort = new ArrayList<Double>();
-		if (col==2){
-			Multimap<Double, String[]> mds = ArrayListMultimap.create();
-			for (int i=0; i<addToTable.size(); i++){
-				String[] otherThings = new String[4];
-				otherThings[0] = addToTable.get(i)[0];
-				otherThings[1] = addToTable.get(i)[1];
-				otherThings[2] = addToTable.get(i)[3];
-				otherThings[3] = addToTable.get(i)[4];
-				if (addToTable.get(i)[2]!=null){
-					mds.put(Double.valueOf(addToTable.get(i)[2]), otherThings);
-					toSort.add(Double.valueOf(addToTable.get(i)[2]));
-				}
-			}
-			
-			Collections.sort(toSort);
-			
-			for (int i=0; i<toSort.size(); i++){
-				for (String[] s : mds.get(toSort.get(i))){
-					String[] toAdd = new String[5];
-					toAdd[0] = s[0];
-					toAdd[1] = s[1];
-					toAdd[2] = String.valueOf(toSort.get(i));
-					toAdd[3] = s[2];
-					toAdd[4] = s[3];
-					newTableAdd.add(toAdd);
-				}
-			}
-			tab.AddCSVData(newTableAdd);
-			resultsTable = new JTable();
-			resultsTable.setModel(tab);
-			final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-			
-			resultsTable.addMouseListener(new MouseAdapter() {
-				  public void mouseClicked(MouseEvent e) {
-				      JTable target = (JTable)e.getSource();
-				      int row = target.getSelectedRow();
-				      sas = new String[2];
-				      sas[0] = newTableAdd.get(row)[0];
-				      sas[1] = newTableAdd.get(row)[1];
-				      selectedP = Double.valueOf(newTableAdd.get(row)[2]);
-				    if (e.getClickCount() == 2) {
-				      if (!newTableAdd.get(row)[1].equals("none")){
-				    	  cd.display(newTableAdd.get(row)[1]);
-				      }
-				    }
-				  }
-				});
-			viewer.setViewportView(resultsTable);
-
-		}
-		else if (col==3){
-			System.out.println("3");
-		}
-		else if (col==4){
-			System.out.println("4");
-		}
-	}
-	
-	
 	
 	
 	/**
@@ -819,25 +736,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
-		final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
+		//final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
 
-		resultsTable.addMouseListener(new MouseAdapter() {
-			  public void mouseClicked(MouseEvent e) {
-				JTable target = (JTable)e.getSource();
-				int row = target.getSelectedRow();
-			    sas = new String[2];
-			    sas[0] = addToTable.get(row)[0];
-			    sas[1] = addToTable.get(row)[1];
-			    selectedP = Double.valueOf(addToTable.get(row)[2]);
-			    if (e.getClickCount() == 2) {
-			      //JTable target = (JTable)e.getSource();
-			      //int row = target.getSelectedRow();
-			      if (!addToTable.get(row)[1].equals("none")){
-			    	  cd.display(addToTable.get(row)[1]);
-			      }
-			    }
-			  }
-			});
+		resultsTable.addMouseListener(this);
 		viewer.setViewportView(resultsTable);
 	}
 	
@@ -853,12 +754,38 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			//exportCorrelatedNetworks();
 			exportMostCorrelated();
 		}
-		
+		/*
+		resultsTable.addMouseListener(new MouseAdapter() {
+			  public void mouseClicked(MouseEvent e) {
+			      JTable target = (JTable)e.getSource();
+			      int row = target.getSelectedRow();
+			      sas = new String[2];
+			      sas[0] = addToTable.get(row)[0];
+			      sas[1] = addToTable.get(row)[1];
+			      selectedP = Double.valueOf(addToTable.get(row)[2]);
+			      if (e.getClickCount() == 2) {
+			    	  if (!addToTable.get(row)[1].equals("none")){
+			    	  cd.display(addToTable.get(row)[1]);
+			      }
+			    }
+			  }
+			});
+		*/
 		if (ae.getSource()==generate){
-			if (!sas[0].equals("none")){
+			int row = resultsTable.getSelectedRow();
+			if (row >= 0){
+			sas = new String[2];
+			sas[0] = addToTable.get(row)[0];
+			sas[1] = addToTable.get(row)[1];
+			selectedP = Double.valueOf(addToTable.get(row)[2]);
+			if (sas[1]!="none"){
 				this.utils.taskMgr.execute(new TaskIterator(new GenerateNetworkTask(sas, this.network, utils, sampleValues)));
 			}
+			}
 			else{
+				ErrorDialog ed = new ErrorDialog(utils, "Please select one valid network to visualize.");
+				ed.setLocationRelativeTo(null);
+				ed.setVisible(true);
 				System.out.println("Please select a valid network to visualize.");
 			}
 			
@@ -869,13 +796,29 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		}
 		
 		if (ae.getSource()==chart){
-			if (parameters.get("stat").equals("logRank")){
-				ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-				cd.display(sas[1]);
+			int row = resultsTable.getSelectedRow();
+			if (row >= 0 ){
+				sas = new String[2];
+				sas[0] = addToTable.get(row)[0];
+				sas[1] = addToTable.get(row)[1];
+				selectedP = Double.valueOf(addToTable.get(row)[2]);
+				if (sas[1]!="none"){
+				if (parameters.get("stat").equals("logRank")){
+					ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
+					cd.display(sas[1]);
+				}
+				else{ //fisher
+					ChartDisplayFisher cdf = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
+					cdf.display(sas[1]);
+				}
+				}
 			}
-			else{ //fisher
-				ChartDisplayFisher cdf = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
-				cdf.display(sas[1]);
+			else{
+				ErrorDialog ed = new ErrorDialog(utils, "Please select one valid entry to display the chart for.");
+				ed.setLocationRelativeTo(null);
+				ed.setVisible(true);
+				System.out.println("Please select one valid entry to display the chart for.");
+				
 			}
 		}
 		
@@ -938,5 +881,37 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				return data.get(row)[col];
 			}
 	  }
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (e.getSource()==tableHeader){
+			int colNumber = resultsTable.columnAtPoint(e.getPoint());
+			sortTable(colNumber);
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
