@@ -196,11 +196,25 @@ public class ChartDisplayFisher {
 			toChart[y] = allVariableNames.get(y);
 		}
 		
-		Chart chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - PValue: " + selectedP).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
+		Chart chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - Genes: " + s + " - PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
 		chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(toChart)), observed);
 		chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(toChart)), expected);
 
 		new SwingWrapper(chart, 0.0).displayFisherChart();
+	}
+	
+	
+	public static double roundToSignificantFigures(double num, int n) {
+	    if(num == 0) {
+	        return 0;
+	    }
+
+	    final double d = Math.ceil(Math.log10(num < 0 ? -num: num));
+	    final int power = n - (int) d;
+
+	    final double magnitude = Math.pow(10, power);
+	    final long shifted = Math.round(num*magnitude);
+	    return shifted/magnitude;
 	}
 	
 }

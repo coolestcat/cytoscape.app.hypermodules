@@ -55,6 +55,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 
 public class MainPanel extends JPanel implements CytoPanelComponent, ActionListener, MouseListener{
 	/**
@@ -182,6 +183,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	private ArrayList<String[]> genes2samplesvaluescopy;
 	//private JButton sort;
 	
+	private JTableHeader mutationHeader;
+	private JTableHeader variableHeader;
 	
 	/**
 	 * constructor
@@ -411,7 +414,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		mainPanel.add(clinicalPanelScrollPane);
 		
 		runPanel = new JPanel();
-		run = new JButton("Run Algorithm");
+		run = new JButton("Run HyperModules");
 		run.addActionListener(this);
 		runPanel.add(run);
 	}
@@ -430,7 +433,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	
 	public void resetSamplePanel(JTable table){
 		if (allGeneSamples!=null){
-			allGeneSamples.getTableHeader().addMouseListener(this);
+			mutationHeader = allGeneSamples.getTableHeader();
+			mutationHeader.addMouseListener(this);
 		}
 		sampleScrollPane.setViewportView(table);
 	}
@@ -723,6 +727,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		nm.AddCSVData(otherValues);
 		clinicalTable = new JTable();
 		clinicalTable.setModel(nm);
+		variableHeader = clinicalTable.getTableHeader();
+		variableHeader.addMouseListener(this);
 		clinicalScrollPane.setViewportView(clinicalTable);	
 	}
 	
@@ -741,6 +747,8 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		nm.AddCSVData(clinicalValues);
 		clinicalTable = new JTable();
 		clinicalTable.setModel(nm);
+		variableHeader = clinicalTable.getTableHeader();
+		variableHeader.addMouseListener(this);
 		clinicalScrollPane.setViewportView(clinicalTable);
 	}
 	
@@ -1328,12 +1336,209 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	}
 
 
-
+	public void sortClinicalTable(int col){
+		ArrayList<String[]> newTable = new ArrayList<String[]>();
+		if (logRank.isSelected()){
+			String[] h = {"Patient ID", "Vital", "Followup Times"};
+			MyModel nm = new MyModel(h);
+			if (col == 2){
+				Multimap<Double, String[]> mds = ArrayListMultimap.create();
+				ArrayList<Double> ad = new ArrayList<Double>();
+				HashSet<Double> gg = new HashSet<Double>();
+				for (int i=0; i<clinicalValues.size(); i++){
+					gg.add(Double.valueOf(clinicalValues.get(i)[2]));
+					String[] entry = new String[2];
+					entry[0] = clinicalValues.get(i)[0];
+					entry[1] = clinicalValues.get(i)[1];
+					mds.put(Double.valueOf(clinicalValues.get(i)[2]), entry);
+				}
+				
+				for (Double d : gg){
+					ad.add(d);
+				}
+				
+				Collections.sort(ad);
+				
+				for (int i=0; i<ad.size(); i++){
+					for (String[] sd : mds.get(ad.get(i))){
+						String[] newEntry = new String[3];
+						newEntry[0] = sd[0];
+						newEntry[1] = sd[1];
+						newEntry[2] = String.valueOf(ad.get(i));
+						newTable.add(newEntry);
+					}
+				}
+				
+			}
+			else{
+				Multimap<String, String[]> mds = ArrayListMultimap.create();
+				ArrayList<String> ad = new ArrayList<String>();
+				HashSet<String> gg = new HashSet<String>();
+				for (int i=0; i<clinicalValues.size(); i++){
+					if (col == 0){
+						gg.add(clinicalValues.get(i)[0]);
+						String[] entry = new String[2];
+						entry[0] = clinicalValues.get(i)[1];
+						entry[1] = clinicalValues.get(i)[2];
+						mds.put(clinicalValues.get(i)[0], entry);
+					}
+					else if (col == 1){
+						gg.add(clinicalValues.get(i)[1]);
+						String[] entry = new String[2];
+						entry[0] = clinicalValues.get(i)[0];
+						entry[1] = clinicalValues.get(i)[2];
+						mds.put(clinicalValues.get(i)[1], entry);
+					}
+				}
+				
+				for (String s : gg){
+					ad.add(s);
+				}
+				
+				Collections.sort(ad);
+				
+				for (int i=0; i<ad.size(); i++){
+					for (String[] sd : mds.get(ad.get(i))){
+						String[] newEntry = new String[3];
+						if (col == 0){
+							newEntry[0] = ad.get(i);
+							newEntry[1] = sd[0];
+							newEntry[2] = sd[1];
+						}
+						else if (col == 1){
+							newEntry[0] = sd[0];
+							newEntry[1] = ad.get(i);
+							newEntry[2] = sd[1];
+						}
+						newTable.add(newEntry);
+					}
+				}
+				
+			}
+			
+			clinicalValues = newTable;
+			nm.AddCSVData(clinicalValues);
+			clinicalTable = new JTable();
+			clinicalTable.setModel(nm);
+			variableHeader = clinicalTable.getTableHeader();
+			variableHeader.addMouseListener(this);
+			clinicalScrollPane.setViewportView(clinicalTable);
+			
+			
+		}
+		else{
+			String[] h = {"Patient ID", "Clinical Variable"};
+			MyModel nm = new MyModel(h);
+			Multimap<String, String> mss = ArrayListMultimap.create();
+			ArrayList<String> ad = new ArrayList<String>();
+			HashSet<String> gg = new HashSet<String>();
+			
+			for (int i=0; i<otherValues.size(); i++){
+				if (col == 0) {
+					gg.add(otherValues.get(i)[0]);
+					mss.put(otherValues.get(i)[0], otherValues.get(i)[1]);
+				}
+				else if (col == 1){
+					gg.add(otherValues.get(i)[1]);
+					mss.put(otherValues.get(i)[1], otherValues.get(i)[0]);
+				}
+			}
+			
+			for (String s : gg){
+				ad.add(s);
+			}
+			
+			Collections.sort(ad);
+			
+			for (int i=0; i<ad.size(); i++){
+				for (String sd : mss.get(ad.get(i))){
+					String[] newEntry = new String[2];
+					if (col == 0){
+						newEntry[0] = ad.get(i);
+						newEntry[1] = sd;
+					}
+					if (col == 1){
+						newEntry[0] = sd;
+						newEntry[1] = ad.get(i);
+					}
+					newTable.add(newEntry);
+				}
+			}
+			
+			otherValues = newTable;
+			
+			
+			nm.AddCSVData(otherValues);
+			clinicalTable = new JTable();
+			clinicalTable.setModel(nm);
+			variableHeader = clinicalTable.getTableHeader();
+			variableHeader.addMouseListener(this);
+			clinicalScrollPane.setViewportView(clinicalTable);	
+		}
+	}
+	
+	
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-
+		if (arg0.getSource()==variableHeader){
+			if (allClinicalData!=null){
+				int col = clinicalTable.columnAtPoint(arg0.getPoint());
+				sortClinicalTable(col);
+			}
+		}
+		
+		if (arg0.getSource()==mutationHeader){
 	    int col = allGeneSamples.columnAtPoint(arg0.getPoint());
+	    
+	    
+	    if (genes2samplesvalues!=null && col==1){
+			Multimap<String, String> reference = ArrayListMultimap.create();
+			for (int i=0; i<genes2samplesvalues.size(); i++){
+				reference.put(genes2samplesvalues.get(i)[1], genes2samplesvalues.get(i)[0]);
+			}
+	    	
+			ArrayList<String> keys = new ArrayList<String>();
+			HashSet<String> gg = new HashSet<String>();
+			
+			for (int i=0; i<genes2samplesvalues.size(); i++){
+				gg.add(genes2samplesvalues.get(i)[1]);
+			}
+			
+			for (String s : gg){
+				keys.add(s);
+			}
+			
+			Collections.sort(keys);
+			
+			newGeneTable = new ArrayList<String[]>();
+			for (int i=0; i<keys.size(); i++){
+				for (String value : reference.get(keys.get(i))){
+					String[] entry = new String[2];
+					entry[1] = keys.get(i);
+					entry[0] = value;
+					newGeneTable.add(entry);
+				}
+			}
+			
+			
+			MyModel NewModel = null;
+        	if (headers.isSelected()){
+        		NewModel = new MyModel(header);
+        	}
+        	else{
+        		String[] c = { "genes", "samples"};
+        		NewModel = new MyModel(c);
+        	}
+        	
+        	 NewModel.AddCSVData(newGeneTable);
+        	 allGeneSamples = new JTable();
+        	 allGeneSamples.setModel(NewModel);
+        	 resetSamplePanel(allGeneSamples);
+	    	
+	    	state = 0;
+	    }
+	    
 	    
 	    if (genes2samplesvalues!=null && col==0 && state ==2 ){
 			MyModel NewModel = null;
@@ -1352,6 +1557,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	 
         	 state = 0;
 	    }
+	    
 	    
 	    
 	    if (genes2samplesvalues!=null && col==0 && state ==1 ){
@@ -1419,6 +1625,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
         	 state = 1;
 			
 		}
+		}
+		
+		
 		
 		
 	}

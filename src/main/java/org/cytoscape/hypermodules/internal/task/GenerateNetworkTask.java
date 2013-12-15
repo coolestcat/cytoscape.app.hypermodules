@@ -52,11 +52,25 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 			}
 		}
 		this.allSamplesMap = new HashMap<String, Double>();
+		
+		HashMap<String, String> genes2samples = new HashMap<String, String>();
+		
 		for (int i=0; i<sampleValues.size(); i++){
-			String d = sampleValues.get(i)[0];
-			String s = sampleValues.get(i)[1];
-			String[] st = s.split(":");
-			allSamplesMap.put(d, (double) st.length);
+			if (genes2samples.get(sampleValues.get(i)[0])!=null){
+				String sti = genes2samples.get(sampleValues.get(i)[0]);
+				sti = sti + ":" + sampleValues.get(i)[1];
+				genes2samples.put(sampleValues.get(i)[0], sti);
+			}
+			else{
+			//System.out.println(sampleValues.get(i)[1]);
+			genes2samples.put(sampleValues.get(i)[0], sampleValues.get(i)[1]);
+			}
+		}
+		
+		for (String s : genes2samples.keySet()){
+			String d = genes2samples.get(s);
+			String[] st = d.split(":");
+			allSamplesMap.put(s, (double) st.length);
 		}
 	}
 	
