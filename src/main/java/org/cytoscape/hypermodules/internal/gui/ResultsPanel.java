@@ -686,25 +686,25 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			
 			if (file!=null){
 				fileName = file.getAbsolutePath();
-				if (!fileName.substring(fileName.length()-4,fileName.length()).equals(".csv")){
-					fileName = fileName + ".csv";
+				if (!fileName.substring(fileName.length()-4,fileName.length()).equals(".tsv")){
+					fileName = fileName + ".tsv";
 				}
 				fout = new FileWriter(fileName);
 				
 				
-				fout.write("Module" + ',' + "Statistical Test P-Value" + ',' + "FDR P-Value" + lineSep);
+				fout.write("Module" + '\t' + "Pvalue_test" + '\t' + "Pvalue_background" + lineSep);
 				for (String s : mostCorrelated.keySet()){
-					fout.write(s + ',' + mostCorrelated.get(s) + ',' + mostCorrelatedFDR.get(s) + lineSep);
+					fout.write(s + '\t' + mostCorrelated.get(s) + '\t' + mostCorrelatedFDR.get(s) + lineSep);
 				}
 				fout.write(lineSep);
 			
 				fout.write("HyperModules Results" + lineSep);
-				fout.write("Date: " + ',' + DateFormat.getDateTimeInstance().format(new Date()) + lineSep + lineSep);
+				fout.write("Date: " + '\t' + DateFormat.getDateTimeInstance().format(new Date()) + lineSep + lineSep);
 				
-				fout.write("Length Option: " + ','+ parameters.get("length") + lineSep);
-				fout.write("Expand Option: " + ',' + parameters.get("expand") + lineSep);
-				fout.write("Shuffle Number: "+ ',' + parameters.get("nShuffled") + lineSep);
-				fout.write("Statistical Test: " + ','+ parameters.get("stat") + lineSep + lineSep);
+				fout.write("Length Option: " + '\t'+ parameters.get("length") + lineSep);
+				fout.write("Expand Option: " + '\t' + parameters.get("expand") + lineSep);
+				fout.write("Shuffle Number: "+ '\t' + parameters.get("nShuffled") + lineSep);
+				fout.write("Statistical Test: " + '\t'+ parameters.get("stat") + lineSep + lineSep);
 
 			}
 		} 

@@ -263,7 +263,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		testPanel = new JPanel();
 		logRank = new JRadioButton("Survival (Log Rank Test)");
-		fisher = new JRadioButton("Discrete Variable (Fisher's Test)");
+		fisher = new JRadioButton("Categorical Variable (Fisher's Test)");
 		logRank.addActionListener(this);
 		fisher.addActionListener(this);
 		statTest = new ButtonGroup();
