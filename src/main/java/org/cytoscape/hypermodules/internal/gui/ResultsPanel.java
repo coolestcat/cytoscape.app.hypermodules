@@ -191,11 +191,215 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	}
 	
 	public void sortTable(int colNumber){
+		System.out.println("col: " + colNumber);
+		ArrayList<String[]> newTable = new ArrayList<String[]>();
 		
+		Model tab = null;
+		if (parameters.get("stat").equals("logRank")){
+			String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "Classification"};
+			tab = new Model(c);
+		}
+		else{
+			String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value"};
+			tab = new Model(c);
+		}
 		
-		
-		
-		
+		if (colNumber == 2 || colNumber == 3){
+			Multimap<Double, String[]> mds = ArrayListMultimap.create();
+			ArrayList<Double> toSort = new ArrayList<Double>();
+			HashSet<Double> gg = new HashSet<Double>();
+			for (int i=0; i<addToTable.size(); i++){
+				gg.add(Double.valueOf(addToTable.get(i)[colNumber]));
+				String[] mdsentry = new String[4];
+				if (parameters.get("stat").equals("logRank")){
+					mdsentry[0] = addToTable.get(i)[0];
+					mdsentry[1] = addToTable.get(i)[1];
+					if (colNumber == 3){
+						mdsentry[2] = addToTable.get(i)[2];
+					}
+					else{
+						mdsentry[2] = addToTable.get(i)[3];
+					}
+					mdsentry[3] = addToTable.get(i)[4];
+				}
+				else{//fisher
+					mdsentry[0] = addToTable.get(i)[0];
+					mdsentry[1] = addToTable.get(i)[1];
+					if (colNumber == 3){
+						mdsentry[2] = addToTable.get(i)[2];
+					}
+					else{
+						mdsentry[2] = addToTable.get(i)[3];
+					}
+				}
+				mds.put(Double.valueOf(addToTable.get(i)[colNumber]), mdsentry);
+			}
+			
+			for (Double t : gg){
+				toSort.add(t);
+			}
+			//System.out.println("toSortsize: " + toSort.size());
+			Collections.sort(toSort);
+			
+			if (parameters.get("stat").equals("logRank")){
+				for (int i=0; i<toSort.size(); i++){
+					for (String[] d : mds.get(toSort.get(i))){
+						//System.out.println(toSort.get(i) + ":" + d);
+						String[] newentry = new String[5];
+						newentry[0] = d[0];
+						newentry[1] = d[1];
+						if (colNumber == 2){
+							newentry[2] = String.valueOf(toSort.get(i));
+							newentry[3] = d[2];
+						}
+						else{
+							newentry[2] = d[2];
+							newentry[3] = String.valueOf(toSort.get(i));
+						}
+						newentry[4] = d[3];
+						newTable.add(newentry);
+					}
+				}
+			}
+			
+			else{
+				for (int i=0; i<toSort.size(); i++){
+					for (String[] d : mds.get(toSort.get(i))){
+						String[] newentry = new String[4];
+						newentry[0] = d[0];
+						newentry[1] = d[1];
+						if (colNumber == 2){
+							newentry[2] = String.valueOf(toSort.get(i));
+							newentry[3] = d[2];
+						}
+						else{
+							newentry[2] = d[2];
+							newentry[3] = String.valueOf(toSort.get(i));
+						}
+						newTable.add(newentry);
+					}
+				}
+			}
+			
+			//System.out.println("newTablesize: " + newTable.size());
+			
+		}
+		else{
+			ArrayList<String> toSort = new ArrayList<String>();
+			Multimap<String, String[]> mds = ArrayListMultimap.create();
+			HashSet<String> gg = new HashSet<String>();
+			
+			for (int i=0; i<addToTable.size(); i++){
+				gg.add((addToTable.get(i)[colNumber]));
+				String[] mdsentry = new String[4];
+				if (parameters.get("stat").equals("logRank")){
+					if (colNumber == 0){
+						mdsentry[0] = addToTable.get(i)[1];
+						mdsentry[1] = addToTable.get(i)[2];
+						mdsentry[2] = addToTable.get(i)[3];
+						mdsentry[3] = addToTable.get(i)[4];
+					}
+					else if (colNumber ==1){
+						mdsentry[0] = addToTable.get(i)[0];
+						mdsentry[1] = addToTable.get(i)[2];
+						mdsentry[2] = addToTable.get(i)[3];
+						mdsentry[3] = addToTable.get(i)[4];
+						
+					}
+					else if (colNumber == 4){
+						mdsentry[0] = addToTable.get(i)[0];
+						mdsentry[1] = addToTable.get(i)[1];
+						mdsentry[2] = addToTable.get(i)[2];
+						mdsentry[3] = addToTable.get(i)[3];
+						
+					}
+				}
+				else{//fisher
+					if (colNumber == 0){
+						mdsentry[0] = addToTable.get(i)[1];
+						mdsentry[1] = addToTable.get(i)[2];
+						mdsentry[2] = addToTable.get(i)[3];
+					}
+					else if (colNumber ==1 ){
+						mdsentry[0] = addToTable.get(i)[0];
+						mdsentry[1] = addToTable.get(i)[2];
+						mdsentry[2] = addToTable.get(i)[3];
+					}
+				}
+				mds.put(addToTable.get(i)[colNumber], mdsentry);
+			}
+			
+			for (String s : gg){
+				toSort.add(s);
+			}
+			Collections.sort(toSort);
+			
+			
+			if (parameters.get("stat").equals("logRank")){
+				for (int i=0; i<toSort.size(); i++){
+					for (String[] d : mds.get(toSort.get(i))){
+						String[] newentry = new String[5];
+						if (colNumber == 0){
+							newentry[0] = toSort.get(i);
+							newentry[1] = d[0];
+							newentry[2] = d[1];
+							newentry[3] = d[2];
+							newentry[4] = d[3];
+							
+						}
+						else if (colNumber == 1){
+							newentry[0] = d[0];
+							newentry[1] = toSort.get(i);
+							newentry[2] = d[1];
+							newentry[3] = d[2];
+							newentry[4] = d[3];
+						}
+						else if (colNumber == 4){
+							newentry[0] = d[0];
+							newentry[1] = d[1];
+							newentry[2] = d[2];
+							newentry[3] = d[3];
+							newentry[4] = toSort.get(i);
+						}
+						newTable.add(newentry);
+					}
+				}
+			}
+			
+			else{
+				for (int i=0; i<toSort.size(); i++){
+					for (String[] d : mds.get(toSort.get(i))){
+						String[] newentry = new String[4];
+						if (colNumber == 0){
+							newentry[0] = toSort.get(i);
+							newentry[1] = d[0];
+							newentry[2] = d[1];
+							newentry[3] = d[2];
+							
+						}
+						else if (colNumber == 1){
+							newentry[0] = d[0];
+							newentry[1] = toSort.get(i);
+							newentry[2] = d[1];
+							newentry[3] = d[2];
+						}
+						newTable.add(newentry);
+					}
+				}
+			}
+			
+			
+			
+		}
+		//System.out.println("reachedddd");
+		addToTable = new ArrayList<String[]>();
+		addToTable = newTable;
+		tab.AddCSVData(addToTable);
+		resultsTable = new JTable();
+		resultsTable.setModel(tab);
+		tableHeader = resultsTable.getTableHeader();
+		tableHeader.addMouseListener(this);
+		viewer.setViewportView(resultsTable);
 	}
 	
 	
@@ -238,8 +442,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
 		//final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
-
-		resultsTable.addMouseListener(this);
+		tableHeader = resultsTable.getTableHeader();
+		tableHeader.addMouseListener(this);
 		viewer = new JScrollPane(resultsTable);
 	}
 	
@@ -254,10 +458,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					String[] newEntry = new String[5];
 					newEntry[0]=key;
 					newEntry[1] = genes;
-					newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
+					newEntry[2] = String.valueOf(set.get(0).get(genes));
+					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
 					Double b = set.get(1).get(genes);
 					if (b!=null){
-						b = (double)Math.round(b * 100000) / 100000;
+						//b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
 					
@@ -288,7 +493,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
 		//final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-		resultsTable.addMouseListener(this);
+		tableHeader = resultsTable.getTableHeader();
+		tableHeader.addMouseListener(this);
 		viewer.setViewportView(resultsTable);
 		/*
 		resultsTable.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -321,7 +527,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
 					Double b = set.get(1).get(genes);
 					if (b!=null){
-						b = (double)Math.round(b * 100000) / 100000;
+						//b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
 					
@@ -352,7 +558,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
 		//final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-		resultsTable.addMouseListener(this);
+		tableHeader = resultsTable.getTableHeader();
+		tableHeader.addMouseListener(this);
 		/*
 		resultsTable.addMouseListener(new MouseAdapter() {
 			  public void mouseClicked(MouseEvent e) {
@@ -738,7 +945,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		resultsTable.setModel(tab);
 		//final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
 
-		resultsTable.addMouseListener(this);
+		tableHeader = resultsTable.getTableHeader();
+		tableHeader.addMouseListener(this);
 		viewer.setViewportView(resultsTable);
 	}
 	

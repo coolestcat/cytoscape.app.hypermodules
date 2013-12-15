@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
+import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.application.swing.CytoPanelState;
 import org.cytoscape.hypermodules.internal.CytoscapeUtils;
 import org.cytoscape.hypermodules.internal.gui.ResultsPanel;
@@ -47,6 +48,13 @@ public class OpenResultsTask implements Task {
 		utils.serviceRegistrar.registerService(resultsPanel, CytoPanelComponent.class, new Properties());
 		CytoPanel eastPanel = utils.getCytoPanelEast();
 		eastPanel.setState(CytoPanelState.DOCK);
+		
+		
+		//pop up on open?
+		CytoPanel cytoPanel = utils.swingApp.getCytoPanel(CytoPanelName.EAST);
+		int index = cytoPanel.indexOfComponent(resultsPanel);
+		cytoPanel.setSelectedIndex(index);
+		
 	}
 
 	@Override
