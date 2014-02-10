@@ -192,18 +192,48 @@ public class ChartDisplayFisher {
 		*/
 		
 		String[] toChart = new String[allVariableNames.size()];
+		
+		/*
 		for (int y = allVariableNames.size()-1; y>=0; y--){
 			toChart[y] = allVariableNames.get(y);
 		}
+		*/
 		
-		Chart chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - Genes: " + s + " - PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
-		chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(toChart)), observed);
-		chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(toChart)), expected);
+		
+		for (int y=0; y<allVariableNames.size(); y++){
+			toChart[y] = allVariableNames.get(y);
+		}
+		
+		/*
+		System.out.println(allVariableNames.get(0));
+		System.out.println(observed.get(0));
+		System.out.println(expected.get(0));
+		System.out.println(toChart[0]);
+		
+		System.out.println(allVariableNames.get(1));
+		System.out.println(observed.get(1));
+		System.out.println(expected.get(1));
+		System.out.println(toChart[1]);
+		*/
+		
+		Chart chart = null;
+		if (allVariableNames.size() == 2){
+			//System.out.println("2");
+			chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - Genes: " + s + " - PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
+			chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(new String[] {toChart[1], toChart[0]})), new ArrayList<Number>(Arrays.asList(new Number[]{observed.get(1), observed.get(0)})));
+			chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(new String[] {toChart[1], toChart[0]})), new ArrayList<Number>(Arrays.asList(new Number[]{expected.get(1), expected.get(0)})));
+		}
+		else{
+			chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - Genes: " + s + " - PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
+			chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(toChart)), observed);
+			chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(toChart)), expected);
+		}	
+		
 
 		new SwingWrapper(chart, 0.0).displayFisherChart();
 	}
 	
-	
+	//rounding function
 	public static double roundToSignificantFigures(double num, int n) {
 	    if(num == 0) {
 	        return 0;

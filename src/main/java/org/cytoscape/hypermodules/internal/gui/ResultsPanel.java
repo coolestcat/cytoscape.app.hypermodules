@@ -196,11 +196,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		Model tab = null;
 		if (parameters.get("stat").equals("logRank")){
-			String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "Classification"};
+			String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
 			tab = new Model(c);
 		}
 		else{
-			String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value"};
+			String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
 			tab = new Model(c);
 		}
 		
@@ -404,7 +404,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	
 	
 	public void setUpTableFisher(){
-		String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value"};
+		String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
 		Model tab = new Model(c);
 		this.sas = new String[2];
 		sas[0] = "none";
@@ -413,7 +413,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		for (String key : allResults.keySet()){
 			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
 				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[4];
+					String[] newEntry = new String[6];
 					newEntry[0]=key;
 					newEntry[1] = genes;
 					newEntry[2] = String.valueOf(set.get(0).get(genes));
@@ -423,15 +423,18 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 						//b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
-
-					if (b!=null){
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
-							addToTable.add(newEntry);
+					newEntry[4] = String.valueOf(set.get(2).get(genes));
+					newEntry[5] = String.valueOf(set.get(3).get(genes));
+					if (!newEntry[1].equals("none")){
+						if (b!=null){
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
 						}
-					}
-					else{
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
-							addToTable.add(newEntry);
+						else{
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
 						}
 					}
 				}
@@ -448,14 +451,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	}
 	
 	public void redoLrTable(){
-		String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "Classification"};
+		String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
 		Model tab = new Model(c);
 		addToTable = new ArrayList<String[]>();
 		
 		for (String key : allResults.keySet()){
 			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
 				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[5];
+					String[] newEntry = new String[6];
 					newEntry[0]=key;
 					newEntry[1] = genes;
 					newEntry[2] = String.valueOf(set.get(0).get(genes));
@@ -466,6 +469,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					}
 					newEntry[3]=String.valueOf(b);
 					
+					/*
 					if (set.get(2).get(genes)==1){
 						newEntry[4] = "HIGH";
 					}
@@ -475,15 +479,19 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					else{
 						newEntry[4] = "NA";
 					}
-					
-					if (b!=null){
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
-							addToTable.add(newEntry);
+					*/
+					newEntry[4] = String.valueOf(set.get(3).get(genes));
+					newEntry[5] = String.valueOf(set.get(4).get(genes));
+					if (!newEntry[1].equals("none")){
+						if (b!=null){
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
 						}
-					}
-					else{
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
-							addToTable.add(newEntry);
+						else{
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
 						}
 					}
 				}
@@ -511,7 +519,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	
 	
 	public void setUpTableLogRank(){
-		String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "Classification"};
+		String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "# of Patients", "Odds Ratio"};
 		Model tab = new Model(c);
 		this.sas = new String[2];
 		sas[0] = "none";
@@ -520,7 +528,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		for (String key : allResults.keySet()){
 			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
 				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[5];
+					String[] newEntry = new String[6];
 					newEntry[0]=key;
 					newEntry[1] = genes;
 					newEntry[2] = String.valueOf(set.get(0).get(genes));
@@ -531,6 +539,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					}
 					newEntry[3]=String.valueOf(b);
 					
+					/*
 						if (set.get(2).get(genes)==1){
 							newEntry[4] = "HIGH";
 						}
@@ -540,17 +549,23 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 						else{
 							newEntry[4] = "NA";
 						}
+					*/
+					newEntry[4]=String.valueOf(set.get(3).get(genes));
+					newEntry[5]=String.valueOf(set.get(4).get(genes));
+					
+					if (!newEntry[1].equals("none")){
+						if (b!=null){
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
+						}
+						else{
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
+						}
+					}
 
-					if (b!=null){
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
-							addToTable.add(newEntry);
-						}
-					}
-					else{
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
-							addToTable.add(newEntry);
-						}
-					}
 				}
 			}
 		}
@@ -909,14 +924,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 
 	public void redoFisherTable(){
 		
-		String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value"};
+		String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
 		Model tab = new Model(c);
 		addToTable = new ArrayList<String[]>();
 		
 		for (String key : allResults.keySet()){
 			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
 				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[4];
+					String[] newEntry = new String[6];
 					newEntry[0]=key;
 					newEntry[1] = genes;
 					newEntry[2] = String.valueOf(set.get(0).get(genes));
@@ -926,17 +941,21 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 						//b = (double)Math.round(b * 100000) / 100000;
 					}
 					newEntry[3]=String.valueOf(b);
-					
-					if (b!=null){
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
-							addToTable.add(newEntry);
+					newEntry[4] = String.valueOf(set.get(2).get(genes));
+					newEntry[5] = String.valueOf(set.get(3).get(genes));
+					if (!newEntry[1].equals("none")){
+						if (b!=null){
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
+						}
+						else{
+							if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
+								addToTable.add(newEntry);
+							}
 						}
 					}
-					else{
-						if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
-							addToTable.add(newEntry);
-						}
-					}
+
 				}
 			}
 		}

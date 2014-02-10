@@ -25,7 +25,7 @@ import org.cytoscape.work.TaskMonitor;
 /**
  * 
  * Called by ResultsPanel. This class generates a new network view in cytoscape which has all the most correlated
- * modules arranged in a circle-attribute layout by taking as input the string forms of the modules
+ * modules arranged in a spring-embedded layout by taking as input the string forms of the modules
  * and expanding from the seed to obtain the edges
  * @author alvinleung
  *
@@ -39,6 +39,7 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	private ArrayList<String[]> sampleValues;
 	private HashSet<String> allSeeds;
 	private HashMap<String, Double> allSamplesMap;
+	private HashSet<String> inputHash;
 	
 	public GenerateNetworkTask(String[] sas, CyNetwork originalNetwork, CytoscapeUtils utils, ArrayList<String[]> sampleValues){
 		this.sas = sas;
@@ -77,7 +78,8 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
 		this.generated = utils.networkFactory.createNetwork();
-		visualize(sas[0], sas[1]);
+		//visualize(sas[0], sas[1]);
+		generate(sas[0], sas[1]);
 		applyVisualStyle();
 	}
 	
@@ -121,6 +123,112 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 		CyLayoutAlgorithm layout = utils.cyLayoutManager.getLayout("force-directed");
 		String layoutAttribute = null;
 		insertTasksAfterCurrentTask(layout.createTaskIterator(myView, layout.createLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, layoutAttribute));
+		
+	}
+	
+	
+	public void generate(String s, String t){
+		//filter unique strings:
+		String[] inputStrings = t.split(":");
+		
+		this.inputHash = new HashSet<String>();
+		for (int i=0; i<inputStrings.length; i++){
+			inputHash.add(inputStrings[i]);
+		}
+		
+		inputHash.remove(s);
+
+		visualizeRecursive(s, null, 2);
+		
+	}
+	
+	
+	
+	public void visualizeRecursive(String s, String parent, int level){
+		
+		//get Seed node to start expanding
+		List<CyNode> cc = runNetwork.getNodeList();
+		CyNode seed = null;
+		for (int k=0; k<cc.size(); k++){
+			if (s.equals(this.runNetwork.getRow(cc.get(k)).get(CyNetwork.NAME, String.class))){
+				seed = cc.get(k);
+			}
+		}
+		
+		//get seed SUID
+		long seedID = seed.getSUID();
+		String seedString = s;
+		
+		seed = generated.addNode(); //add seed to generated
+		generated.getRow(seed).set(CyNetwork.NAME, seedString);
+		long mySeedID = seed.getSUID(); //save SUID of seed in my network
+		
+		//add edge from this node to parent
+
+		if (parent!=null){
+			CyNode par = null;
+			List<CyNode> gg = generated.getNodeList();
+			//find parent in generated
+			for (int k=0; k<gg.size(); k++){
+				if (parent.equals(generated.getRow(gg.get(k)).get(CyNetwork.NAME, String.class))){
+					par = gg.get(k);
+				}
+			}
+			generated.addEdge(par, seed, true);
+		}
+	
+		seed = runNetwork.getNode(seedID); //seed = seed of original network
+		
+		//expand one layer away:
+		for (CyEdge edge : runNetwork.getAdjacentEdgeList(seed, CyEdge.Type.ANY)){
+			CyNode seedHolder = generated.getNode(mySeedID);
+			
+			//target node info
+			CyNode target = edge.getTarget();
+			//long targetID = target.getSUID();
+			String targetString = runNetwork.getRow(target).get(CyNetwork.NAME, String.class);
+			//System.out.println(seedString + " : " + targetString);
+			
+			if (inputHash.contains(targetString)){
+				inputHash.remove(targetString); //remove from global hashset
+				
+				if (level == 0){
+					target = generated.addNode();
+					generated.addEdge(seedHolder, target, true);
+					generated.getRow(target).set(CyNetwork.NAME, targetString);
+					//System.out.println("Adding Terminal Nodes: " + targetString);
+				}
+				else{
+					//System.out.println("Recursing on: " + targetString);
+					visualizeRecursive(targetString, seedString, level-1);	
+				}
+			}
+			//System.out.println("||");
+			//source node info
+			target = edge.getSource();
+			//long targetID = target.getSUID();
+			targetString = runNetwork.getRow(target).get(CyNetwork.NAME, String.class);
+			//System.out.println(seedString + " : " + targetString);
+			
+			if (inputHash.contains(targetString)){
+				inputHash.remove(targetString); //remove from global hashset
+				
+				if (level == 0){
+					target = generated.addNode();
+					generated.addEdge(seedHolder, target, true);
+					generated.getRow(target).set(CyNetwork.NAME, targetString);
+					//System.out.println("Adding Terminal Nodes: " + targetString);
+				}
+				else{
+					//System.out.println("Recursing on: " + targetString);
+					visualizeRecursive(targetString, seedString, level-1);	
+				}
+			}
+			
+			
+		}
+		
+		//System.out.println("|||||||||||||");
 		
 	}
 

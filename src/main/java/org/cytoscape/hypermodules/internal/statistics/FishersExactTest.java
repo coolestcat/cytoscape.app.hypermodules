@@ -34,7 +34,14 @@ public class FishersExactTest {
          */
         public FishersExactTest(int populationSize, int totalSuccesses, int sampleSize, int sampleSuccesses) {
                 try {
-                        setVariables(populationSize, totalSuccesses, sampleSize, sampleSuccesses);
+            		//TODO: erase this.
+                	/*
+                	this.populationSize = 40;
+                	this.totalSuccesses = 22;
+                	this.sampleSize = 27;
+                	this.sampleSuccesses = 16;
+                	*/
+                        setVariables(populationSize,totalSuccesses,sampleSize,sampleSuccesses);
                 } catch (SillyInputException e) {
                         System.out.println(e.toString());
                         e.printStackTrace();
@@ -95,41 +102,61 @@ public class FishersExactTest {
         public int getRepresentation() {
                 return representation;
         }
-
+        
         /**
          * Get the results of the test
          * 
          * @return The results of the two-tailed Fishers exact test.
          */
         public double getResult() {
+        		//System.out.println("1 - " + populationSize);
+        		//System.out.println("2 - " + totalSuccesses);
+        		//System.out.println("3 - " + sampleSize);
+        		//System.out.println("4 - " + sampleSuccesses);
         	/*
-        		System.out.println(populationSize);
-        		System.out.println(totalSuccesses);
-        		System.out.println(sampleSize);
-        		System.out.println(sampleSuccesses);
+        		if (populationSize==sampleSize || ((populationSize - totalSuccesses) == (sampleSize - sampleSuccesses))|| (totalSuccesses == sampleSuccesses)){
+        			//System.out.println("returning 1: " + 1.0);
+        			return 1.0;
+        		}
         	*/
-                if (sampleSuccesses != 0 && sampleSuccesses != sampleSize) {
-                        jsc.contingencytables.FishersExactTest fet = new jsc.contingencytables.FishersExactTest(ct, alternative);
-                        return fet.getSP();
-                } else {
-                        if (alternative == H1.LESS_THAN) {
-                                Hypergeometric hg = new Hypergeometric(sampleSize, populationSize, totalSuccesses);
-                                return hg.pdf(sampleSuccesses);
-                        } else if(alternative == H1.GREATER_THAN){
-                                return 1.0;
-                        } else {
-                                Hypergeometric hg = new Hypergeometric(sampleSize, populationSize, totalSuccesses);
-                                double p0 = hg.pdf(sampleSuccesses);
-                                double sum = p0;
-                                for(int i=1;i<=sampleSize;i++){
-                                        double pI = hg.pdf(i);
-                                        if(pI<=p0){
-                                                sum+=pI;
-                                        }
-                                }
-                                return sum;
-                        }
-                }
+        	
+        	try{
+                if ((sampleSuccesses != 0 && sampleSuccesses != sampleSize)) {
+                    jsc.contingencytables.FishersExactTest fet = new jsc.contingencytables.FishersExactTest(ct, alternative);
+                    //System.out.println("returnval: " + fet.getSP());
+                    return fet.getSP();
+            } else {
+                    if (alternative == H1.LESS_THAN) {
+                            Hypergeometric hg = new Hypergeometric(sampleSize, populationSize, totalSuccesses);
+                            //System.out.println("returnval: " + hg.pdf(sampleSuccesses));
+                            return hg.pdf(sampleSuccesses);
+                    } else if(alternative == H1.GREATER_THAN){
+                    		//System.out.println("returnval: " + 1.0);
+                            return 1.0;
+                    } else {
+                            Hypergeometric hg = new Hypergeometric(sampleSize, populationSize, totalSuccesses);
+                            double p0 = hg.pdf(sampleSuccesses);
+                            double sum = p0;
+                            for(int i=1;i<=sampleSize;i++){
+                                    double pI = hg.pdf(i);
+                                    if(pI<=p0){
+                                            sum+=pI;
+                                    }
+                            }
+                            //System.out.println("returnval: " + sum);
+                            return sum;
+                            
+                    }
+            }
+
+        	}
+        	catch (Exception e){
+        		return 1.0;
+        	}
+        	finally{
+        		
+        	}
+
 
         }
 
