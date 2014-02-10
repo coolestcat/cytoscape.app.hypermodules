@@ -204,34 +204,38 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			tab = new Model(c);
 		}
 		
-		if (colNumber == 2 || colNumber == 3){
+		if (colNumber == 2 || colNumber == 3 || colNumber == 4 || colNumber == 5){
 			Multimap<Double, String[]> mds = ArrayListMultimap.create();
 			ArrayList<Double> toSort = new ArrayList<Double>();
 			HashSet<Double> gg = new HashSet<Double>();
 			for (int i=0; i<addToTable.size(); i++){
 				gg.add(Double.valueOf(addToTable.get(i)[colNumber]));
-				String[] mdsentry = new String[4];
-				if (parameters.get("stat").equals("logRank")){
-					mdsentry[0] = addToTable.get(i)[0];
-					mdsentry[1] = addToTable.get(i)[1];
-					if (colNumber == 3){
-						mdsentry[2] = addToTable.get(i)[2];
-					}
-					else{
-						mdsentry[2] = addToTable.get(i)[3];
-					}
+				String[] mdsentry = new String[5];
+				mdsentry[0] = addToTable.get(i)[0];
+				mdsentry[1] = addToTable.get(i)[1];
+				if (colNumber == 2){
+					mdsentry[2] = addToTable.get(i)[3];
 					mdsentry[3] = addToTable.get(i)[4];
+					mdsentry[4] = addToTable.get(i)[5];
 				}
-				else{//fisher
-					mdsentry[0] = addToTable.get(i)[0];
-					mdsentry[1] = addToTable.get(i)[1];
-					if (colNumber == 3){
-						mdsentry[2] = addToTable.get(i)[2];
-					}
-					else{
-						mdsentry[2] = addToTable.get(i)[3];
-					}
+				else if (colNumber == 3){
+					mdsentry[2] = addToTable.get(i)[2];
+					mdsentry[3] = addToTable.get(i)[4];
+					mdsentry[4] = addToTable.get(i)[5];
+					
 				}
+				else if (colNumber == 4){
+					mdsentry[2] = addToTable.get(i)[2];
+					mdsentry[3] = addToTable.get(i)[3];
+					mdsentry[4] = addToTable.get(i)[5];
+				}
+				
+				else{
+					mdsentry[2] = addToTable.get(i)[2];
+					mdsentry[3] = addToTable.get(i)[3];
+					mdsentry[4] = addToTable.get(i)[4];
+				}
+
 				mds.put(Double.valueOf(addToTable.get(i)[colNumber]), mdsentry);
 			}
 			
@@ -241,46 +245,40 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			//System.out.println("toSortsize: " + toSort.size());
 			Collections.sort(toSort);
 			
-			if (parameters.get("stat").equals("logRank")){
-				for (int i=0; i<toSort.size(); i++){
-					for (String[] d : mds.get(toSort.get(i))){
-						//System.out.println(toSort.get(i) + ":" + d);
-						String[] newentry = new String[5];
-						newentry[0] = d[0];
-						newentry[1] = d[1];
-						if (colNumber == 2){
-							newentry[2] = String.valueOf(toSort.get(i));
-							newentry[3] = d[2];
-						}
-						else{
-							newentry[2] = d[2];
-							newentry[3] = String.valueOf(toSort.get(i));
-						}
+			for (int i=0; i<toSort.size(); i++){
+				for (String[] d : mds.get(toSort.get(i))){
+					//System.out.println(toSort.get(i) + ":" + d);
+					String[] newentry = new String[6];
+					newentry[0] = d[0];
+					newentry[1] = d[1];
+					if (colNumber == 2){
+						newentry[2] = String.valueOf(toSort.get(i));
+						newentry[3] = d[2];
 						newentry[4] = d[3];
-						newTable.add(newentry);
+						newentry[5] = d[4];
 					}
+					else if (colNumber == 3){
+						newentry[2] = d[2];
+						newentry[3] = String.valueOf(toSort.get(i));
+						newentry[4] = d[3];
+						newentry[5] = d[4];
+					}
+					else if (colNumber == 4){
+						newentry[2] = d[2];
+						newentry[3] = d[3];
+						newentry[4] = String.valueOf(toSort.get(i));
+						newentry[5] = d[4];
+						
+					}
+					else{
+						newentry[2] = d[2];
+						newentry[3] = d[3];
+						newentry[4] = d[4];
+						newentry[5] = String.valueOf(toSort.get(i));
+					}
+					newTable.add(newentry);
 				}
 			}
-			
-			else{
-				for (int i=0; i<toSort.size(); i++){
-					for (String[] d : mds.get(toSort.get(i))){
-						String[] newentry = new String[4];
-						newentry[0] = d[0];
-						newentry[1] = d[1];
-						if (colNumber == 2){
-							newentry[2] = String.valueOf(toSort.get(i));
-							newentry[3] = d[2];
-						}
-						else{
-							newentry[2] = d[2];
-							newentry[3] = String.valueOf(toSort.get(i));
-						}
-						newTable.add(newentry);
-					}
-				}
-			}
-			
 			//System.out.println("newTablesize: " + newTable.size());
 			
 		}
@@ -291,39 +289,22 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			
 			for (int i=0; i<addToTable.size(); i++){
 				gg.add((addToTable.get(i)[colNumber]));
-				String[] mdsentry = new String[4];
+				String[] mdsentry = new String[5];
 				if (parameters.get("stat").equals("logRank")){
 					if (colNumber == 0){
 						mdsentry[0] = addToTable.get(i)[1];
 						mdsentry[1] = addToTable.get(i)[2];
 						mdsentry[2] = addToTable.get(i)[3];
 						mdsentry[3] = addToTable.get(i)[4];
+						mdsentry[4] = addToTable.get(i)[5];
 					}
 					else if (colNumber ==1){
 						mdsentry[0] = addToTable.get(i)[0];
 						mdsentry[1] = addToTable.get(i)[2];
 						mdsentry[2] = addToTable.get(i)[3];
 						mdsentry[3] = addToTable.get(i)[4];
+						mdsentry[4] = addToTable.get(i)[5];
 						
-					}
-					else if (colNumber == 4){
-						mdsentry[0] = addToTable.get(i)[0];
-						mdsentry[1] = addToTable.get(i)[1];
-						mdsentry[2] = addToTable.get(i)[2];
-						mdsentry[3] = addToTable.get(i)[3];
-						
-					}
-				}
-				else{//fisher
-					if (colNumber == 0){
-						mdsentry[0] = addToTable.get(i)[1];
-						mdsentry[1] = addToTable.get(i)[2];
-						mdsentry[2] = addToTable.get(i)[3];
-					}
-					else if (colNumber ==1 ){
-						mdsentry[0] = addToTable.get(i)[0];
-						mdsentry[1] = addToTable.get(i)[2];
-						mdsentry[2] = addToTable.get(i)[3];
 					}
 				}
 				mds.put(addToTable.get(i)[colNumber], mdsentry);
@@ -334,61 +315,29 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			}
 			Collections.sort(toSort);
 			
-			
-			if (parameters.get("stat").equals("logRank")){
-				for (int i=0; i<toSort.size(); i++){
-					for (String[] d : mds.get(toSort.get(i))){
-						String[] newentry = new String[5];
-						if (colNumber == 0){
-							newentry[0] = toSort.get(i);
-							newentry[1] = d[0];
-							newentry[2] = d[1];
-							newentry[3] = d[2];
-							newentry[4] = d[3];
-							
-						}
-						else if (colNumber == 1){
-							newentry[0] = d[0];
-							newentry[1] = toSort.get(i);
-							newentry[2] = d[1];
-							newentry[3] = d[2];
-							newentry[4] = d[3];
-						}
-						else if (colNumber == 4){
-							newentry[0] = d[0];
-							newentry[1] = d[1];
-							newentry[2] = d[2];
-							newentry[3] = d[3];
-							newentry[4] = toSort.get(i);
-						}
-						newTable.add(newentry);
+			for (int i=0; i<toSort.size(); i++){
+				for (String[] d : mds.get(toSort.get(i))){
+					String[] newentry = new String[6];
+					if (colNumber == 0){
+						newentry[0] = toSort.get(i);
+						newentry[1] = d[0];
+						newentry[2] = d[1];
+						newentry[3] = d[2];
+						newentry[4] = d[3];
+						newentry[5] = d[4];
+ 						
 					}
+					else if (colNumber == 1){
+						newentry[0] = d[0];
+						newentry[1] = toSort.get(i);
+						newentry[2] = d[1];
+						newentry[3] = d[2];
+						newentry[4] = d[3];
+						newentry[5] = d[4];
+					}
+					newTable.add(newentry);
 				}
 			}
-			
-			else{
-				for (int i=0; i<toSort.size(); i++){
-					for (String[] d : mds.get(toSort.get(i))){
-						String[] newentry = new String[4];
-						if (colNumber == 0){
-							newentry[0] = toSort.get(i);
-							newentry[1] = d[0];
-							newentry[2] = d[1];
-							newentry[3] = d[2];
-							
-						}
-						else if (colNumber == 1){
-							newentry[0] = d[0];
-							newentry[1] = toSort.get(i);
-							newentry[2] = d[1];
-							newentry[3] = d[2];
-						}
-						newTable.add(newentry);
-					}
-				}
-			}
-			
-			
 			
 		}
 		//System.out.println("reachedddd");

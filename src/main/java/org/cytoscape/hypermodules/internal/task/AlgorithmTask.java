@@ -433,7 +433,7 @@ public class AlgorithmTask implements Task {
 		this.filteredSampleValues = new ArrayList<String[]>();
 		for (String s : sam){
 			String[] t = s.split(";");
-			System.out.println(t[0] + " : " + t[1]);
+			//System.out.println(t[0] + " : " + t[1]);
 			filteredSampleValues.add(t);
 		}
 		
