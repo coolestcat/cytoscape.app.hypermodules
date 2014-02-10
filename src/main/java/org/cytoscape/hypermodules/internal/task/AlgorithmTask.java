@@ -377,7 +377,7 @@ public class AlgorithmTask implements Task {
 		for (String s : originalResults.keySet()){
 			FDRAdjust fdr = new FDRAdjust(originalResults.get(s), shuffling.get(s));
 			HashMap<String, Double> adjusted = fdr.fdrAdjust();
-			System.out.println(adjusted.size());
+			//System.out.println(adjusted.size());
 			adjustedResults.put(s, adjusted);
 			
 		}

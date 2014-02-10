@@ -290,22 +290,20 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			for (int i=0; i<addToTable.size(); i++){
 				gg.add((addToTable.get(i)[colNumber]));
 				String[] mdsentry = new String[5];
-				if (parameters.get("stat").equals("logRank")){
-					if (colNumber == 0){
-						mdsentry[0] = addToTable.get(i)[1];
-						mdsentry[1] = addToTable.get(i)[2];
-						mdsentry[2] = addToTable.get(i)[3];
-						mdsentry[3] = addToTable.get(i)[4];
-						mdsentry[4] = addToTable.get(i)[5];
-					}
-					else if (colNumber ==1){
-						mdsentry[0] = addToTable.get(i)[0];
-						mdsentry[1] = addToTable.get(i)[2];
-						mdsentry[2] = addToTable.get(i)[3];
-						mdsentry[3] = addToTable.get(i)[4];
-						mdsentry[4] = addToTable.get(i)[5];
-						
-					}
+				if (colNumber == 0){
+					mdsentry[0] = addToTable.get(i)[1];
+					mdsentry[1] = addToTable.get(i)[2];
+					mdsentry[2] = addToTable.get(i)[3];
+					mdsentry[3] = addToTable.get(i)[4];
+					mdsentry[4] = addToTable.get(i)[5];
+				}
+				else if (colNumber ==1){
+					mdsentry[0] = addToTable.get(i)[0];
+					mdsentry[1] = addToTable.get(i)[2];
+					mdsentry[2] = addToTable.get(i)[3];
+					mdsentry[3] = addToTable.get(i)[4];
+					mdsentry[4] = addToTable.get(i)[5];
+					
 				}
 				mds.put(addToTable.get(i)[colNumber], mdsentry);
 			}
@@ -340,6 +338,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			}
 			
 		}
+		
 		//System.out.println("reachedddd");
 		addToTable = new ArrayList<String[]>();
 		addToTable = newTable;
