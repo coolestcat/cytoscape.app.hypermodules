@@ -580,16 +580,31 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		ArrayList<HashMap<String, Double>> rt = new ArrayList<HashMap<String, Double>>();
 		HashMap<String, Double> mostCorrelated = new HashMap<String, Double>();
 		HashMap<String, Double> mostCorrelatedFDR = new HashMap<String, Double>();
+		HashMap<String, Double> mostCorrelatedPatn = new HashMap<String, Double>();
+		HashMap<String, Double> mostCorrelatedOddsRatio = new HashMap<String, Double>();
 		
 		for (String s : allResults.keySet()){
 			for (ArrayList<HashMap<String, Double>> ahhs : allResults.get(s).keySet()){
 				HashMap<String, Double> original = ahhs.get(0);
 				HashMap<String, Double> adjusted = ahhs.get(1);
+				HashMap<String, Double> patn = null;
+				HashMap<String, Double> oddsratio = null;
+				if (this.parameters.get("stat").equals("logRank")){
+					patn = ahhs.get(3);
+					oddsratio = ahhs.get(4);
+				}
+				else{
+					patn = ahhs.get(2);
+					oddsratio = ahhs.get(3);
+					
+				}
 				for (String set : original.keySet()){
 					if (adjusted.containsKey(set)){
 						if (original.get(set)<this.pValueCutoff && adjusted.get(set)<this.pValueCutoff){
 							mostCorrelated.put(set, original.get(set));
 							mostCorrelatedFDR.put(set, adjusted.get(set));
+							mostCorrelatedPatn.put(set, patn.get(set));
+							mostCorrelatedOddsRatio.put(set, oddsratio.get(set));
 						}
 					}
 				}
@@ -598,6 +613,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		rt.add(mostCorrelated);
 		rt.add(mostCorrelatedFDR);
+		rt.add(mostCorrelatedPatn);
+		rt.add(mostCorrelatedOddsRatio);
 		
 		return rt;
 		
@@ -638,6 +655,8 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		HashMap<String, Double> mostCorrelated = a.get(0);
 		HashMap<String, Double> mostCorrelatedFDR = a.get(1);
+		HashMap<String, Double> mostCorrelatedPatn = a.get(2);
+		HashMap<String, Double> mostCorrelatedOddsRatio = a.get(3);
 		
 		final String lineSep = System.getProperty("line.separator");
 		String fileName = null;
@@ -654,20 +673,22 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				}
 				fout = new FileWriter(fileName);
 				
+				fout.write("# HyperModules Results" + lineSep);
+				fout.write("# Date: " + '\t' + DateFormat.getDateTimeInstance().format(new Date()) + lineSep + lineSep);
 				
-				fout.write("Module" + '\t' + "Pvalue_test" + '\t' + "Pvalue_background" + lineSep);
-				for (String s : mostCorrelated.keySet()){
-					fout.write(s + '\t' + mostCorrelated.get(s) + '\t' + mostCorrelatedFDR.get(s) + lineSep);
-				}
+				fout.write("# Length Option: " + '\t'+ parameters.get("length") + lineSep);
+				fout.write("# Expand Option: " + '\t' + parameters.get("expand") + lineSep);
+				fout.write("# Shuffle Number: "+ '\t' + parameters.get("nShuffled") + lineSep);
+				fout.write("# Statistical Test: " + '\t'+ parameters.get("stat") + lineSep + lineSep);
 				fout.write(lineSep);
-			
-				fout.write("HyperModules Results" + lineSep);
-				fout.write("Date: " + '\t' + DateFormat.getDateTimeInstance().format(new Date()) + lineSep + lineSep);
 				
-				fout.write("Length Option: " + '\t'+ parameters.get("length") + lineSep);
-				fout.write("Expand Option: " + '\t' + parameters.get("expand") + lineSep);
-				fout.write("Shuffle Number: "+ '\t' + parameters.get("nShuffled") + lineSep);
-				fout.write("Statistical Test: " + '\t'+ parameters.get("stat") + lineSep + lineSep);
+				fout.write("Module" + '\t' + "Pvalue_test" + '\t' + "Pvalue_background" + '\t' + "Number_patients" + '\t' + "Log_odds_ratio" + lineSep);
+				for (String s : mostCorrelated.keySet()){
+					fout.write(s + '\t' + mostCorrelated.get(s) + '\t' + mostCorrelatedFDR.get(s) + '\t' + mostCorrelatedPatn.get(s) + '\t' + mostCorrelatedOddsRatio.get(s) + lineSep);
+				}
+				
+			
+
 
 			}
 		} 
