@@ -32,7 +32,6 @@ public class OpenPanelTask implements Task{
 	}
 	
 	
-	
 	@Override
 	public void cancel() {
 		// TODO Auto-generated method stub

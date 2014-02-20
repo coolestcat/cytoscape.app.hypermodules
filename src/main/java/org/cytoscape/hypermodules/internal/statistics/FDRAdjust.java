@@ -83,6 +83,20 @@ public class FDRAdjust {
 			toAdjust[i]=lengthWhich(resultDoubles.get(i), randomResultDoubles)/(double) randomResultDoubles.length;
 		}
 		
+		//NEW PART
+		
+		
+		for (int i=0; i<resultDoubles.size(); i++){
+			for (String s : reversedResults.get(resultDoubles.get(i))){
+				adjustedResults.put(s, toAdjust[i]);
+			}
+		}
+		
+		return adjustedResults;
+		
+		
+		//END OF NEW PART
+		
 		/*
 		for (int i=0; i<toAdjust.length; i++){
 			System.out.println(toAdjust[i]);
@@ -100,6 +114,7 @@ public class FDRAdjust {
 		*/
 		
 		//perform FDR adjustment
+		/*
 		double[] adjustedDoubles = new double[resultDoubles.size()];
         BigDecimal min = new BigDecimal("" + 1);
         BigDecimal mkprk;
@@ -120,14 +135,9 @@ public class FDRAdjust {
 			}
 		}
 		
-		/*
-		for (int i=0; i<adjustedDoubles.length; i++){
-			System.out.println(adjustedDoubles[i]);
-		}
-		*/
-		
 		System.out.println(adjustedResults.size());
 		return adjustedResults;
+		*/
 		
 	}
 	

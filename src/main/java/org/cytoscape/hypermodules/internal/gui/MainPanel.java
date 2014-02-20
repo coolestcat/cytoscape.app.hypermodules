@@ -739,6 +739,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			add[0] = allClinicalData.get(i)[one];
 			add[1] = allClinicalData.get(i)[two];
 			add[2] = allClinicalData.get(i)[three];
+			//add[3] = allClinicalData.get(i)[3];//changed
 			clinicalValues.add(add);
 		}
 		

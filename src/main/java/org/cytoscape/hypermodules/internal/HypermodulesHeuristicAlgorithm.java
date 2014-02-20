@@ -66,11 +66,11 @@ public class HypermodulesHeuristicAlgorithm {
 	/**
 	 * patient days from birth
 	 */
-	//private double[] daysFromBirth;
+	private double[] daysFromBirth;
 	/**
 	 * patient age (- days from birth + days followup)
 	 */
-	//private double[] age;
+	private double[] age;
 	/**
 	 * patient censor values - 0 means alive (censored), 1 means deceased;
 	 */
@@ -168,10 +168,17 @@ public class HypermodulesHeuristicAlgorithm {
 		else if (statTest.equals("logRank")){
 			initClinicals();
 			logRankObject = new LogRankTest(this.followupDays);
+			//coxModel = new CoxPh(this.followupDays.length, this.followupDays, this.censor, this.age);
+			//coxModel.coxInit();
 		}
-		//coxModel = new CoxPh(this.followupDays.length, this.followupDays, this.censor, this.age);
-		//coxModel.coxInit();
-
+		else{
+			initClinicals();
+			logRankObject = new LogRankTest(this.followupDays);
+			coxModel = new CoxPh(this.followupDays.length, this.followupDays, this.censor, this.age);
+			coxModel.coxInit();
+		}
+		
+		
 		allGeneSamplesMap = new HashMap<String, String>();
 		
 		for (int i=0; i<sampleValues.size(); i++){
@@ -869,9 +876,72 @@ public class HypermodulesHeuristicAlgorithm {
 		Double pValue = Double.valueOf(0);
 		
 		if (this.statTest.equals("logRank")){
+			//TODO: cancelled call of logRank
+			
 			Double[] result = logRankObject.logRank(time1, time2, censor1, censor2);
 			pValue = result[2];
 			this.numberTests++;
+			
+			/*
+			double[] group = new double[allPatients.length];
+			for (int k=0; k<allPatients.length; k++){
+				if (truePatients.contains(allPatients[k])){
+					group[k]=1.0;
+				}
+				else{
+					group[k]=2.0;
+				}
+			}
+			*/
+
+			//pValue = coxModel.cox(group);
+			
+			/*
+			double[][] a = new double[2][clinicalValues.size()];
+			a[0] = group;
+			
+			
+			double[] agecopy = new double[clinicalValues.size()];
+			for (int i=0; i<age.length; i++){
+				agecopy[i] = age[i];
+			}
+			
+			a[1] = agecopy;
+			*/
+			
+			/*
+			for (int i=0; i<followupDays.length; i++){
+				System.out.print(followupDays[i] + " ");
+			}
+			System.out.println();
+			for (int i=0; i<this.censor.length; i++){
+				System.out.print(censor[i] + " ");
+			}
+			System.out.println();
+			for (int i=0; i<a[0].length; i++){
+				System.out.print(a[0][i] + " ");
+			}
+			System.out.println();
+			for (int i=0; i<a[1].length; i++){
+				System.out.print(a[1][i] + " ");
+			}
+			*/
+			
+			/*
+			CoxRegression testclass1 = new CoxRegression(0.05, this.followupDays, this.censor, a); 
+			double [] pValueArray = testclass1.pValue; 
+			for (int i=0; i<pValueArray.length; i++){
+				System.out.println(pValueArray[i] + " ");
+			}
+			System.out.println();
+			if (Double.isNaN(pValueArray[1])){
+				pValue = Double.valueOf(1);
+			}
+			else{
+				pValue = pValueArray[1];
+			}
+			*/
+			
 		}
 		
 		else if (this.statTest.equals("CoxPh")){
@@ -898,6 +968,7 @@ public class HypermodulesHeuristicAlgorithm {
 				pValue = pValueArray[1];
 			}
 			*/
+			
 			/*
 			ConnectR rconnection = new ConnectR(this.followupDays, this.censor, group, this.age);
 			try {
@@ -907,7 +978,6 @@ public class HypermodulesHeuristicAlgorithm {
 			}
 			*/
 		}
-
 		return pValue;
 	}
 	
@@ -972,17 +1042,16 @@ public class HypermodulesHeuristicAlgorithm {
 			daysFromBirth[k] = Double.valueOf(clinicalValues.get(k)[3]);
 		}
 		*/
-		
-		
+
 		/*
 		age = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			age[k]=(-1*daysFromBirth[k]+followupDays[k]);
-			//System.out.println(age[k]);
+			System.out.println(age[k]);
 		}
 		*/
 		
-
+		
 		censor = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			if (status[k]==true){

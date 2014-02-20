@@ -201,11 +201,43 @@ public class CytoscapeUtils {
 		return swingApp.getCytoPanel(CytoPanelName.EAST);
 	}
 	
+	public CytoPanel getCytoPanelSouth(){
+		return swingApp.getCytoPanel(CytoPanelName.SOUTH);
+	}
+	
+	public ResultsPanel getResultsPanel(){
+		CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.SOUTH);
+		int count = cytoPanel.getCytoPanelComponentCount();
+
+		for (int i = 0; i < count; i++) {
+			if (cytoPanel.getComponentAt(i) instanceof ResultsPanel)
+				return (ResultsPanel) cytoPanel.getComponentAt(i);
+		}
+		
+		return null;
+	}
+	
+	public HashSet<ResultsPanel> getAllResultsPanels(){
+		CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.SOUTH);
+		int count = cytoPanel.getCytoPanelComponentCount();
+		HashSet<ResultsPanel> rph = new HashSet<ResultsPanel>();
+		
+		for (int i = 0; i < count; i++) {
+			if (cytoPanel.getComponentAt(i) instanceof ResultsPanel)
+				rph.add((ResultsPanel) cytoPanel.getComponentAt(i));
+		}
+		
+		return rph;
+		
+	}
+	
 	
 	/**
 	 * fetches a result panel
 	 * @return ResultsPanel
 	 */
+	//TODO: changed
+	/*
 	public ResultsPanel getResultsPanel(){
 		CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.EAST);
 		int count = cytoPanel.getCytoPanelComponentCount();
@@ -217,11 +249,13 @@ public class CytoscapeUtils {
 		
 		return null;
 	}
+	*/
 	
 	/**
 	 * fetches all opened results panels
 	 * @return HashSet<ResultsPanel> rph
 	 */
+	/*
 	public HashSet<ResultsPanel> getAllResultsPanels(){
 		CytoPanel cytoPanel = swingApp.getCytoPanel(CytoPanelName.EAST);
 		int count = cytoPanel.getCytoPanelComponentCount();
@@ -235,6 +269,7 @@ public class CytoscapeUtils {
 		return rph;
 		
 	}
+	*/
 	
 	/**
 	 * discards a result panel

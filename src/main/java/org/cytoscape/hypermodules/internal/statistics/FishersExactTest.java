@@ -11,7 +11,7 @@ public class FishersExactTest {
         private int sampleSize;
         private int sampleSuccesses;
         private ContingencyTable2x2 ct;
-        private H1 alternative = H1.NOT_EQUAL;
+        private H1 alternative = H1.LESS_THAN;
         private static final int OVERREP = 1;
         private static final int UNDERREP = -1;
         private static final int NOREP = 0;
@@ -106,7 +106,7 @@ public class FishersExactTest {
         /**
          * Get the results of the test
          * 
-         * @return The results of the two-tailed Fishers exact test.
+         * @return The results of the one-tailed Fishers exact test//two-tailed Fishers exact test.
          */
         public double getResult() {
         		//System.out.println("1 - " + populationSize);
@@ -124,14 +124,14 @@ public class FishersExactTest {
                 if ((sampleSuccesses != 0 && sampleSuccesses != sampleSize)) {
                     jsc.contingencytables.FishersExactTest fet = new jsc.contingencytables.FishersExactTest(ct, alternative);
                     //System.out.println("returnval: " + fet.getSP());
-                    return fet.getSP();
+                    return fet.getOneTailedSP();
+                    //return fet.getSP();
             } else {
                     if (alternative == H1.LESS_THAN) {
                             Hypergeometric hg = new Hypergeometric(sampleSize, populationSize, totalSuccesses);
                             //System.out.println("returnval: " + hg.pdf(sampleSuccesses));
                             return hg.pdf(sampleSuccesses);
                     } else if(alternative == H1.GREATER_THAN){
-                    		//System.out.println("returnval: " + 1.0);
                             return 1.0;
                     } else {
                             Hypergeometric hg = new Hypergeometric(sampleSize, populationSize, totalSuccesses);

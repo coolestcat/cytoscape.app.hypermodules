@@ -66,6 +66,7 @@ public class AlgorithmTask implements Task {
 	private ArrayList<String[]> sampleValues;
 	private ArrayList<String[]> filteredSampleValues;
 	private ArrayList<String[]> clinicalValues;
+	private Multimap<String, String> sampleValueHash;
 	private ArrayList<String[]> otherValues;
 	private int nShuffled;
 	private CyNetwork network;
@@ -133,6 +134,11 @@ public class AlgorithmTask implements Task {
 		this.otherValues = otherValues;
 		this.nShuffled = nShuffled;
 		this.network = currNetwork;
+		this.sampleValueHash = ArrayListMultimap.create();
+		for (int i=0; i<sampleValues.size(); i++){
+			sampleValueHash.put(sampleValues.get(i)[0], sampleValues.get(i)[1]);
+		}
+		
 		
 		if (statTest.equals("logRank")){
 			
@@ -529,59 +535,34 @@ public class AlgorithmTask implements Task {
 					}
 				}
 				
+				HashMap<String, Double> patn = new HashMap<String, Double>();
+				for (String x : neworig.keySet()){
+					patn.put(x, (double) getNumPatients(x));
+				}
+				
+				HashMap<String, Double> oddsratio = new HashMap<String, Double>();
 				if (this.statTest.equals("logRank")){
-					HashMap<String, Double> clas = ahsd.get(2);
-					HashMap<String, Double> newclas = new HashMap<String, Double>();
-					for (String o : clas.keySet()){
-						if (!rejectedList.contains(o)){
-							newclas.put(seedAtBeginning(s, o), roundToSignificantFigures(clas.get(o),5));
-						}
-					}
-					
-					HashMap<String, Double> patn = new HashMap<String, Double>();
-					for (String x : neworig.keySet()){
-						patn.put(x, (double) getNumPatients(x));
-					}
-					
-					HashMap<String, Double> oddsratio = new HashMap<String, Double>();
 					for (String x : neworig.keySet()){
 						oddsratio.put(x, roundToSignificantFigures(getRatioLogRank(x), 5));
 					}
-					
-					newahsd.add(neworig);
-					newahsd.add(newadj);
-					newahsd.add(newclas);
-					newahsd.add(patn);
-					newahsd.add(oddsratio);
-
 				}
 				else{
-					HashMap<String, Double> patn = new HashMap<String, Double>();
-					for (String x : neworig.keySet()){
-						patn.put(x, (double) getNumPatients(x));
-					}
-					
-					HashMap<String, Double> oddsratio = new HashMap<String, Double>();
 					for (String x : neworig.keySet()){
 						oddsratio.put(x, roundToSignificantFigures(getRatioFisher(x), 5));
 					}
-					
-					newahsd.add(neworig);
-					newahsd.add(newadj);
-					newahsd.add(patn);
-					newahsd.add(oddsratio);
-				
 				}
+
+					
+				newahsd.add(neworig);
+				newahsd.add(newadj);
+				newahsd.add(patn);
+				newahsd.add(oddsratio);
 				
 				hah.put(newahsd, inputhah.get(ahsd));
 			}
 			output.put(s, hah);
 			
 		}
-		
-		
-		
-		
 		
 		return output;
 	}
@@ -679,6 +660,25 @@ public class AlgorithmTask implements Task {
 		return false;
 	}
 	
+	public String getPatientList(String genes){
+		String ret = "";
+		String[] t = genes.split(":");
+		HashSet<String> pats = new HashSet<String>();
+		for (int i=0; i<t.length; i++){
+			for (String s : sampleValueHash.get(t[i])){
+				pats.add(s);
+			}	
+		}
+		
+		for (String s : pats){
+			ret = ret + s + ",";
+		}
+		
+		if (ret.charAt(ret.length()-1)==','){
+			ret = ret.substring(0, ret.length()-1);
+		}
+			return ret;
+	}
 	
 	public int getNumPatients(String genes){
 		int result = 0;
@@ -691,7 +691,7 @@ public class AlgorithmTask implements Task {
 		HashSet<String> patients = new HashSet<String>();
 		for (int i=0; i<filteredSampleValues.size(); i++){
 			if (checker.contains(filteredSampleValues.get(i)[0])){
-				if (filteredSampleValues.get(i)[1]!="no_sample"){
+				if (!filteredSampleValues.get(i)[1].equals("no_sample")){
 					patients.add(filteredSampleValues.get(i)[1]);
 				}
 

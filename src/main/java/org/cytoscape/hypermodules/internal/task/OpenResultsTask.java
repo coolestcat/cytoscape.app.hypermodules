@@ -46,12 +46,22 @@ public class OpenResultsTask implements Task {
 	public void run(TaskMonitor taskMonitor) throws Exception {
 		ResultsPanel resultsPanel = new ResultsPanel(parameters, utils, allResults, network, sampleValues, clinicalValues, otherValues);
 		utils.serviceRegistrar.registerService(resultsPanel, CytoPanelComponent.class, new Properties());
-		CytoPanel eastPanel = utils.getCytoPanelEast();
-		eastPanel.setState(CytoPanelState.DOCK);
+		
+		
+		//CytoPanel eastPanel = utils.getCytoPanelEast();
+		//eastPanel.setState(CytoPanelState.DOCK);
+		
+		CytoPanel southPanel = utils.getCytoPanelSouth();
+		southPanel.setState(CytoPanelState.DOCK);
 		
 		
 		//pop up on open?
-		CytoPanel cytoPanel = utils.swingApp.getCytoPanel(CytoPanelName.EAST);
+		
+		//CytoPanel cytoPanel = utils.swingApp.getCytoPanel(CytoPanelName.EAST);
+		//int index = cytoPanel.indexOfComponent(resultsPanel);
+		//cytoPanel.setSelectedIndex(index);
+		
+		CytoPanel cytoPanel = utils.swingApp.getCytoPanel(CytoPanelName.SOUTH);
 		int index = cytoPanel.indexOfComponent(resultsPanel);
 		cytoPanel.setSelectedIndex(index);
 		

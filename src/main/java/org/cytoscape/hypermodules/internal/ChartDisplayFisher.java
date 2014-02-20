@@ -224,7 +224,7 @@ public class ChartDisplayFisher {
 			chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(new String[] {toChart[1], toChart[0]})), new ArrayList<Number>(Arrays.asList(new Number[]{expected.get(1), expected.get(0)})));
 		}
 		else{
-			chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - Genes: " + s + " - PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
+			chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - \n Genes: " + s + " - \n PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
 			chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(toChart)), observed);
 			chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(toChart)), expected);
 		}	

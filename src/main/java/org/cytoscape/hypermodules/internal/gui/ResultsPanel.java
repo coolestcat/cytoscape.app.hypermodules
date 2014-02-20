@@ -64,7 +64,6 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	 * seedData is a hashmap of 3 arraylists of HashMap<String, Double> and a multimap
 	 * arraylist.get(0) - original test results (module - statistical test pValue)
 	 * arraylist.get(1) - FDR permutation p values (module - FDR permutation test pValue)
-	 * arraylist.get(2) - classification of high or low (module - 0,1, or 2)
 	 * multimap - all the shuffled data, in case user wants to export all the results
 	 * 
 	 */
@@ -122,6 +121,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	private ArrayList<String[]> otherValues;
 	
 	private ArrayList<String[]> addToTable;
+	
+	private Multimap<String, String> sampleValueHash;
+	
+	private HashMap<String, String> patientListHash;
 
 	private double pValueCutoff;
 	
@@ -147,8 +150,57 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		this.sampleValues = sampleValues;
 		this.clinicalValues = clinicalValues;
 		this.otherValues = otherValues;
+		
+		this.sampleValueHash = ArrayListMultimap.create();
+		for (int i=0; i<sampleValues.size(); i++){
+			sampleValueHash.put(sampleValues.get(i)[0], sampleValues.get(i)[1]);
+		}
+		
+		this.patientListHash = new HashMap<String, String>();
+		
+		for (String s : allResults.keySet()){
+			for (ArrayList<HashMap<String, Double>> ahsd : allResults.get(s).keySet()){
+				HashMap<String, Double> one = ahsd.get(0);
+				for (String t : one.keySet()){
+					this.patientListHash.put(t, getPatientList(t));
+				}
+			}
+		}
+
 		makeComponents();
 		makeLayout();
+	}
+	
+	public String getPatientList(String genes){
+		String ret = "";
+		String[] t = genes.split(":");
+		HashSet<String> pats = new HashSet<String>();
+		for (int i=0; i<t.length; i++){
+			for (String s : sampleValueHash.get(t[i])){
+				if (!s.equals("no_sample")){
+					pats.add(s);
+				}
+			}	
+		}
+		
+		ArrayList<String> as = new ArrayList<String>();
+		for (String s : pats){
+			as.add(s);
+		}
+		
+		Collections.sort(as);
+		
+		for (int i=0; i<as.size(); i++){
+			ret = ret + as.get(i) + ",";
+		}
+		
+		if (ret.length()>0){
+			if (ret.charAt(ret.length()-1)==','){
+				ret = ret.substring(0, ret.length()-1);
+			}
+		}
+
+		return ret;
 	}
 
 	/**
@@ -181,13 +233,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		panel3.add(setCutoff);
 		panel3.add(cutoff);
 		this.pValueCutoff = 0.05;
-		if (parameters.get("stat").equals("logRank")){
-			setUpTableLogRank();
-		}
-		else if (parameters.get("stat").equals("fisher")){
-			setUpTableFisher();
-		}
-
+		setUpTable(true);
 	}
 	
 	public void sortTable(int colNumber){
@@ -196,11 +242,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		Model tab = null;
 		if (parameters.get("stat").equals("logRank")){
-			String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
+			String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value",  "# of Patients", "Followup Time Ratio, Log", "List of Patients"};
 			tab = new Model(c);
 		}
 		else{
-			String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
+			String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio, Log", "List of Patients"};
 			tab = new Model(c);
 		}
 		
@@ -210,9 +256,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			HashSet<Double> gg = new HashSet<Double>();
 			for (int i=0; i<addToTable.size(); i++){
 				gg.add(Double.valueOf(addToTable.get(i)[colNumber]));
-				String[] mdsentry = new String[5];
+				String[] mdsentry = new String[6];
 				mdsentry[0] = addToTable.get(i)[0];
 				mdsentry[1] = addToTable.get(i)[1];
+				mdsentry[5] = addToTable.get(i)[6];
 				if (colNumber == 2){
 					mdsentry[2] = addToTable.get(i)[3];
 					mdsentry[3] = addToTable.get(i)[4];
@@ -221,15 +268,13 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				else if (colNumber == 3){
 					mdsentry[2] = addToTable.get(i)[2];
 					mdsentry[3] = addToTable.get(i)[4];
-					mdsentry[4] = addToTable.get(i)[5];
-					
+					mdsentry[4] = addToTable.get(i)[5];					
 				}
 				else if (colNumber == 4){
 					mdsentry[2] = addToTable.get(i)[2];
 					mdsentry[3] = addToTable.get(i)[3];
 					mdsentry[4] = addToTable.get(i)[5];
 				}
-				
 				else{
 					mdsentry[2] = addToTable.get(i)[2];
 					mdsentry[3] = addToTable.get(i)[3];
@@ -248,9 +293,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			for (int i=0; i<toSort.size(); i++){
 				for (String[] d : mds.get(toSort.get(i))){
 					//System.out.println(toSort.get(i) + ":" + d);
-					String[] newentry = new String[6];
+					String[] newentry = new String[7];
 					newentry[0] = d[0];
 					newentry[1] = d[1];
+					newentry[6] = d[5];
 					if (colNumber == 2){
 						newentry[2] = String.valueOf(toSort.get(i));
 						newentry[3] = d[2];
@@ -289,13 +335,14 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			
 			for (int i=0; i<addToTable.size(); i++){
 				gg.add((addToTable.get(i)[colNumber]));
-				String[] mdsentry = new String[5];
+				String[] mdsentry = new String[6];
 				if (colNumber == 0){
 					mdsentry[0] = addToTable.get(i)[1];
 					mdsentry[1] = addToTable.get(i)[2];
 					mdsentry[2] = addToTable.get(i)[3];
 					mdsentry[3] = addToTable.get(i)[4];
 					mdsentry[4] = addToTable.get(i)[5];
+					mdsentry[5] = addToTable.get(i)[6];
 				}
 				else if (colNumber ==1){
 					mdsentry[0] = addToTable.get(i)[0];
@@ -303,7 +350,15 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					mdsentry[2] = addToTable.get(i)[3];
 					mdsentry[3] = addToTable.get(i)[4];
 					mdsentry[4] = addToTable.get(i)[5];
-					
+					mdsentry[5] = addToTable.get(i)[6];
+				}
+				else if (colNumber == 6){
+					mdsentry[0] = addToTable.get(i)[0];
+					mdsentry[1] = addToTable.get(i)[1];
+					mdsentry[2] = addToTable.get(i)[2];
+					mdsentry[3] = addToTable.get(i)[3];
+					mdsentry[4] = addToTable.get(i)[4];
+					mdsentry[5] = addToTable.get(i)[5];
 				}
 				mds.put(addToTable.get(i)[colNumber], mdsentry);
 			}
@@ -315,7 +370,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			
 			for (int i=0; i<toSort.size(); i++){
 				for (String[] d : mds.get(toSort.get(i))){
-					String[] newentry = new String[6];
+					String[] newentry = new String[7];
 					if (colNumber == 0){
 						newentry[0] = toSort.get(i);
 						newentry[1] = d[0];
@@ -323,6 +378,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 						newentry[3] = d[2];
 						newentry[4] = d[3];
 						newentry[5] = d[4];
+						newentry[6] = d[5];
  						
 					}
 					else if (colNumber == 1){
@@ -332,6 +388,16 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 						newentry[3] = d[2];
 						newentry[4] = d[3];
 						newentry[5] = d[4];
+						newentry[6] = d[5];
+					}
+					else if (colNumber == 6){
+						newentry[0] = d[0];
+						newentry[1] = d[1];
+						newentry[2] = d[2];
+						newentry[3] = d[3];
+						newentry[4] = d[4];
+						newentry[5] = d[5];
+						newentry[6] = toSort.get(i);
 					}
 					newTable.add(newentry);
 				}
@@ -351,8 +417,15 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	}
 	
 	
-	public void setUpTableFisher(){
-		String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
+	public void setUpTable(boolean first){
+		String[] c = null;
+		if (parameters.get("stat").equals("logRank")){
+			c = new String[]{"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "# of Patients", "Followup Time Ratio, Log", "List of Patients"};
+		}
+		else{
+			c = new String[]{"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio, log", "List of Patients"};
+		}
+		
 		Model tab = new Model(c);
 		this.sas = new String[2];
 		sas[0] = "none";
@@ -361,146 +434,15 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		for (String key : allResults.keySet()){
 			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
 				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[6];
+					String[] newEntry = new String[7];
 					newEntry[0]=key;
 					newEntry[1] = genes;
 					newEntry[2] = String.valueOf(set.get(0).get(genes));
-					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
 					Double b = set.get(1).get(genes);
-					if (b!=null){
-						//b = (double)Math.round(b * 100000) / 100000;
-					}
 					newEntry[3]=String.valueOf(b);
-					newEntry[4] = String.valueOf(set.get(2).get(genes));
-					newEntry[5] = String.valueOf(set.get(3).get(genes));
-					if (!newEntry[1].equals("none")){
-						if (b!=null){
-							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
-								addToTable.add(newEntry);
-							}
-						}
-						else{
-							if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
-								addToTable.add(newEntry);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		tab.AddCSVData(addToTable);
-		resultsTable = new JTable();
-		resultsTable.setModel(tab);
-		//final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
-		tableHeader = resultsTable.getTableHeader();
-		tableHeader.addMouseListener(this);
-		viewer = new JScrollPane(resultsTable);
-	}
-	
-	public void redoLrTable(){
-		String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
-		Model tab = new Model(c);
-		addToTable = new ArrayList<String[]>();
-		
-		for (String key : allResults.keySet()){
-			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
-				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[6];
-					newEntry[0]=key;
-					newEntry[1] = genes;
-					newEntry[2] = String.valueOf(set.get(0).get(genes));
-					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
-					Double b = set.get(1).get(genes);
-					if (b!=null){
-						//b = (double)Math.round(b * 100000) / 100000;
-					}
-					newEntry[3]=String.valueOf(b);
-					
-					/*
-					if (set.get(2).get(genes)==1){
-						newEntry[4] = "HIGH";
-					}
-					else if (set.get(2).get(genes)==0){
-						newEntry[4] = "LOW";
-					}
-					else{
-						newEntry[4] = "NA";
-					}
-					*/
-					newEntry[4] = String.valueOf(set.get(3).get(genes));
-					newEntry[5] = String.valueOf(set.get(4).get(genes));
-					if (!newEntry[1].equals("none")){
-						if (b!=null){
-							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
-								addToTable.add(newEntry);
-							}
-						}
-						else{
-							if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
-								addToTable.add(newEntry);
-							}
-						}
-					}
-				}
-			}
-		}
-		tab.AddCSVData(addToTable);
-		resultsTable = new JTable();
-		resultsTable.setModel(tab);
-		//final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
-		tableHeader = resultsTable.getTableHeader();
-		tableHeader.addMouseListener(this);
-		viewer.setViewportView(resultsTable);
-		/*
-		resultsTable.getTableHeader().addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        int col = resultsTable.columnAtPoint(e.getPoint());
-		        String name = resultsTable.getColumnName(col);
-		        System.out.println(col);
-		        sortTable(col, addToTable);
-		    }
-		});
-		*/
-	}
-	
-	
-	public void setUpTableLogRank(){
-		String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "# of Patients", "Odds Ratio"};
-		Model tab = new Model(c);
-		this.sas = new String[2];
-		sas[0] = "none";
-		addToTable = new ArrayList<String[]>();
-		
-		for (String key : allResults.keySet()){
-			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
-				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[6];
-					newEntry[0]=key;
-					newEntry[1] = genes;
-					newEntry[2] = String.valueOf(set.get(0).get(genes));
-					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
-					Double b = set.get(1).get(genes);
-					if (b!=null){
-						//b = (double)Math.round(b * 100000) / 100000;
-					}
-					newEntry[3]=String.valueOf(b);
-					
-					/*
-						if (set.get(2).get(genes)==1){
-							newEntry[4] = "HIGH";
-						}
-						else if (set.get(2).get(genes)==0){
-							newEntry[4] = "LOW";
-						}
-						else{
-							newEntry[4] = "NA";
-						}
-					*/
-					newEntry[4]=String.valueOf(set.get(3).get(genes));
-					newEntry[5]=String.valueOf(set.get(4).get(genes));
-					
+					newEntry[4]=String.valueOf((int) (double) set.get(2).get(genes));
+					newEntry[5]=String.valueOf(set.get(3).get(genes));
+					newEntry[6]= patientListHash.get(genes);
 					if (!newEntry[1].equals("none")){
 						if (b!=null){
 							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
@@ -520,42 +462,15 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		tab.AddCSVData(addToTable);
 		resultsTable = new JTable();
 		resultsTable.setModel(tab);
-		//final ChartDisplay cd = new ChartDisplay(this.clinicalValues, this.sampleValues, this.network);
+		
 		tableHeader = resultsTable.getTableHeader();
 		tableHeader.addMouseListener(this);
-		/*
-		resultsTable.addMouseListener(new MouseAdapter() {
-			  public void mouseClicked(MouseEvent e) {
-			      JTable target = (JTable)e.getSource();
-			      int row = target.getSelectedRow();
-			      sas = new String[2];
-			      sas[0] = addToTable.get(row)[0];
-			      sas[1] = addToTable.get(row)[1];
-			      selectedP = Double.valueOf(addToTable.get(row)[2]);
-			      if (e.getClickCount() == 2) {
-			    	  if (!addToTable.get(row)[1].equals("none")){
-			    	  cd.display(addToTable.get(row)[1]);
-			      }
-			    }
-			  }
-			});
-		*/
-		viewer = new JScrollPane(resultsTable);
-		//viewer.setViewportView(resultsTable);
-		
-		/*
-		resultsTable.getTableHeader().addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        int col = resultsTable.columnAtPoint(e.getPoint());
-		        String name = resultsTable.getColumnName(col);
-		        System.out.println(col);
-		        sortTable(col, addToTable);
-		       
-		    }
-		});
-		*/
-
+		if (first){
+			viewer = new JScrollPane(resultsTable);
+		}
+		else{
+			viewer.setViewportView(resultsTable);
+		}
 	}
 	
 	
@@ -589,15 +504,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				HashMap<String, Double> adjusted = ahhs.get(1);
 				HashMap<String, Double> patn = null;
 				HashMap<String, Double> oddsratio = null;
-				if (this.parameters.get("stat").equals("logRank")){
-					patn = ahhs.get(3);
-					oddsratio = ahhs.get(4);
-				}
-				else{
 					patn = ahhs.get(2);
 					oddsratio = ahhs.get(3);
-					
-				}
+
+
 				for (String set : original.keySet()){
 					if (adjusted.containsKey(set)){
 						if (original.get(set)<this.pValueCutoff && adjusted.get(set)<this.pValueCutoff){
@@ -682,9 +592,9 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				fout.write("# Statistical Test: " + '\t'+ parameters.get("stat") + lineSep + lineSep);
 				fout.write(lineSep);
 				
-				fout.write("Module" + '\t' + "Pvalue_test" + '\t' + "Pvalue_background" + '\t' + "Number_patients" + '\t' + "Log_odds_ratio" + lineSep);
+				fout.write("Module" + '\t' + "Pvalue_test" + '\t' + "Pvalue_background" + '\t' + "Number_patients" + '\t' + "Log_odds_ratio" + '\t' + "Patient_list" +  lineSep);
 				for (String s : mostCorrelated.keySet()){
-					fout.write(s + '\t' + mostCorrelated.get(s) + '\t' + mostCorrelatedFDR.get(s) + '\t' + mostCorrelatedPatn.get(s) + '\t' + mostCorrelatedOddsRatio.get(s) + lineSep);
+					fout.write(s + '\t' + mostCorrelated.get(s) + '\t' + mostCorrelatedFDR.get(s) + '\t' + (int) (double) mostCorrelatedPatn.get(s) + '\t' + mostCorrelatedOddsRatio.get(s) + '\t' + patientListHash.get(s) +  lineSep);
 				}
 				
 			
@@ -877,7 +787,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 
 	@Override
 	public CytoPanelName getCytoPanelName() {
-		return CytoPanelName.EAST;
+		return CytoPanelName.SOUTH;
 	}
 
 	@Override
@@ -891,53 +801,6 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		return "HyperModules Results";
 	}
 
-	public void redoFisherTable(){
-		
-		String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio"};
-		Model tab = new Model(c);
-		addToTable = new ArrayList<String[]>();
-		
-		for (String key : allResults.keySet()){
-			for (ArrayList<HashMap<String,Double>> set : allResults.get(key).keySet()){
-				for (String genes : set.get(0).keySet()){
-					String[] newEntry = new String[6];
-					newEntry[0]=key;
-					newEntry[1] = genes;
-					newEntry[2] = String.valueOf(set.get(0).get(genes));
-					//newEntry[2]=String.valueOf((double)Math.round(set.get(0).get(genes)* 100000) / 100000);
-					Double b = set.get(1).get(genes);
-					if (b!=null){
-						//b = (double)Math.round(b * 100000) / 100000;
-					}
-					newEntry[3]=String.valueOf(b);
-					newEntry[4] = String.valueOf(set.get(2).get(genes));
-					newEntry[5] = String.valueOf(set.get(3).get(genes));
-					if (!newEntry[1].equals("none")){
-						if (b!=null){
-							if (Double.valueOf(newEntry[2])<=this.pValueCutoff && Double.valueOf(newEntry[3])<=this.pValueCutoff){
-								addToTable.add(newEntry);
-							}
-						}
-						else{
-							if (Double.valueOf(newEntry[2])<=this.pValueCutoff){
-								addToTable.add(newEntry);
-							}
-						}
-					}
-
-				}
-			}
-		}
-		tab.AddCSVData(addToTable);
-		resultsTable = new JTable();
-		resultsTable.setModel(tab);
-		//final ChartDisplayFisher cd = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
-
-		tableHeader = resultsTable.getTableHeader();
-		tableHeader.addMouseListener(this);
-		viewer.setViewportView(resultsTable);
-	}
-	
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		/*
@@ -1025,12 +888,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 			else{
 				this.pValueCutoff = Double.valueOf(cutoff.getText());
 				System.out.println(this.pValueCutoff);
-				if (parameters.get("stat").equals("logRank")){
-					redoLrTable();
-				}
-				else{
-					redoFisherTable();
-				}
+				setUpTable(false);
 			}
 		}
 	}
