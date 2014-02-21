@@ -49,6 +49,7 @@ public class OriginalTest {
 	/**
 	 * progress bar
 	 */
+	private String foregroundvariable;
 	private TaskMonitor tm;
 	
 	/**
@@ -63,10 +64,11 @@ public class OriginalTest {
 	 * @param tm
 	 * @param network
 	 */
-	public OriginalTest(String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils, TaskMonitor tm, CyNetwork network){
+	public OriginalTest(String expandOption, String statTest, String foregroundvariable, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils, TaskMonitor tm, CyNetwork network){
 		this.utils = utils;
 		this.expandOption = expandOption;
 		this.statTest = statTest;
+		this.foregroundvariable = foregroundvariable;
 		this.sampleValues = sampleValues;
 		this.otherValues = otherValues;
 		this.clinicalValues = clinicalValues;
@@ -83,7 +85,7 @@ public class OriginalTest {
 	 */
 	public HashMap<String, HashMap<String, Double>> testHighOrLow(HashMap<String, HashMap<String, Double>> ot){
 		HashMap<String, HashMap<String, Double>> rt = new HashMap<String, HashMap<String, Double>>();
-		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
+		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		ha.initialize();
 		for (String s : ot.keySet()){
 			HashMap<String, Double> newMap = new HashMap<String, Double>();
@@ -111,7 +113,7 @@ public class OriginalTest {
 	 */
 	public HashMap<String, HashMap<String, Double>> callTest(){
 		HashMap<String, HashMap<String, Double>> rt = new HashMap<String, HashMap<String, Double>>();
-		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
+		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		ha.initialize();
 		
 		if (this.expandOption.equals("expand")){

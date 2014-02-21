@@ -27,7 +27,6 @@ import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.hypermodules.internal.CytoscapeUtils;
-import org.cytoscape.hypermodules.internal.gui.NewMainPanel.CSVFile;
 import org.cytoscape.hypermodules.internal.task.AlgorithmTask;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.events.NetworkAddedListener;
@@ -177,6 +176,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	
 	private JComboBox fpatients;
 	private JComboBox fvariable;
+	private JComboBox fforeground;
 	
 	private int state;
 	private ArrayList<String[]> newGeneTable;
@@ -623,6 +623,16 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 
 	}
 	
+	public HashSet<String> extractClinicalVariables(){
+		HashSet<String> variables = new HashSet<String>();
+		for (int i=0; i<otherValues.size(); i++){
+			variables.add(otherValues.get(i)[1]);
+		}
+		
+		return variables;
+	}
+	
+	
 	public void setClinicalPanelFisher(Boolean header, int flag){
 
 		clinicalPanel = new JPanel();
@@ -651,7 +661,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		
 		JPanel drops = new JPanel();
-		drops.setLayout(new GridLayout(2,2));
+		drops.setLayout(new GridLayout(3,2));
 		
 		JLabel fpatientlabel = new JLabel("patients: ");
 		fpatients = new JComboBox();
@@ -663,12 +673,19 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		fvariable.setPreferredSize(new Dimension(150, 23));
 		fvariable.setMaximumSize(new Dimension(150, 23));
 		
+		JLabel fforegroundlabel = new JLabel("foreground variable:");
+		fforeground = new JComboBox();
+		fforeground.setPreferredSize(new Dimension(150,23));
+		fforeground.setMaximumSize(new Dimension(150, 23));
+		
 		drops.add(fpatientlabel);
 		drops.add(fpatients);
 		drops.add(fvariablelabel);
 		drops.add(fvariable);
-		drops.setPreferredSize(new Dimension(300, 60));
-		drops.setMaximumSize(new Dimension(300, 60));
+		drops.add(fforegroundlabel);
+		drops.add(fforeground);
+		drops.setPreferredSize(new Dimension(300, 90));
+		drops.setMaximumSize(new Dimension(300, 90));
 		
 		clinicalPanel.add(drops);
 		
@@ -714,6 +731,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	}
 
 	public void setfishertable(int one, int two){
+		
+		fforeground.removeAllItems();
+		
 		otherValues = new ArrayList<String[]>();
 		for (int i=0; i<allClinicalData.size(); i++){
 			String[] add = new String[2];
@@ -721,6 +741,15 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			add[1] = allClinicalData.get(i)[two];
 			otherValues.add(add);
 		}
+		
+		HashSet<String> vars = extractClinicalVariables();
+		for (String h : vars){
+			fforeground.addItem(h);
+		}
+		
+		fforeground.setSelectedIndex(0);
+		
+		
 		
 		String[] t = {"Patient ID", "Clinical Variable"};
 		MyModel nm = new MyModel(t);
@@ -1004,77 +1033,82 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		
 		if (ae.getSource() == loadClinicalData){
 			File DataFile = utils.fileUtil.getFile(utils.swingApp.getJFrame(), "Load Clinical Data", FileUtil.LOAD, getFilters());
-			CSVFile Rd = new CSVFile();
-			allClinicalData = Rd.ReadCSVfile(DataFile);
-			columnIndices = new HashMap<String, Integer>();
-			if (allClinicalData.get(0).length<3 && logRank.isSelected()){
-				ErrorDialog ed = new ErrorDialog(utils, "There are not enough columns in the CSV for log rank test.");
-				ed.setLocationRelativeTo(null);
-				ed.setVisible(true);
-				System.out.println("Not enough columns!");
-				return;
-			}
-			if (clinicalheaders.isSelected()){
-				clinicalheader = allClinicalData.get(0);
-				allClinicalData.remove(0);
-				for (int y = 0; y<clinicalheader.length; y++){
-					columnIndices.put(clinicalheader[y], y);
+			if (DataFile!=null){
+				CSVFile Rd = new CSVFile();
+				allClinicalData = Rd.ReadCSVfile(DataFile);
+				columnIndices = new HashMap<String, Integer>();
+				if (allClinicalData.get(0).length<3 && logRank.isSelected()){
+					ErrorDialog ed = new ErrorDialog(utils, "There are not enough columns in the CSV for log rank test.");
+					ed.setLocationRelativeTo(null);
+					ed.setVisible(true);
+					System.out.println("Not enough columns!");
+					return;
 				}
-			}
-			else{
-				for (int y = 0; y<allClinicalData.get(0).length; y++){
-					columnIndices.put("Column " + (y+1), y);
+				if (clinicalheaders.isSelected()){
+					clinicalheader = allClinicalData.get(0);
+					allClinicalData.remove(0);
+					for (int y = 0; y<clinicalheader.length; y++){
+						columnIndices.put(clinicalheader[y], y);
+					}
 				}
+				else{
+					for (int y = 0; y<allClinicalData.get(0).length; y++){
+						columnIndices.put("Column " + (y+1), y);
+					}
+				}
+				
+				if (logRank.isSelected()){
+					setClinicalPanelLogRank(clinicalheaders.isSelected(), 1);
+				}
+				else if (fisher.isSelected()){
+					setClinicalPanelFisher(clinicalheaders.isSelected(), 1);
+				}
+				loadClinicalPanel.setCollapsed(false);
 			}
-			
-			if (logRank.isSelected()){
-				setClinicalPanelLogRank(clinicalheaders.isSelected(), 1);
-			}
-			else if (fisher.isSelected()){
-				setClinicalPanelFisher(clinicalheaders.isSelected(), 1);
-			}
-			loadClinicalPanel.setCollapsed(false);
 		}
 		
 		if (ae.getSource() == loadSamples){
 			
         	File DataFile = utils.fileUtil.getFile(utils.swingApp.getJFrame(), "Load Samples", FileUtil.LOAD, getFilters());
-        	CSVFile Rd = new CSVFile();
-        	genes2samplesvalues = Rd.ReadCSVfile(DataFile);
-        	MyModel NewModel = null;
-        	if (headers.isSelected()){
-        		header = genes2samplesvalues.get(0);
-        		NewModel = new MyModel(header);
-        		genes2samplesvalues.remove(0);
-        	}
-        	else{
-        		String[] c = { "genes", "samples"};
-        		NewModel = new MyModel(c);
-        	}
-        	if (genes2samplesvalues.get(0)[0].equals("Hugo_Symbol")){
-        		extractDataFromMaf();
-        	}
-        	
-        	/*
-        	if (!genes2samplesvalues.get(0)[1].equals("no_sample")){
-        		if (genes2samplesvalues.get(0)[1].length()<5){
+        	if (DataFile!=null){
+            	CSVFile Rd = new CSVFile();
+            	genes2samplesvalues = Rd.ReadCSVfile(DataFile);
+            	MyModel NewModel = null;
+            	if (headers.isSelected()){
+            		header = genes2samplesvalues.get(0);
+            		NewModel = new MyModel(header);
             		genes2samplesvalues.remove(0);
-        		}
-        		else if (!genes2samplesvalues.get(0)[1].substring(0,4).equals("TCGA")) {
-            		genes2samplesvalues.remove(0);
-        		}
+            	}
+            	else{
+            		String[] c = { "genes", "samples"};
+            		NewModel = new MyModel(c);
+            	}
+            	if (genes2samplesvalues.get(0)[0].equals("Hugo_Symbol")){
+            		extractDataFromMaf();
+            	}
+            	
+            	/*
+            	if (!genes2samplesvalues.get(0)[1].equals("no_sample")){
+            		if (genes2samplesvalues.get(0)[1].length()<5){
+                		genes2samplesvalues.remove(0);
+            		}
+            		else if (!genes2samplesvalues.get(0)[1].substring(0,4).equals("TCGA")) {
+                		genes2samplesvalues.remove(0);
+            		}
 
+            	}
+            	*/
+            	
+            	
+            	
+            	 NewModel.AddCSVData(genes2samplesvalues);
+            	 allGeneSamples = new JTable();
+            	 allGeneSamples.setModel(NewModel);
+            	 resetSamplePanel(allGeneSamples);
+            	 loadSamplePanel.setCollapsed(false);
+            	 //otherValues = new ArrayList<String[]>();
         	}
-        	*/
-        	
-        	
-        	
-        	 NewModel.AddCSVData(genes2samplesvalues);
-        	 allGeneSamples = new JTable();
-        	 allGeneSamples.setModel(NewModel);
-        	 resetSamplePanel(allGeneSamples);
-        	 loadSamplePanel.setCollapsed(false);
-        	 //otherValues = new ArrayList<String[]>();
+
 		}
 		/*
 		if (ae.getSource()==sort){
@@ -1151,6 +1185,12 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				CyNetwork currNet = netSelect.getSelectedNetwork();
 				
 				
+				String foregroundVariable = "default";
+				if (fisher.isSelected()){
+					foregroundVariable = (String) fforeground.getSelectedItem();
+				}
+				System.out.println(foregroundVariable);
+				
 				
 				if (genes2samplesvalues!=null){
 					genes2samplesvaluescopy = new ArrayList<String[]>();
@@ -1162,12 +1202,12 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				
 			if (stat.equals("logRank") && genes2samplesvaluescopy!=null && clinicalValues!=null){
 				if (handleSurvivalExceptions()){
-					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
+					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, foregroundVariable, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
 				}
 			}
 			else if (stat.equals("fisher") && genes2samplesvaluescopy!=null && otherValues!=null){
 				if (handleClinicalVariableExceptions()){
-					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
+					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, foregroundVariable, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
 				}
 			}
 			else{
@@ -1242,7 +1282,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				}
 			}
 
-			if (variables.size() > 5){
+			if (variables.size() > 20){
 				ErrorDialog ed = new ErrorDialog(utils, "INPUT ERROR: Please pick a clinical variable with fewer categories");
 				ed.setLocationRelativeTo(null);
 				ed.setVisible(true);

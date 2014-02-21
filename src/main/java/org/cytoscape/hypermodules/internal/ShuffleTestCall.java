@@ -30,10 +30,12 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 	private ArrayList<String[]> otherValues;
 	private CyNetwork network;
 	private int nShuffled;
+	private String foregroundvariable;
 	
-	public ShuffleTestCall(int nShuffled, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CyNetwork network){
+	public ShuffleTestCall(int nShuffled, String expandOption, String statTest, String foregroundvariable, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CyNetwork network){
 		this.expandOption = expandOption;
 		this.statTest = statTest;
+		this.foregroundvariable = foregroundvariable;
 		this.sampleValues = sampleValues;
 		this.otherValues = otherValues;
 		this.clinicalValues = clinicalValues;
@@ -43,7 +45,7 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
 	@Override
 	public HashMap<String, Multimap<String, Double>> call() throws Exception {
 		HashMap<String, Multimap<String, Double>> rt = new HashMap<String, Multimap<String, Double>>();
-		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
+		HypermodulesHeuristicAlgorithm ha = new HypermodulesHeuristicAlgorithm(this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		ha.initialize();
 		
 		if (this.expandOption.equals("expand")){

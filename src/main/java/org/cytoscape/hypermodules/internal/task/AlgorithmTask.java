@@ -70,6 +70,7 @@ public class AlgorithmTask implements Task {
 	private ArrayList<String[]> otherValues;
 	private int nShuffled;
 	private CyNetwork network;
+	private String foregroundvariable;
 	
 	private boolean interrupted;
 	
@@ -126,10 +127,11 @@ public class AlgorithmTask implements Task {
 	 * @param utils
 	 */
 
-	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String expandOption, String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){
+	public AlgorithmTask(CyNetwork currNetwork, int nShuffled, String expandOption, String statTest, String foregroundVariable, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CytoscapeUtils utils){
 		this.utils = utils;
 		this.expandOption = expandOption;
 		this.statTest = statTest;
+		this.foregroundvariable = foregroundVariable;
 		this.sampleValues = sampleValues;
 		this.otherValues = otherValues;
 		this.nShuffled = nShuffled;
@@ -212,7 +214,7 @@ public class AlgorithmTask implements Task {
 	public void run(TaskMonitor taskMonitor) throws Exception {
 		this.interrupted = false;
 		long before = System.nanoTime();
-		OriginalTest ot = new OriginalTest(this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.utils, taskMonitor, this.network);
+		OriginalTest ot = new OriginalTest(this.expandOption, this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, this.utils, taskMonitor, this.network);
 		int nCores = Runtime.getRuntime().availableProcessors();
 		this.originalResults = ot.callTest();
 		
@@ -235,21 +237,21 @@ public class AlgorithmTask implements Task {
 		List<Future<HashMap<String, Multimap<String, Double>>>> list = new ArrayList<Future<HashMap<String, Multimap<String, Double>>>>();
 		
 		
-		ShuffleTestTMCall sttm = new ShuffleTestTMCall(nCores,(int) nShuffled/nCores , this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, taskMonitor, this.network);
+		ShuffleTestTMCall sttm = new ShuffleTestTMCall(nCores,(int) nShuffled/nCores , this.expandOption, this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, taskMonitor, this.network);
 		Future<HashMap<String, Multimap<String, Double>>> submit = executor.submit(sttm);
 		list.add(submit);
 		shuffleCount += (int) nShuffled/nCores;
 		
 		for (int i=1; i<nCores-1; i++){
 			//reinitializeVariables();
-			ShuffleTestCall st = new ShuffleTestCall((int) nShuffled/nCores, this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
+			ShuffleTestCall st = new ShuffleTestCall((int) nShuffled/nCores, this.expandOption, this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 			Future<HashMap<String, Multimap<String, Double>>> submitPool = executor.submit(st);
 			list.add(submitPool);
 			shuffleCount += (int) nShuffled/nCores;
 		}
 
 		//reinitializeVariables();
-		ShuffleTestCall st = new ShuffleTestCall(nShuffled-shuffleCount, this.expandOption, this.statTest, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
+		ShuffleTestCall st = new ShuffleTestCall(nShuffled-shuffleCount, this.expandOption, this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		Future<HashMap<String, Multimap<String, Double>>> submitPool = executor.submit(st);
 		list.add(submitPool);
 
@@ -297,6 +299,7 @@ public class AlgorithmTask implements Task {
 		parameters.put("expand", this.expandOption);
 		parameters.put("nShuffled", String.valueOf(this.nShuffled));
 		parameters.put("stat", this.statTest);
+		parameters.put("foregroundvariable", this.foregroundvariable);
 		OpenResultsTaskFactory resultsTaskFac = new OpenResultsTaskFactory(parameters, utils, allResults, this.network, this.sampleValues, this.clinicalValues, this.otherValues);
 		utils.taskMgr.execute(resultsTaskFac.createTaskIterator());
 		
@@ -569,8 +572,11 @@ public class AlgorithmTask implements Task {
 	
 	
 	public static double roundToSignificantFigures(double num, int n) {
-		if (Double.isNaN(num) || Double.isInfinite(num)){
+		if (Double.isNaN(num)){
 			return Double.NaN;
+		}
+		if (Double.isInfinite(num)){
+			return num;
 		}
 		
 	    if(num == 0) {
@@ -714,17 +720,37 @@ public class AlgorithmTask implements Task {
 		
 		
 		HashSet<String> inModulePatients = new HashSet<String>();
-		HashSet<String> outOfModulePatients = new HashSet<String>();
 		
 		for (int i=0; i<filteredSampleValues.size(); i++){
 			if (gs.contains(filteredSampleValues.get(i)[0])){
 				inModulePatients.add(filteredSampleValues.get(i)[1]);
 			}
+		}
+		
+		
+		ArrayList<Double> inModuleFollowup = new ArrayList<Double>();
+		ArrayList<Double> outOfModuleFollowup = new ArrayList<Double>();
+		
+		for (int i=0; i<clinicalValues.size(); i++){
+			if (inModulePatients.contains(clinicalValues.get(i)[0])){
+				inModuleFollowup.add(Double.valueOf(clinicalValues.get(i)[2]));
+			}
 			else{
-				outOfModulePatients.add(filteredSampleValues.get(i)[1]);
+				outOfModuleFollowup.add(Double.valueOf(clinicalValues.get(i)[2]));
 			}
 		}
 		
+		if (inModuleFollowup.size()>0){
+			double p1 = inModuleFollowup.get(inModuleFollowup.size()/2);
+			double p2 = outOfModuleFollowup.get(outOfModuleFollowup.size()/2);
+			return Math.log(p1/(double)p2);
+		}
+		else{
+			return Double.NaN;
+		}
+
+		
+		/*
 		int inModuleVar1 = 0;
 		int outOfModuleVar1 = 0;
 		
@@ -755,6 +781,8 @@ public class AlgorithmTask implements Task {
 			
 		}
 		
+		
+		
 		double p1 = inModuleVar1/ (double) inModulePatients.size();
 		double p2 = outOfModuleVar1/ (double) outOfModulePatients.size();
 		double rvalue = p1*(1-p2)/(double) (p2*(1-p1));
@@ -764,6 +792,8 @@ public class AlgorithmTask implements Task {
 			rvalue = Math.log(rvalue);
 		}
 		return rvalue;
+		*/
+		
 		
 		
 	}
@@ -774,7 +804,7 @@ public class AlgorithmTask implements Task {
 	public double getRatioFisher(String genes){
 		String[] g = genes.split(":");
 		
-		String v1 = otherValues.get(0)[1];
+		String v1 = foregroundvariable;
 		
 		HashSet<String> gs = new HashSet<String>();
 		for (int i=0; i<g.length; i++){
@@ -817,8 +847,12 @@ public class AlgorithmTask implements Task {
 		if (!Double.isNaN(rvalue) && !Double.isInfinite(rvalue)){
 			rvalue = Math.log(rvalue);
 		}
-
-	
+		if (p1 == 0){
+			rvalue = Double.NEGATIVE_INFINITY;
+		}
+		if (p1 == 1){
+			rvalue = Double.POSITIVE_INFINITY;
+		}
 		return rvalue;
 	}
 	

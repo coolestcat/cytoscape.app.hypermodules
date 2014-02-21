@@ -140,6 +140,7 @@ public class HypermodulesHeuristicAlgorithm {
 	 * global repository
 	 */
 	private HashMap<String, Double> repository;
+	private String foregroundvariable;
 	
 	/**
 	 * constructor
@@ -149,8 +150,9 @@ public class HypermodulesHeuristicAlgorithm {
 	 * @param otherValues
 	 * @param network
 	 */
-	public HypermodulesHeuristicAlgorithm(String statTest, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CyNetwork network){
+	public HypermodulesHeuristicAlgorithm(String statTest, String foregroundvariable, ArrayList<String[]> sampleValues, ArrayList<String[]> clinicalValues, ArrayList<String[]> otherValues, CyNetwork network){
 		this.statTest = statTest;
+		this.foregroundvariable = foregroundvariable;
 		this.sampleValues = sampleValues;
 		this.otherValues = otherValues;
 		this.clinicalValues = clinicalValues;
@@ -728,7 +730,23 @@ public class HypermodulesHeuristicAlgorithm {
 			return null;
 		}
 		
+		int c = 0;
+		int matrix00 = 0;
+		for (int k=0; k<this.otherValues.size(); k++){
+			if (var2patients[k] == true){
+				if (this.otherValues.get(k)[1].equals(this.foregroundvariable)){
+					matrix00++;
+				}
+			}
+			if (this.otherValues.get(k)[1].equals(this.foregroundvariable)){
+				c++;
+			}
+		}
+
+		org.cytoscape.hypermodules.internal.statistics.FishersExactTest fet = new org.cytoscape.hypermodules.internal.statistics.FishersExactTest(otherValues.size(), c, alpha, matrix00);
+		return fet.getResult();
 		
+		/*
 		int[][] matrix = new int[clinicalVariableHash.size()][2];
 		
 		for (int i=0; i<matrix.length; i++){
@@ -760,14 +778,17 @@ public class HypermodulesHeuristicAlgorithm {
 			}
 		}
 		
+		
 		if (clinicalVariableHash.size()==2){
 			org.cytoscape.hypermodules.internal.statistics.FishersExactTest fet = new org.cytoscape.hypermodules.internal.statistics.FishersExactTest(otherValues.size(), c, alpha, matrix[0][0]);
 			return fet.getResult();
 		}
+			
 		else{
 			FishersExact fe = new FishersExact(matrix);
 			return fe.fisher2c();
 		}
+		*/
 	}
 	
 	

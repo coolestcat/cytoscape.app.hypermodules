@@ -135,6 +135,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	private double selectedP;
 	
 	private JTableHeader tableHeader;
+	
 	/**
 	 * constructor
 	 * @param parameters
@@ -575,7 +576,6 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		try {
 			File file = utils.fileUtil.getFile(utils.swingApp.getJFrame(), "Export Most Correlated Results in CSV File", FileUtil.SAVE, getFilters());
 			
-			
 			if (file!=null){
 				fileName = file.getAbsolutePath();
 				if (!fileName.substring(fileName.length()-4,fileName.length()).equals(".tsv")){
@@ -589,12 +589,45 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				fout.write("# Length Option: " + '\t'+ parameters.get("length") + lineSep);
 				fout.write("# Expand Option: " + '\t' + parameters.get("expand") + lineSep);
 				fout.write("# Shuffle Number: "+ '\t' + parameters.get("nShuffled") + lineSep);
-				fout.write("# Statistical Test: " + '\t'+ parameters.get("stat") + lineSep + lineSep);
+				fout.write("# Statistical Test: " + '\t'+ parameters.get("stat") + lineSep);
+				if (parameters.get("stat").equals("fisher")){
+					fout.write("# Foreground Variable: " + '\t' + parameters.get("foregroundvariable") + lineSep + lineSep);
+				}
 				fout.write(lineSep);
 				
-				fout.write("Module" + '\t' + "Pvalue_test" + '\t' + "Pvalue_background" + '\t' + "Number_patients" + '\t' + "Log_odds_ratio" + '\t' + "Patient_list" +  lineSep);
+				fout.write("Seed" + '\t' + "Module" + '\t' + "Pvalue_test" + '\t' + "Pvalue_background" + '\t' + "Number_patients" + '\t' + "Log_odds_ratio" + '\t' + "Patient_list" +  lineSep);
 				for (String s : mostCorrelated.keySet()){
-					fout.write(s + '\t' + mostCorrelated.get(s) + '\t' + mostCorrelatedFDR.get(s) + '\t' + (int) (double) mostCorrelatedPatn.get(s) + '\t' + mostCorrelatedOddsRatio.get(s) + '\t' + patientListHash.get(s) +  lineSep);
+					String[] t = s.split(":");
+					String seed = t[0];
+					ArrayList<String> toSort = new ArrayList<String>();
+					
+					for (int i=0; i<t.length; i++){
+						toSort.add(t[i]);
+					}
+					
+					Collections.sort(toSort);
+					String k = toSort.get(0);
+					for (int i=1; i<toSort.size(); i++){
+						k = k + ";" + toSort.get(i);
+					}
+					
+					
+					String c = "";
+					if (mostCorrelatedOddsRatio.get(s).equals(Double.NEGATIVE_INFINITY)){
+						c = "-Infinity";
+					}
+					else if (mostCorrelatedOddsRatio.get(s).equals(Double.POSITIVE_INFINITY)){
+						c = "Infinity";
+					}
+					else if (Double.isNaN(mostCorrelatedOddsRatio.get(s))){
+						c = "NaN";
+					}
+					else{
+						c = String.valueOf(mostCorrelatedOddsRatio.get(s));
+					}
+					
+					
+					fout.write(seed + '\t' + k + '\t' + mostCorrelated.get(s) + '\t' + mostCorrelatedFDR.get(s) + '\t' + (int) (double) mostCorrelatedPatn.get(s) + '\t' + c + '\t' + patientListHash.get(s) +  lineSep);
 				}
 				
 			
@@ -867,7 +900,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 					cd.display(sas[1]);
 				}
 				else{ //fisher
-					ChartDisplayFisher cdf = new ChartDisplayFisher(selectedP, this.otherValues, this.sampleValues, this.network);
+					ChartDisplayFisher cdf = new ChartDisplayFisher(parameters.get("foregroundvariable"), selectedP, this.otherValues, this.sampleValues, this.network);
 					cdf.display(sas[1]);
 				}
 				}
