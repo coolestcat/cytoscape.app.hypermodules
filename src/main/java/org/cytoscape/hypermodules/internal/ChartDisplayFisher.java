@@ -1,5 +1,6 @@
 package org.cytoscape.hypermodules.internal;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.xeiam.xchart.Chart;
 import com.xeiam.xchart.ChartBuilder;
+import com.xeiam.xchart.Series;
 import com.xeiam.xchart.StyleManager.ChartTheme;
 import com.xeiam.xchart.StyleManager.ChartType;
 
@@ -152,14 +154,21 @@ public class ChartDisplayFisher {
 		}
 		*/
 		
+		double of = 0;
+		double nof = 0;
 		for (int k=0; k<otherValues.size(); k++){
 			if (var2patients[k]==true){
 				for (int i=0; i<allVariableNames.size(); i++){
-					if (otherValues.get(k)[1].equals(allVariableNames.get(i))){
+					if (otherValues.get(k)[1].equals(foregroundvariable)){
+						of++;
 						//System.out.println(allVariableNames.get(i));
-						int c = matrix.get(allVariableNames.get(i));
-						matrix.put(allVariableNames.get(i), c+1);
+						//int c = matrix.get(allVariableNames.get(i));
+						//matrix.put(allVariableNames.get(i), c+1);
 					}
+					else{
+						nof++;
+					}
+					
 				}
 			}
 		}
@@ -171,6 +180,7 @@ public class ChartDisplayFisher {
 		}
 		*/
 		
+		/*
 		ArrayList<Number> observed = new ArrayList<Number>();
 		for (int i=0; i<allVariableNames.size(); i++){
 			observed.add((double) matrix.get(allVariableNames.get(i)));
@@ -180,16 +190,32 @@ public class ChartDisplayFisher {
 		for (int i=0; i<percentages.length; i++){
 			expected.add((double) percentages[i] * alpha);
 		}
+		*/
 		
 		
-		double of = (double) matrix.get(foregroundvariable);
+		ArrayList<Number> observed = new ArrayList<Number>();
+		observed.add(of);
+		observed.add(nof);
+
+		
+		//double of = (double) matrix.get(foregroundvariable);
 		double ef = 100;
+		double otheref = 0;
 		for (int i=0; i<percentages.length; i++){
 			if (allVariableNames.get(i).equals(foregroundvariable)){
 				ef = (double) percentages[i]*alpha;
 			}
+			else{
+				otheref += percentages[i];
+			}
 		}
-
+		
+		otheref = otheref*alpha;
+		ArrayList<Number> expected = new ArrayList<Number>();
+		expected.add(ef);
+		expected.add(otheref);
+		
+		
 		/*
 		System.out.println("Observed: " );
 		for (int h = 0; h< observed.size(); h++){
@@ -202,16 +228,13 @@ public class ChartDisplayFisher {
 		}
 		*/
 		
-		/*
+		
 		String[] toChart = new String[allVariableNames.size()];
 		
 
+		toChart[0] = foregroundvariable;
+		toChart[1] = "NOT " + foregroundvariable;
 		
-		
-		for (int y=0; y<allVariableNames.size(); y++){
-			toChart[y] = allVariableNames.get(y);
-		}
-		*/
 		
 		/*
 		System.out.println(allVariableNames.get(0));
@@ -226,6 +249,10 @@ public class ChartDisplayFisher {
 		*/
 		
 		Chart chart = null;
+		
+		chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Number of Patients with status " + foregroundvariable + " in module, p = " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("Module - " + s).yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
+		Series s1 = chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(new String[] {toChart[1], toChart[0]})), new ArrayList<Number>(Arrays.asList(new Number[]{observed.get(0), observed.get(1)})));
+		Series s2 = chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(new String[] {toChart[1], toChart[0]})), new ArrayList<Number>(Arrays.asList(new Number[]{expected.get(0), expected.get(1)})));
 		/*
 		if (allVariableNames.size() == 2){
 			//System.out.println("2");
@@ -239,10 +266,15 @@ public class ChartDisplayFisher {
 			chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(toChart)), expected);
 		}	
 		*/
-		chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - Genes: " + s + " - PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
-
-		chart.addCategorySeries("observed " + foregroundvariable + " in module", new ArrayList<String>(Arrays.asList(new String[] {foregroundvariable})), new ArrayList<Number>(Arrays.asList(new Number[]{of})));
-		chart.addCategorySeries("expected " + foregroundvariable + " in module", new ArrayList<String>(Arrays.asList(new String[] {foregroundvariable})), new ArrayList<Number>(Arrays.asList(new Number[]{ef})));
+		//chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Fisher's Exact Test Observed vs. Expected - Genes: " + s + " - PValue: " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("").yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
+		
+		//Series s1 = chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(new String[] {foregroundvariable})), new ArrayList<Number>(Arrays.asList(new Number[]{of})));
+		//Series s2 = chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(new String[] {foregroundvariable})), new ArrayList<Number>(Arrays.asList(new Number[]{ef})));
+		s1.setMarkerColor(Color.orange);
+		s1.setLineColor(Color.orange);
+		s2.setMarkerColor(Color.gray);
+		s2.setLineColor(Color.gray);
+		
 		new SwingWrapper(chart, 0.0).displayFisherChart();
 	}
 	

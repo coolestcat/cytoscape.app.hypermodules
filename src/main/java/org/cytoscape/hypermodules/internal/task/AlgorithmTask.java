@@ -509,9 +509,8 @@ public class AlgorithmTask implements Task {
 			//System.out.println(y);
 		}
 		
-		System.out.println("rejectedlist size:"  + rejectedList.size());
-		System.out.println("finished creating rejection list");
-		
+		System.out.println("Redundant Modules Filtered: "  + rejectedList.size());
+
 		for (String s : input.keySet()){
 			//output.put(s, input.get(s));
 			
@@ -740,6 +739,7 @@ public class AlgorithmTask implements Task {
 			}
 		}
 		
+		
 		if (inModuleFollowup.size()>0){
 			double p1 = inModuleFollowup.get(inModuleFollowup.size()/2);
 			double p2 = outOfModuleFollowup.get(outOfModuleFollowup.size()/2);
@@ -848,10 +848,12 @@ public class AlgorithmTask implements Task {
 			rvalue = Math.log(rvalue);
 		}
 		if (p1 == 0){
-			rvalue = Double.NEGATIVE_INFINITY;
+			//rvalue = Double.NEGATIVE_INFINITY;
+			rvalue = -1000.0;
 		}
 		if (p1 == 1){
-			rvalue = Double.POSITIVE_INFINITY;
+			//rvalue = Double.POSITIVE_INFINITY;
+			rvalue = 1000.0;
 		}
 		return rvalue;
 	}
