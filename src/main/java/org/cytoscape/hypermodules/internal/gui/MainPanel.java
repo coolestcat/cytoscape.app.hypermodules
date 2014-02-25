@@ -673,7 +673,7 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 		fvariable.setPreferredSize(new Dimension(150, 23));
 		fvariable.setMaximumSize(new Dimension(150, 23));
 		
-		JLabel fforegroundlabel = new JLabel("variable to test:");
+		JLabel fforegroundlabel = new JLabel("value to test:");
 		fforeground = new JComboBox();
 		fforeground.setPreferredSize(new Dimension(150,23));
 		fforeground.setMaximumSize(new Dimension(150, 23));

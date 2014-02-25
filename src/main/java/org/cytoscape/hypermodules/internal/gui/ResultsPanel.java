@@ -2,12 +2,9 @@ package org.cytoscape.hypermodules.internal.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -21,23 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.cytoscape.application.swing.CytoPanelComponent;
-import org.cytoscape.application.swing.CytoPanelName;
-import org.cytoscape.hypermodules.internal.ChartDisplay;
-import org.cytoscape.hypermodules.internal.ChartDisplayFisher;
-import org.cytoscape.hypermodules.internal.CytoscapeUtils;
-import org.cytoscape.hypermodules.internal.task.GenerateNetworkTask;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
-import org.cytoscape.util.swing.FileChooserFilter;
-import org.cytoscape.util.swing.FileUtil;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.work.TaskIterator;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -48,6 +28,20 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
+
+import org.cytoscape.application.swing.CytoPanelComponent;
+import org.cytoscape.application.swing.CytoPanelName;
+import org.cytoscape.hypermodules.internal.ChartDisplay;
+import org.cytoscape.hypermodules.internal.ChartDisplayFisher;
+import org.cytoscape.hypermodules.internal.CytoscapeUtils;
+import org.cytoscape.hypermodules.internal.task.GenerateNetworkTask;
+import org.cytoscape.model.CyNetwork;
+import org.cytoscape.util.swing.FileChooserFilter;
+import org.cytoscape.util.swing.FileUtil;
+import org.cytoscape.work.TaskIterator;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * 
@@ -243,11 +237,11 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 		
 		Model tab = null;
 		if (parameters.get("stat").equals("logRank")){
-			String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value",  "# of Patients", "Followup Time Ratio, Log", "List of Patients"};
+			String[] c = {"Seed", "Genes", "Log-Rank P-Value", "Empirical P-value",  "# of Patients", "Followup Time Ratio, Log", "List of Patients"};
 			tab = new Model(c);
 		}
 		else{
-			String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio, Log", "List of Patients"};
+			String[] c = {"Seed", "Genes", "Fisher P-Value", "Empirical P-value",  "# of Patients", "Odds Ratio, Log", "List of Patients"};
 			tab = new Model(c);
 		}
 		
@@ -421,10 +415,10 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	public void setUpTable(boolean first){
 		String[] c = null;
 		if (parameters.get("stat").equals("logRank")){
-			c = new String[]{"Seed", "Genes", "Log-Rank P-Value", "Empirical FDR P-value", "# of Patients", "Followup Time Ratio, Log", "List of Patients"};
+			c = new String[]{"Seed", "Genes", "Log-Rank P-Value", "Empirical P-value", "# of Patients", "Followup Time Ratio, Log", "List of Patients"};
 		}
 		else{
-			c = new String[]{"Seed", "Genes", "Fisher P-Value", "Empirical FDR P-value",  "# of Patients", "Odds Ratio, log", "List of Patients"};
+			c = new String[]{"Seed", "Genes", "Fisher P-Value", "Empirical P-value",  "# of Patients", "Odds Ratio, log", "List of Patients"};
 		}
 		
 		Model tab = new Model(c);
@@ -591,7 +585,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				fout.write("# Shuffle Number: "+ '\t' + parameters.get("nShuffled") + lineSep);
 				fout.write("# Statistical Test: " + '\t'+ parameters.get("stat") + lineSep);
 				if (parameters.get("stat").equals("fisher")){
-					fout.write("# Foreground Variable: " + '\t' + parameters.get("foregroundvariable") + lineSep + lineSep);
+					fout.write("# Fisher Value Tested: " + '\t' + parameters.get("foregroundvariable") + lineSep + lineSep);
 				}
 				fout.write(lineSep);
 				

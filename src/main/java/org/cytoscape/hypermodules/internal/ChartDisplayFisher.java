@@ -158,7 +158,7 @@ public class ChartDisplayFisher {
 		double nof = 0;
 		for (int k=0; k<otherValues.size(); k++){
 			if (var2patients[k]==true){
-				for (int i=0; i<allVariableNames.size(); i++){
+				//for (int i=0; i<allVariableNames.size(); i++){
 					if (otherValues.get(k)[1].equals(foregroundvariable)){
 						of++;
 						//System.out.println(allVariableNames.get(i));
@@ -169,7 +169,7 @@ public class ChartDisplayFisher {
 						nof++;
 					}
 					
-				}
+				//}
 			}
 		}
 		

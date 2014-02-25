@@ -136,15 +136,100 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 			inputHash.add(inputStrings[i]);
 		}
 		
-		inputHash.remove(s);
+		//TODO: changed
+		//inputHash.remove(s);
 
-		visualizeRecursive(s, null, 2);
+		//visualizeRecursive(s, null, 3);
+		newVisualize();
 		
 	}
 	
 	
+	public void newVisualize(){
+		List<CyNode> cc = runNetwork.getNodeList();
+		HashSet<CyNode> inNodes = new HashSet<CyNode>();
+		
+		for (int k=0; k<cc.size(); k++){
+			CyNode nod = null;
+			if (inputHash.contains(this.runNetwork.getRow(cc.get(k)).get(CyNetwork.NAME, String.class))){
+				nod = cc.get(k);
+				inNodes.add(nod);
+			}
+		}
+		
+		
+		for (CyNode c : inNodes){
+			String curNodeName = this.runNetwork.getRow(c).get(CyNetwork.NAME, String.class);
+			long curNodeID = c.getSUID();
+			c = generated.addNode();
+			generated.getRow(c).set(CyNetwork.NAME, curNodeName);
+			c = runNetwork.getNode(curNodeID);
+		}
+		
+		for (CyNode c : inNodes){
+			
+			String curNodeName = this.runNetwork.getRow(c).get(CyNetwork.NAME, String.class);
+			
+			for (CyEdge edge : runNetwork.getAdjacentEdgeList(c, CyEdge.Type.ANY)){
+				
+				//nodes in generated
+				List<CyNode> mycc = generated.getNodeList();
+				
+				CyNode target = edge.getTarget();
+				String targetString = runNetwork.getRow(target).get(CyNetwork.NAME, String.class);
+				
+				if (inputHash.contains(targetString) && !curNodeName.equals(targetString)){
+					CyNode cInGenerated = null;
+					CyNode foundTarget = null;
+					
+					for (int k=0; k<mycc.size(); k++){
+						if (curNodeName.equals(generated.getRow(mycc.get(k)).get(CyNetwork.NAME, String.class))){
+							cInGenerated = mycc.get(k);
+						}
+						if (targetString.equals(generated.getRow(mycc.get(k)).get(CyNetwork.NAME, String.class))){
+							foundTarget = mycc.get(k);
+						}
+					}
+					
+					if(!generated.containsEdge(cInGenerated, foundTarget)){
+						generated.addEdge(cInGenerated, foundTarget, true);
+					}
+				}
+				
+				
+				
+				target = edge.getSource();
+				targetString = runNetwork.getRow(target).get(CyNetwork.NAME, String.class);
+				
+				if (inputHash.contains(targetString) && !curNodeName.equals(targetString)){
+					CyNode cInGenerated = null;
+					CyNode foundTarget = null;
+					
+					for (int k=0; k<mycc.size(); k++){
+						if (curNodeName.equals(generated.getRow(mycc.get(k)).get(CyNetwork.NAME, String.class))){
+							cInGenerated = mycc.get(k);
+						}
+						if (targetString.equals(generated.getRow(mycc.get(k)).get(CyNetwork.NAME, String.class))){
+							foundTarget = mycc.get(k);
+						}
+					}
+					
+					if(!generated.containsEdge(cInGenerated, foundTarget)){
+						generated.addEdge(cInGenerated, foundTarget, true);
+					}
+				}
+
+				
+			}
+
+			
+		}
+		
+	}
 	
 	public void visualizeRecursive(String s, String parent, int level){
+		
+		
 		
 		//get Seed node to start expanding
 		List<CyNode> cc = runNetwork.getNodeList();

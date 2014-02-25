@@ -205,6 +205,7 @@ public class ChartDisplay {
 		ArrayList<Double> yData1 = new ArrayList<Double>();
 		ArrayList<Double> yData2 = new ArrayList<Double>();
 		
+		/*
 		double survival = 1;
 		double numPeopleLeft = alpha;
 		
@@ -229,6 +230,33 @@ public class ChartDisplay {
 				yData1.add(survival);
 			}
 		}
+		*/
+		
+		double survival = 1;
+		double numPeopleLeft = alpha;
+		
+		xData1.add(0.0);
+		yData1.add(1.0);
+		
+		xData2.add(0.0);
+		yData2.add(1.0);
+		
+		
+		for (int i=0; i<censor1.length; i++){
+			if (censor1[i]==1){
+				xData1.add(time1[i]);
+				xData1.add(time1[i]);
+				yData1.add(survival);
+				numPeopleLeft--;
+				survival = numPeopleLeft/(double) alpha;
+				yData1.add(survival);
+			}
+			else{
+				xData1.add(time1[i]);
+				yData1.add(survival);
+				numPeopleLeft--;
+			}
+		}
 		
 		survival = 1;
 		numPeopleLeft = allPatients.length-alpha;
@@ -247,6 +275,7 @@ public class ChartDisplay {
 			else{
 				xData2.add(time2[i]);
 				yData2.add(survival);
+				numPeopleLeft--;
 			}
 		}
 		
@@ -266,15 +295,14 @@ public class ChartDisplay {
 			xd2[i] = xData2.get(i);
 			yd2[i] = yData2.get(i);
 		}
-		
 
 	    Chart chart = new ChartBuilder().width(800).height(600).theme(ChartTheme.GGPlot2).build();
-	    chart.setChartTitle("Kaplan-Meier Survival Analysis - Genes: " + s + " - pValue: " + roundToSignificantFigures(lrvalue[2], 6));
-	    chart.setXAxisTitle("Time");
+	    chart.setChartTitle("Kaplan-Meier Survival Analysis - log-rank p=" + roundToSignificantFigures(lrvalue[2], 3));
+	    chart.setXAxisTitle("Module genes: " + s);
 	    chart.setYAxisTitle("Survival Probability");
 	    chart.getStyleManager().setYAxisMin(0.0);
 	    chart.getStyleManager().setYAxisMax(1);
-	    Series series = chart.addSeries("Patients with mutation in module", xd1, yd1);
+	    Series series = chart.addSeries("Module-linked patients", xd1, yd1);
 	    Series series2 = chart.addSeries("Other patients", xd2, yd2);
 	    series.setLineColor(Color.RED);
 	    series.setMarker(SeriesMarker.CIRCLE);
