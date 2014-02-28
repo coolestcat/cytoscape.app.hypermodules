@@ -211,8 +211,8 @@ public class ChartDisplayFisher {
 		
 		otheref = otheref*alpha;
 		ArrayList<Number> expected = new ArrayList<Number>();
-		expected.add(ef);
-		expected.add(otheref);
+		expected.add(Math.round(ef));
+		expected.add(Math.round(otheref));
 		
 		
 		/*

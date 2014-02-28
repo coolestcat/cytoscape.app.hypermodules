@@ -137,6 +137,25 @@ public class MyFET{
 
 
         }
+        
+        public Double getLogOdds(){
+			double lodds1 = (ct.getFrequency(1,1)*ct.getFrequency(0,0));
+			double lodds2 = (ct.getFrequency(0,1)*ct.getFrequency(1,0));
+			
+			Double lodds = lodds1/lodds2;
+			
+			if (!lodds.isNaN() && !lodds.isInfinite()){
+				return Math.log(lodds);
+			}
+			if (lodds == Double.POSITIVE_INFINITY){
+				return 1000.0;
+			}
+			if (lodds == 0){
+				return -1000.0;
+			}
+			
+			return lodds;
+        }
 
         private boolean testNan(double d) {
                 if (Double.isNaN(d) || Double.isInfinite(d)) {

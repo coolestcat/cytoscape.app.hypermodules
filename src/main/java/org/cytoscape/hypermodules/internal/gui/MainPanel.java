@@ -747,10 +747,9 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			fforeground.addItem(h);
 		}
 		
-		fforeground.setSelectedIndex(0);
-		
-		
-		
+		fforeground.addItem("--");
+		fforeground.setSelectedItem("--");
+
 		String[] t = {"Patient ID", "Clinical Variable"};
 		MyModel nm = new MyModel(t);
 		nm.AddCSVData(otherValues);
@@ -1188,6 +1187,12 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				String foregroundVariable = "default";
 				if (fisher.isSelected()){
 					foregroundVariable = (String) fforeground.getSelectedItem();
+					if (foregroundVariable.equals("--")){
+						ErrorDialog ed = new ErrorDialog(utils, "Please select a value to test.");
+						ed.setLocationRelativeTo(null);
+						ed.setVisible(true);
+						return;
+					}
 				}
 				System.out.println(foregroundVariable);
 				

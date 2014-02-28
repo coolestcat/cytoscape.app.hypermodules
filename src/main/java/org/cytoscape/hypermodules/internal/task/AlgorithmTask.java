@@ -18,7 +18,9 @@ import org.cytoscape.hypermodules.internal.ShuffleTestCall;
 import org.cytoscape.hypermodules.internal.ShuffleTestTMCall;
 import org.cytoscape.hypermodules.internal.statistics.ConnectR;
 import org.cytoscape.hypermodules.internal.statistics.FDRAdjust;
+import org.cytoscape.hypermodules.internal.statistics.MyFET;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 import org.rosuda.REngine.REXPMismatchException;
@@ -140,7 +142,6 @@ public class AlgorithmTask implements Task {
 		for (int i=0; i<sampleValues.size(); i++){
 			sampleValueHash.put(sampleValues.get(i)[0], sampleValues.get(i)[1]);
 		}
-		
 		
 		if (statTest.equals("logRank")){
 			
@@ -473,42 +474,38 @@ public class AlgorithmTask implements Task {
 		HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>> output = new HashMap<String, HashMap<ArrayList<HashMap<String, Double>>, Multimap<String, Double>>>();
 		
 		HashMap<String, Double> masterList = new HashMap<String, Double>();
+		ArrayList<String> everyString = new ArrayList<String>();
+		
 		
 		for (String s : input.keySet()){
 			for (ArrayList<HashMap<String, Double>> ahsd : input.get(s).keySet()){
 				HashMap<String, Double> original = ahsd.get(0);
 				for (String i : original.keySet()){
 					masterList.put(i, original.get(i));
+					everyString.add(i);
 					//System.out.println(i + " : " + original.get(i));
 				}
 			}
 		}
 		
-		HashMap<String, Double> m2 = new HashMap<String, Double>();
-		for (String s : masterList.keySet()){
-			m2.put(s, masterList.get(s));
-		}
+		ArrayList<String> rejectedList = new ArrayList<String>();
 		
-		HashSet<String> rejectedList = new HashSet<String>();
+		//System.out.println("everyString size: " + everyString.size());
+		//System.out.println("masterList size: " + masterList.size());
 		
-		int y = 0;
-		System.out.println("masterlist size: " + masterList.size());
-		//filter the masterList (O (n^2)):
-		for (String s : masterList.keySet()){
-			double d = masterList.get(s);
-			for (String t : m2.keySet()){
-				double e = m2.get(t);
-				if ((d == e) && !(s.equals(t))){
-					//System.out.println(d + " : " + e + " : " + s + " : " + t);
-					if (checkConditions(s, t)){//t is redundant to s
-						rejectedList.add(t);
+		for (int i=0; i<everyString.size(); i++){
+			double d = masterList.get(everyString.get(i));
+			for (int j=i; j<everyString.size(); j++){
+				double e = masterList.get(everyString.get(j));
+				if ((d == e) && !(i==j)){
+					if (checkConditions(everyString.get(i), everyString.get(j))){
+						rejectedList.add(everyString.get(j));
 					}
-				}	
+				}			
 			}
-			y++;
-			//System.out.println(y);
 		}
 		
+	
 		System.out.println("Redundant Modules Filtered: "  + rejectedList.size());
 
 		for (String s : input.keySet()){
@@ -524,15 +521,31 @@ public class AlgorithmTask implements Task {
 				HashMap<String, Double> orig = ahsd.get(0);
 				HashMap<String, Double> neworig = new HashMap<String, Double>();
 				for (String o : orig.keySet()){
-					if (!rejectedList.contains(o)){
+					boolean rejected = false;
+					for (int i=0; i<rejectedList.size(); i++){
+						if (rejectedList.get(i).equals(o)){
+							rejectedList.remove(i);
+							rejected = true;
+							break;
+						}
+					}
+					if (rejected == false){
 						neworig.put(seedAtBeginning(s, o), roundToSignificantFigures(orig.get(o),5));
 					}
 				}
 				
 				HashMap<String, Double> adj = ahsd.get(1);
 				HashMap<String, Double> newadj = new HashMap<String, Double>();
-				for (String o : adj.keySet()){
-					if (!rejectedList.contains(o)){
+				for (String o : orig.keySet()){
+					boolean rejected = false;
+					for (int i=0; i<rejectedList.size(); i++){
+						if (rejectedList.get(i).equals(o)){
+							rejectedList.remove(i);
+							rejected = true;
+							break;
+						}
+					}
+					if (rejected == false){
 						newadj.put(seedAtBeginning(s, o), roundToSignificantFigures(adj.get(o),5));
 					}
 				}
@@ -639,6 +652,19 @@ public class AlgorithmTask implements Task {
 			}
 		}
 		
+		if (g1.contains("EIF2S1") && g1.contains("EIF2S3")){
+			for (int i=0; i<genes1.length; i++){
+				System.out.print(genes1[i] + " ");
+			}
+			
+			System.out.println();
+			for (int i=0; i<genes2.length; i++){
+				System.out.print(genes2[i] + " ");
+			}
+			System.out.println();
+			System.out.println("returning: " + sSubsetOfT);	
+		}
+		
 		if (sSubsetOfT == true){
 			return true;
 		}
@@ -722,7 +748,9 @@ public class AlgorithmTask implements Task {
 		
 		for (int i=0; i<filteredSampleValues.size(); i++){
 			if (gs.contains(filteredSampleValues.get(i)[0])){
-				inModulePatients.add(filteredSampleValues.get(i)[1]);
+				if (!filteredSampleValues.get(i)[1].equals("no_sample")){
+					inModulePatients.add(filteredSampleValues.get(i)[1]);
+				}
 			}
 		}
 		
@@ -770,7 +798,62 @@ public class AlgorithmTask implements Task {
 	//TODO:
 	
 	//variable 1 is the first one to appear in otherValues
-	public double getRatioFisher(String genes){
+	public double getRatioFisher(String thisNetwork){
+		String[] genes = thisNetwork.split(":");
+		
+		String v1 = foregroundvariable;
+		
+		HashSet<String> gs = new HashSet<String>();
+		for (int i=0; i<genes.length; i++){
+			gs.add(genes[i]);
+		}
+		
+		ArrayList<String> patients = new ArrayList<String>();
+		
+		for (int i=0; i<filteredSampleValues.size(); i++){
+			if (gs.contains(filteredSampleValues.get(i)[0])){
+				if (!filteredSampleValues.get(i)[1].equals("no_sample")){
+					patients.add(filteredSampleValues.get(i)[1]);
+				}
+			}
+		}
+		
+		boolean[] var2patients = new boolean[this.otherValues.size()];
+		for (int k=0; k<this.otherValues.size(); k++){
+			var2patients[k]=false;
+			
+			for (int l=0; l<patients.size(); l++){		
+				if(patients.get(l).equals(otherValues.get(k)[0])){
+					var2patients[k]=true;
+				}
+			}
+		}
+		
+		int alpha=0;
+		for (int k=0; k<var2patients.length; k++){
+			if (var2patients[k]==true){
+				alpha++;
+			}
+		}
+		
+		
+		int c = 0;
+		int matrix00 = 0;
+		for (int k=0; k<this.otherValues.size(); k++){
+			if (var2patients[k] == true){
+				if (this.otherValues.get(k)[1].equals(this.foregroundvariable)){
+					matrix00++;
+				}
+			}
+			if (this.otherValues.get(k)[1].equals(this.foregroundvariable)){
+				c++;
+			}
+		}
+		
+		MyFET fet = new MyFET(otherValues.size(), c, alpha, matrix00); 
+		Double rvalue =  fet.getLogOdds();
+	
+		/*
 		String[] g = genes.split(":");
 		
 		String v1 = foregroundvariable;
@@ -789,7 +872,6 @@ public class AlgorithmTask implements Task {
 				if (!filteredSampleValues.get(i)[1].equals("no_sample")){
 					inModulePatients.add(filteredSampleValues.get(i)[1]);
 				}
-
 			}
 			else{
 				if (!filteredSampleValues.get(i)[1].equals("no_sample")){
@@ -797,12 +879,6 @@ public class AlgorithmTask implements Task {
 				}
 			}
 		}
-		
-		/*
-		if (g[0].equals("MAP3K7")){
-			System.out.println("MAP3K7: " + inModulePatients.size() + " : " + outOfModulePatients.size());
-		}
-		*/
 		
 
 		int inModuleVar1 = 0;
@@ -821,20 +897,15 @@ public class AlgorithmTask implements Task {
 			}
 		}
 		
-		/*
-		if (g[0].equals("MAP3K7")){
-			System.out.println("MAP3K7 in/out var1: " + inModuleVar1 + " : " + outOfModuleVar1);
-		}
-		*/
-		
 		
 		double p1 = inModuleVar1/ (double) inModulePatients.size();
 		double p2 = outOfModuleVar1/ (double) outOfModulePatients.size();
 		double rvalue = p1*(1-p2)/(double) (p2*(1-p1));
+		*/
 		
 		
 		if (!Double.isNaN(rvalue) && !Double.isInfinite(rvalue)){
-			rvalue = Math.log(rvalue);
+			return rvalue;
 		}
 		if (rvalue == Double.POSITIVE_INFINITY){
 			rvalue = 1000.0;
@@ -842,8 +913,6 @@ public class AlgorithmTask implements Task {
 		if (rvalue == Double.NEGATIVE_INFINITY){
 			rvalue = -1000.0;
 		}
-
-
 		return rvalue;
 	}
 	
