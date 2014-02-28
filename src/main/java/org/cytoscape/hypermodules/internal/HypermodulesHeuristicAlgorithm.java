@@ -11,6 +11,7 @@ import javastat.survival.regression.CoxRegression;
 import org.cytoscape.hypermodules.internal.statistics.CoxPh;
 import org.cytoscape.hypermodules.internal.statistics.FishersExact;
 import org.cytoscape.hypermodules.internal.statistics.LogRankTest;
+import org.cytoscape.hypermodules.internal.statistics.MyFET;
 import org.cytoscape.hypermodules.internal.task.AlgorithmTask;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -463,8 +464,6 @@ public class HypermodulesHeuristicAlgorithm {
 		HashMap<String, String[]> pairwiseConcatMemory = new HashMap<String, String[]>();
     	
     	while(true){
-        	
-
 			String[] pairwiseKey = new String[2];
     		Double[] pairwiseValue = new Double[2];
     		
@@ -682,9 +681,7 @@ public class HypermodulesHeuristicAlgorithm {
 			}
 			k++;
 		}
-		
 		return newNetwork;
-		
 	}
 	
 	/**
@@ -743,7 +740,7 @@ public class HypermodulesHeuristicAlgorithm {
 			}
 		}
 
-		org.cytoscape.hypermodules.internal.statistics.FishersExactTest fet = new org.cytoscape.hypermodules.internal.statistics.FishersExactTest(otherValues.size(), c, alpha, matrix00);
+		MyFET fet = new MyFET(otherValues.size(), c, alpha, matrix00);
 		return fet.getResult();
 		
 		/*

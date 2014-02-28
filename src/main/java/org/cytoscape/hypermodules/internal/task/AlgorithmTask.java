@@ -741,59 +741,28 @@ public class AlgorithmTask implements Task {
 		
 		
 		if (inModuleFollowup.size()>0){
-			double p1 = inModuleFollowup.get(inModuleFollowup.size()/2);
-			double p2 = outOfModuleFollowup.get(outOfModuleFollowup.size()/2);
+			
+			double p1 = 0;
+			if (inModuleFollowup.size() %2 == 0){
+				p1 = ((double)inModuleFollowup.get(inModuleFollowup.size()/2) + (double) inModuleFollowup.get((inModuleFollowup.size()/2)-1))/2;
+			}
+			else{
+				p1 = inModuleFollowup.get(inModuleFollowup.size()/2);
+			}
+
+			double p2 = 0;
+			if (outOfModuleFollowup.size() %2 ==0){
+				p2 = ((double)outOfModuleFollowup.get(outOfModuleFollowup.size()/2) + (double) outOfModuleFollowup.get((outOfModuleFollowup.size()/2)-1))/2;
+			}
+			else{
+				p2 = outOfModuleFollowup.get(outOfModuleFollowup.size()/2);
+			}
+			
 			return Math.log(p1/(double)p2);
 		}
 		else{
 			return Double.NaN;
 		}
-
-		
-		/*
-		int inModuleVar1 = 0;
-		int outOfModuleVar1 = 0;
-		
-		for (int i=0; i<clinicalValues.size(); i++){
-			if (inModulePatients.contains(clinicalValues.get(i)[0])){
-				if (clinicalValues.get(i)[1].toLowerCase().equals("alive") ||
-					clinicalValues.get(i)[1].toLowerCase().equals("yes") ||	
-					clinicalValues.get(i)[1].toLowerCase().equals("y") ||	
-					clinicalValues.get(i)[1].toLowerCase().equals("0") ||
-					clinicalValues.get(i)[1].toLowerCase().equals("living")){
-					inModuleVar1 ++;
-					
-					
-				}
-			}
-			else{
-				if (clinicalValues.get(i)[1].toLowerCase().equals("alive") ||
-						clinicalValues.get(i)[1].toLowerCase().equals("yes") ||	
-						clinicalValues.get(i)[1].toLowerCase().equals("y") ||	
-						clinicalValues.get(i)[1].toLowerCase().equals("0") ||
-						clinicalValues.get(i)[1].toLowerCase().equals("living")){
-						outOfModuleVar1 ++;
-						
-						
-				}
-				
-			}
-			
-		}
-		
-		
-		
-		double p1 = inModuleVar1/ (double) inModulePatients.size();
-		double p2 = outOfModuleVar1/ (double) outOfModulePatients.size();
-		double rvalue = p1*(1-p2)/(double) (p2*(1-p1));
-
-		
-		if (!Double.isNaN(rvalue) && !Double.isInfinite(rvalue)){
-			rvalue = Math.log(rvalue);
-		}
-		return rvalue;
-		*/
-		
 		
 		
 	}
@@ -817,13 +786,25 @@ public class AlgorithmTask implements Task {
 		
 		for (int i=0; i<filteredSampleValues.size(); i++){
 			if (gs.contains(filteredSampleValues.get(i)[0])){
-				inModulePatients.add(filteredSampleValues.get(i)[1]);
+				if (!filteredSampleValues.get(i)[1].equals("no_sample")){
+					inModulePatients.add(filteredSampleValues.get(i)[1]);
+				}
+
 			}
 			else{
-				outOfModulePatients.add(filteredSampleValues.get(i)[1]);
+				if (!filteredSampleValues.get(i)[1].equals("no_sample")){
+					outOfModulePatients.add(filteredSampleValues.get(i)[1]);
+				}
 			}
 		}
 		
+		/*
+		if (g[0].equals("MAP3K7")){
+			System.out.println("MAP3K7: " + inModulePatients.size() + " : " + outOfModulePatients.size());
+		}
+		*/
+		
+
 		int inModuleVar1 = 0;
 		int outOfModuleVar1 = 0;
 		
@@ -840,21 +821,29 @@ public class AlgorithmTask implements Task {
 			}
 		}
 		
+		/*
+		if (g[0].equals("MAP3K7")){
+			System.out.println("MAP3K7 in/out var1: " + inModuleVar1 + " : " + outOfModuleVar1);
+		}
+		*/
+		
+		
 		double p1 = inModuleVar1/ (double) inModulePatients.size();
 		double p2 = outOfModuleVar1/ (double) outOfModulePatients.size();
 		double rvalue = p1*(1-p2)/(double) (p2*(1-p1));
 		
+		
 		if (!Double.isNaN(rvalue) && !Double.isInfinite(rvalue)){
 			rvalue = Math.log(rvalue);
 		}
-		if (p1 == 0){
-			//rvalue = Double.NEGATIVE_INFINITY;
-			rvalue = -1000.0;
-		}
-		if (p1 == 1){
-			//rvalue = Double.POSITIVE_INFINITY;
+		if (rvalue == Double.POSITIVE_INFINITY){
 			rvalue = 1000.0;
 		}
+		if (rvalue == Double.NEGATIVE_INFINITY){
+			rvalue = -1000.0;
+		}
+
+
 		return rvalue;
 	}
 	

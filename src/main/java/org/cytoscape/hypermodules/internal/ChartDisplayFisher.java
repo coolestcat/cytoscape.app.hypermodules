@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.cytoscape.hypermodules.internal.statistics.FishersExactTest;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
@@ -234,25 +233,24 @@ public class ChartDisplayFisher {
 
 		toChart[0] = foregroundvariable;
 		toChart[1] = "NOT " + foregroundvariable;
-		
-		
-		/*
-		System.out.println(allVariableNames.get(0));
+/*
 		System.out.println(observed.get(0));
 		System.out.println(expected.get(0));
 		System.out.println(toChart[0]);
 		
-		System.out.println(allVariableNames.get(1));
 		System.out.println(observed.get(1));
 		System.out.println(expected.get(1));
 		System.out.println(toChart[1]);
-		*/
+*/
+		
 		
 		Chart chart = null;
 		
+		
+		
 		chart = new ChartBuilder().chartType(ChartType.Bar).width(800).height(600).title("Number of Patients with status " + foregroundvariable + " in module, p = " + roundToSignificantFigures(selectedP, 6)).xAxisTitle("Module - " + s).yAxisTitle("Number of Patients").theme(ChartTheme.GGPlot2).build();
-		Series s1 = chart.addCategorySeries("observed", new ArrayList<String>(Arrays.asList(new String[] {toChart[1], toChart[0]})), new ArrayList<Number>(Arrays.asList(new Number[]{observed.get(0), observed.get(1)})));
-		Series s2 = chart.addCategorySeries("expected", new ArrayList<String>(Arrays.asList(new String[] {toChart[1], toChart[0]})), new ArrayList<Number>(Arrays.asList(new Number[]{expected.get(0), expected.get(1)})));
+		Series s1 = chart.addSeries("observed", new ArrayList<String>(Arrays.asList(new String[] {toChart[0], toChart[1]})), new ArrayList<Number>(Arrays.asList(new Number[]{observed.get(0), observed.get(1)})));
+		Series s2 = chart.addSeries("expected", new ArrayList<String>(Arrays.asList(new String[] {toChart[0], toChart[1]})), new ArrayList<Number>(Arrays.asList(new Number[]{expected.get(0), expected.get(1)})));
 		/*
 		if (allVariableNames.size() == 2){
 			//System.out.println("2");

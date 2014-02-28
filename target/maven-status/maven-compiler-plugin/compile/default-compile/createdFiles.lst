@@ -10,7 +10,6 @@ org/cytoscape/hypermodules/internal/gui/ErrorDialog$1.class
 org/cytoscape/hypermodules/internal/gui/MainPanel.class
 org/cytoscape/hypermodules/internal/task/OpenResultsTask.class
 org/cytoscape/hypermodules/internal/statistics/LogRankTest.class
-org/cytoscape/hypermodules/internal/statistics/FishersExactTest.class
 org/cytoscape/hypermodules/internal/task/OpenVisualizeTask.class
 org/cytoscape/hypermodules/internal/gui/CollapsiblePanel$CollapsableTitledBorder.class
 org/cytoscape/hypermodules/internal/task/CloseTask.class
@@ -51,3 +50,4 @@ org/cytoscape/hypermodules/internal/gui/ResultsPanel$Model.class
 org/cytoscape/hypermodules/internal/SwingWrapper$1.class
 org/cytoscape/hypermodules/internal/Resources.class
 org/cytoscape/hypermodules/internal/gui/AboutDialog.class
+org/cytoscape/hypermodules/internal/statistics/MyFET.class
