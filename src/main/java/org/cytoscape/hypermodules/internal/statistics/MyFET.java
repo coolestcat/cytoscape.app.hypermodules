@@ -154,7 +154,9 @@ public class MyFET{
 				return -1000.0;
 			}
 			
-			return lodds;
+			return Math.log(lodds);
+			
+			
         }
 
         private boolean testNan(double d) {

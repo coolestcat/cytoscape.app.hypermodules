@@ -61,6 +61,8 @@ public class AlgorithmTask implements Task {
 	
 	private HashMap<String, HashMap<String, Double>> adjustedWithR;
 	
+	private List<Future<HashMap<String, Multimap<String, Double>>>> list;
+	
 	
 	private CytoscapeUtils utils;
 	private String expandOption;
@@ -235,7 +237,7 @@ public class AlgorithmTask implements Task {
 		}
 		
 		ExecutorService executor = Executors.newFixedThreadPool(nCores);
-		List<Future<HashMap<String, Multimap<String, Double>>>> list = new ArrayList<Future<HashMap<String, Multimap<String, Double>>>>();
+		list = new ArrayList<Future<HashMap<String, Multimap<String, Double>>>>();
 		
 		
 		ShuffleTestTMCall sttm = new ShuffleTestTMCall(nCores,(int) nShuffled/nCores , this.expandOption, this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, taskMonitor, this.network);
@@ -255,7 +257,8 @@ public class AlgorithmTask implements Task {
 		ShuffleTestCall st = new ShuffleTestCall(nShuffled-shuffleCount, this.expandOption, this.statTest, this.foregroundvariable, this.sampleValues, this.clinicalValues, this.otherValues, this.network);
 		Future<HashMap<String, Multimap<String, Double>>> submitPool = executor.submit(st);
 		list.add(submitPool);
-
+		
+		/*
 		if (interrupted){
 			for (Future<HashMap<String, Multimap<String, Double>>> ft : list){
 				ft.cancel(true);
@@ -263,20 +266,16 @@ public class AlgorithmTask implements Task {
 			System.out.println("Task was cancelled.");
 			return;
 		}
+		*/
 		
 		for (Future<HashMap<String, Multimap<String, Double>>> future : list){
 			try{
-				if (interrupted){
-					for (Future<HashMap<String, Multimap<String, Double>>> ft : list){
-						ft.cancel(true);
-					}
-					System.out.println("Task was cancelled.");
-					return;
-				}
 				combinedShuffling.add(future.get());
 			}
-			catch (Exception e){
-				e.printStackTrace();
+			catch (RuntimeException e){
+				//e.printStackTrace();
+				System.out.println("task was cancelled.");
+				return;
 			}
 		}
 		
@@ -652,19 +651,6 @@ public class AlgorithmTask implements Task {
 			}
 		}
 		
-		if (g1.contains("EIF2S1") && g1.contains("EIF2S3")){
-			for (int i=0; i<genes1.length; i++){
-				System.out.print(genes1[i] + " ");
-			}
-			
-			System.out.println();
-			for (int i=0; i<genes2.length; i++){
-				System.out.print(genes2[i] + " ");
-			}
-			System.out.println();
-			System.out.println("returning: " + sSubsetOfT);	
-		}
-		
 		if (sSubsetOfT == true){
 			return true;
 		}
@@ -808,6 +794,8 @@ public class AlgorithmTask implements Task {
 			gs.add(genes[i]);
 		}
 		
+		
+		
 		ArrayList<String> patients = new ArrayList<String>();
 		
 		for (int i=0; i<filteredSampleValues.size(); i++){
@@ -850,8 +838,32 @@ public class AlgorithmTask implements Task {
 			}
 		}
 		
+		
 		MyFET fet = new MyFET(otherValues.size(), c, alpha, matrix00); 
 		Double rvalue =  fet.getLogOdds();
+		
+		/*
+		if (gs.contains("XAB2")){
+			System.out.println(thisNetwork);
+			System.out.println("populationSize: " + otherValues.size());
+			System.out.println("totalSuccesses: " + c);
+			System.out.println("sampleSize: " + alpha);
+			System.out.println("sampleSucceses: " + matrix00);
+			System.out.println("p-value: " + fet.getResult());
+			System.out.println("lodds: " + rvalue);
+			
+            int[][] data = new int[2][2];
+            data[0][0] = matrix00;
+            data[0][1] = alpha - matrix00;
+            data[1][0] = c-matrix00;
+            data[1][1] = otherValues.size() - data[0][0] - data[0][1] - data[1][0];
+            
+            System.out.println("Contingency table: " + data[0][0] + " - " + data[0][1] + " - " + data[1][0] + " - " + data[1][1]);   
+            System.out.println();
+            System.out.println();
+		}
+		*/
+
 	
 		/*
 		String[] g = genes.split(":");
@@ -903,16 +915,6 @@ public class AlgorithmTask implements Task {
 		double rvalue = p1*(1-p2)/(double) (p2*(1-p1));
 		*/
 		
-		
-		if (!Double.isNaN(rvalue) && !Double.isInfinite(rvalue)){
-			return rvalue;
-		}
-		if (rvalue == Double.POSITIVE_INFINITY){
-			rvalue = 1000.0;
-		}
-		if (rvalue == Double.NEGATIVE_INFINITY){
-			rvalue = -1000.0;
-		}
 		return rvalue;
 	}
 	
@@ -923,6 +925,11 @@ public class AlgorithmTask implements Task {
 	@Override
 	public void cancel() {
 		this.interrupted = true;
+		for (int i=0; i<list.size(); i++){
+			list.get(i).cancel(true);
+		}
+		Thread.currentThread().interrupt();
+		return;
 	}
 
 }

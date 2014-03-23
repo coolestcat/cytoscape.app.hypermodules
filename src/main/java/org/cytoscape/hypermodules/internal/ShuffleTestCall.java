@@ -117,6 +117,10 @@ public class ShuffleTestCall implements Callable<HashMap<String, Multimap<String
         	for (String s : shuffledAnswer.keySet()){
         		returnMap.put(s, shuffledAnswer.get(s));
         	}
+            if (Thread.currentThread().isInterrupted()) {
+                // Cannot use InterruptedException since it's checked
+                throw new RuntimeException(); 
+            }
     	}
 
 		return returnMap;
