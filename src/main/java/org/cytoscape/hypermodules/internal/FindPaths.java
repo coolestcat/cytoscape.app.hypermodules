@@ -88,6 +88,8 @@ public class FindPaths {
 		
 		
 	}
+	
+	
 	/**
 	 * A HashSet is used so only unique genes in path added. This method is for getting paths of length 2 from the seed
 	 * @param seed the seed node
@@ -102,10 +104,14 @@ public class FindPaths {
 		for (CyNode node : this.net.getNeighborList(seed, CyEdge.Type.ANY)){
 			if (!this.net.getNeighborList(node, CyEdge.Type.ANY).isEmpty()){
 				for (CyNode node2 : this.net.getNeighborList(node, CyEdge.Type.ANY)){
+					
 					HashSet<String> thisPath = new HashSet<String>();
 					thisPath.add(this.net.getRow(node2).get(CyNetwork.NAME, String.class));
 					thisPath.add(this.net.getRow(node).get(CyNetwork.NAME, String.class));
 					thisPath.add(nameOfSeed);
+					
+					//System.out.println(this.net.getRow(node2).get(CyNetwork.NAME, String.class) + ":"
+					//		 + this.net.getRow(node).get(CyNetwork.NAME, String.class) + ":" + nameOfSeed);
 					set.add(thisPath);
 				}
 			}
@@ -124,8 +130,10 @@ public class FindPaths {
 				}
 				i++;
 			}
+			//System.out.println(allString);
 			ret.add(allString);
 		}
+		//System.out.println();
 		return ret;
 		
 	}

@@ -146,7 +146,7 @@ public class AlgorithmTask implements Task {
 		}
 		
 		if (statTest.equals("logRank")){
-			
+		
 		
 		ArrayList<String[]> sortedClinicals = new ArrayList<String[]>();
 		Multimap<Double, Integer> followupDaysPosition = ArrayListMultimap.create();
@@ -191,10 +191,13 @@ public class AlgorithmTask implements Task {
 		}
 		
 		for (int k=0; k<sortedPositions.size(); k++){
+
 			String[] thisString = new String[3];
 			thisString[0]=clinicalValues.get(sortedPositions.get(k))[0];
 			thisString[1]=clinicalValues.get(sortedPositions.get(k))[1];
 			thisString[2]=clinicalValues.get(sortedPositions.get(k))[2];
+			
+
 			//thisString[3]=clinicalValues.get(sortedPositions.get(k))[3];
 			sortedClinicals.add(thisString);
 			
@@ -205,6 +208,7 @@ public class AlgorithmTask implements Task {
 		else{
 			this.clinicalValues = clinicalValues;
 		}
+		
 	}
 	
 	/**
@@ -475,6 +479,7 @@ public class AlgorithmTask implements Task {
 		HashMap<String, Double> masterList = new HashMap<String, Double>();
 		ArrayList<String> everyString = new ArrayList<String>();
 		
+		ArrayList<String> rejectedList = new ArrayList<String>();
 		
 		for (String s : input.keySet()){
 			for (ArrayList<HashMap<String, Double>> ahsd : input.get(s).keySet()){
@@ -482,12 +487,17 @@ public class AlgorithmTask implements Task {
 				for (String i : original.keySet()){
 					masterList.put(i, original.get(i));
 					everyString.add(i);
+					
+					//TODO: Added
+					
+					if (checkNoMutations(s,i)){
+						rejectedList.add(i);
+					}
+					
 					//System.out.println(i + " : " + original.get(i));
 				}
 			}
 		}
-		
-		ArrayList<String> rejectedList = new ArrayList<String>();
 		
 		//System.out.println("everyString size: " + everyString.size());
 		//System.out.println("masterList size: " + masterList.size());
@@ -624,6 +634,28 @@ public class AlgorithmTask implements Task {
 	}
 	
 	
+	public boolean checkNoMutations(String seed, String s){
+		String[] genes = s.split(":");
+		
+		//TODO: Added
+		boolean ret = true;
+		String t = "default";
+		for (int i=0; i<genes.length; i++){
+			if (!genes[i].equals(seed)){
+				if (!(sampleValueHash.get(genes[i])==null)){
+					if (!(sampleValueHash.get(genes[i]).size() == 0)){
+						ret = false;
+						t = genes[i];
+					}
+				}
+			}
+		}
+
+		return ret;
+		
+		
+	}
+	
 	public boolean checkConditions(String s, String t){
 		String[] genes1 = s.split(":");
 		String[] genes2 = t.split(":");
@@ -641,6 +673,7 @@ public class AlgorithmTask implements Task {
 		
 		for (int i=0; i<genes2.length; i++){
 			g2.add(genes2[i]);
+			
 		}
 		
 		boolean sSubsetOfT = true;

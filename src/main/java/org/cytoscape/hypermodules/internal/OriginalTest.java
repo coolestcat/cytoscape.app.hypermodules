@@ -1,6 +1,7 @@
 package org.cytoscape.hypermodules.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -194,11 +195,36 @@ public class OriginalTest {
 		HashSet<String> allPaths = new HashSet<String>();
 		allPaths = pathfinder.getAllPaths2(seedExpand);
 		
+		
+		//TODO: REMOVE
+		/*
+		System.out.println("ALL PATHS:");
+		ArrayList<String> pathSort = new ArrayList<String>();
+		for (String s : allPaths){
+			pathSort.add(s);
+		}
+		Collections.sort(pathSort);
+		for (int i=0; i<pathSort.size(); i++){
+			System.out.println(pathSort.get(i));
+		}
+		System.out.println();
+		*/
+		
 		//System.out.println("ALL PATHS SIZE: " + allPaths.size());
 		
 		//this.tm.setProgress(0.3);
 		
 		ArrayList<String> compress = ha.compressTokens(allPaths, seedName);
+		
+		//TODO: REMOVE
+		/*
+		Collections.sort(compress);
+		System.out.println("COMPRESSED: ");
+		for (int i=0; i<compress.size(); i++){
+			System.out.println(compress.get(i));
+		}
+		System.out.println();
+		*/
 		
 		//System.out.println("COMPRESSED SIZE: " + compress.size());
 		
@@ -206,6 +232,19 @@ public class OriginalTest {
 		
 		HashMap<String, Double> answer = ha.mineHublets(compress);
 		returnMap = answer;
+		
+		//TODO: REMOVE
+		/*
+		System.out.println("ANSWER: ");
+		ArrayList<String> as = new ArrayList<String>();
+		for (String s : answer.keySet()){
+			as.add(s);
+		}
+		Collections.sort(as);
+		for (int i=0; i<as.size(); i++){
+			System.out.println(as.get(i));
+		}
+		*/
 		
 		//System.out.println("FINAL SIZE: " + returnMap.size());
 		//this.tm.setProgress(1.0);

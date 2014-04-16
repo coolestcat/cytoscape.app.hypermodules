@@ -763,10 +763,12 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	public void setlrtable(int one, int two, int three){
 		clinicalValues = new ArrayList<String[]>();
 		for (int i=0; i<allClinicalData.size(); i++){
+
 			String[] add = new String[3];
 			add[0] = allClinicalData.get(i)[one];
 			add[1] = allClinicalData.get(i)[two];
 			add[2] = allClinicalData.get(i)[three];
+
 			//add[3] = allClinicalData.get(i)[3];//changed
 			clinicalValues.add(add);
 		}

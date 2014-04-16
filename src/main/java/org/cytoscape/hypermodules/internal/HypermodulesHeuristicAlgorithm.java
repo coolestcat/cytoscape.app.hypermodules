@@ -13,6 +13,7 @@ import org.cytoscape.hypermodules.internal.statistics.FishersExact;
 import org.cytoscape.hypermodules.internal.statistics.LogRankTest;
 import org.cytoscape.hypermodules.internal.statistics.MyFET;
 import org.cytoscape.hypermodules.internal.task.AlgorithmTask;
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.work.TaskMonitor;
@@ -143,6 +144,8 @@ public class HypermodulesHeuristicAlgorithm {
 	private HashMap<String, Double> repository;
 	private String foregroundvariable;
 	
+	private Multimap<String, String> networkInteractions;
+	
 	/**
 	 * constructor
 	 * @param statTest
@@ -158,6 +161,15 @@ public class HypermodulesHeuristicAlgorithm {
 		this.otherValues = otherValues;
 		this.clinicalValues = clinicalValues;
 		this.network = network;
+		networkInteractions = ArrayListMultimap.create();
+		for (CyNode c : network.getNodeList()){
+			String s = network.getRow(c).get(CyNetwork.NAME, String.class);
+			for (CyNode d : network.getNeighborList(c, CyEdge.Type.ANY)){
+				String t = network.getRow(d).get(CyNetwork.NAME, String.class);
+				networkInteractions.put(s,t);
+			}
+		}
+		
 	}
 
 	/**
@@ -229,14 +241,13 @@ public class HypermodulesHeuristicAlgorithm {
 				clinicalSamples.add(s[0]);
 			}
 		}
-
 		
 		for (String s : g2sSamples){
 			if (!clinicalSamples.contains(s)){
 				for (String z : memoryone.get(s)){
 					allGeneSamplesMap.put(z, "no_sample");
-					System.out.println("The sample " + s + " was not found in your clinical table. All genes corresponding to " + s + " are now assumed to have no sample.");
 				}
+				System.out.println("The sample " + s + " was not found in your clinical table. All genes corresponding to " + s + " are now assumed to have no sample.");
 			}
 		}
 		
@@ -430,6 +441,19 @@ public class HypermodulesHeuristicAlgorithm {
 		return true;
 	}
 	
+	
+	public int getDegree(String s){
+		int deg = 0;
+
+		String[] genes = s.split(":");
+		for (int i=0; i<genes.length; i++){
+			int num = networkInteractions.get(genes[i]).size();
+			deg += num;
+		}
+		
+		return deg;
+	}
+	
 	/**
 	 * the main iteration step of the algorithm. takes all compressed paths and iteratively merges
 	 * all possible combinations of paths; in each iteration, the top hit (pairwise combination with
@@ -441,6 +465,7 @@ public class HypermodulesHeuristicAlgorithm {
 	 * @param compressedList
 	 * @return HashMap<String, Double> hubletsTested
 	 */
+	
 	public HashMap<String, Double> mineHublets(ArrayList<String> compressedList){
 		
 		HashMap<String, Double> hubletsTested = new HashMap<String, Double>();
@@ -462,8 +487,22 @@ public class HypermodulesHeuristicAlgorithm {
     	HashMap<String[], Double[]> pairwise = new HashMap<String[], Double[]>();
     	HashMap<String, Double> pairwiseConcat = new HashMap<String, Double>();
 		HashMap<String, String[]> pairwiseConcatMemory = new HashMap<String, String[]>();
-    	
+    	int t = 0;
     	while(true){
+    		/*
+    		System.out.println(t + ": ");
+    		ArrayList<String> testt = new ArrayList<String>();
+    		for (String i : hubletsTested.keySet()){
+    			testt.add(i);
+    		}
+    		Collections.sort(testt);
+    		for (int i=0; i<testt.size(); i++){
+    			System.out.println(testt.get(i));
+    		}
+       		t++;
+    		System.out.println();
+    		*/
+    		
 			String[] pairwiseKey = new String[2];
     		Double[] pairwiseValue = new Double[2];
     		
@@ -474,6 +513,7 @@ public class HypermodulesHeuristicAlgorithm {
     			list.add(cy1);
     		}
     		
+    		Collections.sort(list);
     		
     		for (int k=0; k<list.size(); k++){
     			for (int j = k+1; j<list.size(); j++){
@@ -488,16 +528,19 @@ public class HypermodulesHeuristicAlgorithm {
     				pairwise.put(pairwiseKey, pairwiseValue);
     			}
     		}
-
+    		
     		String key7;
     		Double value7;
     		//System.out.println("concatenatedNetwork :");
     		
     		String minKey = null;
     		Double minVal=Double.valueOf(2);
+    		//TODO: Add to CMD LINE
+    		ArrayList<String> allMins = new ArrayList<String>();
     		
+			//TODO: NOTE: THIS BREAKS TIES ARBITRARILY - if two keys have the same min value, one or the other may be further expanded upon (for key6 : pairwise.keyset() is not ordered)
     		for (String[] key6 : pairwise.keySet()){
-    			//TODO: got rid of concatenate network... why does it still work?
+
     			key7 = key6[0] + ":" + key6[1];
     			//key7 = concatenateNetwork(key6[0], key6[1]);
     			if (repository.get(key7)!=null){
@@ -508,14 +551,20 @@ public class HypermodulesHeuristicAlgorithm {
             			repository.put(key7, value7);
 
     			}
-
+    			
     			if (value7 < pairwise.get(key6)[0] && value7 < pairwise.get(key6)[1]){
-        		pairwiseConcat.put(key7, value7);
-        		pairwiseConcatMemory.put(key7, key6);
+    				pairwiseConcat.put(key7, value7);
+    				pairwiseConcatMemory.put(key7, key6);
         			if (value7<minVal){
+        				allMins = new ArrayList<String>();
         				minVal = value7;
         				minKey = key7;
+        				allMins.add(key7);
         			}
+        			if (value7.equals(minVal)){
+        				allMins.add(key7);
+        			}
+        			
     			}
     			
     			/*
@@ -525,6 +574,35 @@ public class HypermodulesHeuristicAlgorithm {
     			}
     			*/
     		}
+    		
+    		//TODO: Add to CMD LINE
+    		Collections.sort(allMins);
+    		//BREAKING TIES:
+    		int minDegree = 0;
+    		if (allMins.size()>1){
+    			minKey = allMins.get(0);
+    			minDegree = getDegree(allMins.get(0));
+    			for (int i=0; i<allMins.size(); i++){
+    				if (!allMins.get(i).equals(minKey)){
+        				int thisDegree = getDegree(allMins.get(i));
+        				if (thisDegree < minDegree){
+        					minKey = allMins.get(i);
+        					minDegree = thisDegree;
+        				}
+    				}
+    			}
+    		}
+    		
+    		//System.out.println();
+    		
+    		
+    		/*
+    		System.out.println(t + ": ");
+    		System.out.println(minKey + " - " + minVal);
+    		t++;
+    		System.out.println();
+    		*/
+
 
     		if (pairwiseConcat.isEmpty()){
     			break;
@@ -838,6 +916,30 @@ public class HypermodulesHeuristicAlgorithm {
 		}
 	}
 	
+	public static double[] scale(double[] input){
+		double[] retValue = new double[input.length];
+		
+		Double acc = 0.0;
+		for (int i=0; i<input.length; i++){
+			acc += input[i];
+		}
+		
+		Double mean = acc/(double) input.length;
+		
+		Double sumOfSquares = 0.0;
+		for (int i=0; i<input.length; i++){
+			sumOfSquares += Math.pow((input[i]-mean), 2);
+		}
+		
+		Double sd = Math.sqrt(sumOfSquares/(double)(input.length - 1));
+		
+		for (int i=0; i<input.length; i++){
+			retValue[i] = (input[i] - mean)/(double) sd;
+		}
+		return retValue;
+		
+	}
+	
 	/**
 	 * The main method for running the statistical test on the survival data of
 	 * the module to be tested (thisNetwork)
@@ -910,11 +1012,11 @@ public class HypermodulesHeuristicAlgorithm {
 					group[k]=2.0;
 				}
 			}
-			*/
+			
 
 			//pValue = coxModel.cox(group);
 			
-			/*
+			
 			double[][] a = new double[2][clinicalValues.size()];
 			a[0] = group;
 			
@@ -924,7 +1026,7 @@ public class HypermodulesHeuristicAlgorithm {
 				agecopy[i] = age[i];
 			}
 			
-			a[1] = agecopy;
+			a[1] = scale(agecopy);
 			*/
 			
 			/*
@@ -948,10 +1050,6 @@ public class HypermodulesHeuristicAlgorithm {
 			/*
 			CoxRegression testclass1 = new CoxRegression(0.05, this.followupDays, this.censor, a); 
 			double [] pValueArray = testclass1.pValue; 
-			for (int i=0; i<pValueArray.length; i++){
-				System.out.println(pValueArray[i] + " ");
-			}
-			System.out.println();
 			if (Double.isNaN(pValueArray[1])){
 				pValue = Double.valueOf(1);
 			}
@@ -959,6 +1057,7 @@ public class HypermodulesHeuristicAlgorithm {
 				pValue = pValueArray[1];
 			}
 			*/
+			
 			
 		}
 		
@@ -1054,14 +1153,13 @@ public class HypermodulesHeuristicAlgorithm {
 			followupDays[k] = Double.valueOf(clinicalValues.get(k)[2]);
 		}
 		
+		//TODO: comment out next two things
 		/*
 		daysFromBirth = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			daysFromBirth[k] = Double.valueOf(clinicalValues.get(k)[3]);
 		}
-		*/
-
-		/*
+		
 		age = new double[this.clinicalValues.size()];
 		for (int k=0; k<this.clinicalValues.size(); k++){
 			age[k]=(-1*daysFromBirth[k]+followupDays[k]);
