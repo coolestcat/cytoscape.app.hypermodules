@@ -1,8 +1,9 @@
 org/cytoscape/hypermodules/internal/gui/ResultsPanel.class
 org/cytoscape/hypermodules/internal/task/CloseTaskFactory.class
-org/cytoscape/hypermodules/internal/task/GenerateNetworkTask.class
 org/cytoscape/hypermodules/internal/task/OpenAboutTaskFactory.class
+org/cytoscape/hypermodules/internal/task/GenerateNetworkTask.class
 org/cytoscape/hypermodules/internal/CytoscapeUtils.class
+org/cytoscape/hypermodules/internal/gui/LoadResultsPanel$CSVFile.class
 org/cytoscape/hypermodules/internal/ChartDisplay.class
 org/cytoscape/hypermodules/internal/OriginalTest.class
 org/cytoscape/hypermodules/internal/task/OpenAboutTask.class
@@ -26,11 +27,13 @@ org/cytoscape/hypermodules/internal/gui/ErrorDialog.class
 org/cytoscape/hypermodules/internal/gui/MainPanel$CSVFile.class
 org/cytoscape/hypermodules/internal/gui/AboutDialog$HyperlinkAction.class
 org/cytoscape/hypermodules/internal/SwingWrapper$2.class
+org/cytoscape/hypermodules/internal/gui/LoadResultsPanel.class
 org/cytoscape/hypermodules/internal/gui/MainPanel$MyModel.class
 org/cytoscape/hypermodules/internal/task/OpenPanelTaskFactory.class
 org/cytoscape/hypermodules/internal/SwingWrapper.class
 org/cytoscape/hypermodules/internal/gui/AboutDialog$1.class
 org/cytoscape/hypermodules/internal/HypermodulesHeuristicAlgorithm.class
+org/cytoscape/hypermodules/internal/task/OpenLoadTask.class
 org/cytoscape/hypermodules/internal/CyActivator.class
 org/cytoscape/hypermodules/internal/gui/VisualizePanel.class
 org/cytoscape/hypermodules/internal/gui/NetworkSelectionPanel.class
@@ -45,6 +48,7 @@ org/cytoscape/hypermodules/internal/task/OpenVisualizeTaskFactory.class
 org/cytoscape/hypermodules/internal/ShuffleTestCall.class
 org/cytoscape/hypermodules/internal/task/AlgorithmTask.class
 org/cytoscape/hypermodules/internal/HypermodulesAlgorithm.class
+org/cytoscape/hypermodules/internal/task/OpenLoadTaskFactory.class
 org/cytoscape/hypermodules/internal/gui/CollapsiblePanel$1.class
 org/cytoscape/hypermodules/internal/gui/ResultsPanel$Model.class
 org/cytoscape/hypermodules/internal/SwingWrapper$1.class

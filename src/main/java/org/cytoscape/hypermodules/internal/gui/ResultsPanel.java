@@ -158,6 +158,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 				HashMap<String, Double> one = ahsd.get(0);
 				for (String t : one.keySet()){
 					this.patientListHash.put(t, getPatientList(t));
+					//System.out.println(t + " - " + getPatientList(t));
 				}
 			}
 		}
@@ -168,7 +169,7 @@ public class ResultsPanel extends JPanel implements CytoPanelComponent, ActionLi
 	
 	public String getPatientList(String genes){
 		String ret = "";
-		String[] t = genes.split(":");
+		String[] t = genes.split(":|;");
 		HashSet<String> pats = new HashSet<String>();
 		for (int i=0; i<t.length; i++){
 			for (String s : sampleValueHash.get(t[i])){

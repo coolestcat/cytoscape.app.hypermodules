@@ -18,6 +18,7 @@ import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.hypermodules.internal.gui.NetworkSelectionPanel;
 import org.cytoscape.hypermodules.internal.task.CloseTaskFactory;
 import org.cytoscape.hypermodules.internal.task.OpenAboutTaskFactory;
+import org.cytoscape.hypermodules.internal.task.OpenLoadTaskFactory;
 import org.cytoscape.hypermodules.internal.task.OpenPanelTaskFactory;
 import org.cytoscape.hypermodules.internal.task.OpenVisualizeTaskFactory;
 import org.cytoscape.model.CyNetwork;
@@ -114,11 +115,19 @@ public class CyActivator extends AbstractCyActivator {
 		
 		registerService(bc, closeTaskFactory, TaskFactory.class, closeTaskFactoryProps);
 		
+		OpenLoadTaskFactory loadTaskFactory = new OpenLoadTaskFactory(utils);
+		Properties loadTaskFactoryProps = new Properties();
+		loadTaskFactoryProps.setProperty("preferredMenu", "Apps.HyperModules");
+		loadTaskFactoryProps.setProperty("title", "Load To Panel");
+		loadTaskFactoryProps.setProperty("menuGravity","3.0");
+		
+		registerService(bc, loadTaskFactory, TaskFactory.class, loadTaskFactoryProps);
+		
 		OpenAboutTaskFactory openAboutFactory = new OpenAboutTaskFactory(utils);
 		Properties openAboutFactoryProps = new Properties();
 		openAboutFactoryProps.setProperty("preferredMenu", "Apps.HyperModules");
 		openAboutFactoryProps.setProperty("title", "About");
-		openAboutFactoryProps.setProperty("menuGravity","3.0");
+		openAboutFactoryProps.setProperty("menuGravity","4.0");
 		
 		registerService(bc, openAboutFactory, TaskFactory.class, openAboutFactoryProps);
 		

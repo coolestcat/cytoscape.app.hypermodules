@@ -111,7 +111,7 @@ public class ChartDisplayFisher {
 		}
 		*/
 		
-		String[] genes = s.split(":");
+		String[] genes = s.split(":|;");
 
 		ArrayList<String> patients = new ArrayList<String>();
 		String[] thesePatients;

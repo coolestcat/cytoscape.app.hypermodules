@@ -1,17 +1,16 @@
 Manifest-Version: 1.0
-Bundle-ClassPath: .,xchart-2.3.1-SNAPSHOT.jar,trove-3.0.3.jar,colt-1.2
- .0.jar,RserveEngine-1.0.0.jar,REngine-1.0.0.jar,guava-12.0.jar,javast
- at-1.4.jar
-Built-By: user
+Bundle-ClassPath: .,xchart-2.3.2.jar,trove-3.0.3.jar,colt-1.2.0.jar,Rs
+ erveEngine-1.0.0.jar,REngine-1.0.0.jar,guava-12.0.jar,javastat-1.4.ja
+ r
+Built-By: alvinleung
 Tool: Bnd-1.15.0
 Bundle-Name: HyperModules
 Created-By: Apache Maven Bundle Plugin
-Build-Jdk: 1.7.0_09
+Build-Jdk: 1.6.0_65
 Bundle-Version: 1.0.2
-Bnd-LastModified: 1396155931215
+Bnd-LastModified: 1400188241626
 Bundle-ManifestVersion: 2
 Bundle-Activator: org.cytoscape.hypermodules.internal.CyActivator
-Bundle-SymbolicName: HyperModules
 Import-Package: EDU.oswego.cs.dl.util.concurrent;resolution:=optional,
  javax.annotation;resolution:=optional,javax.imageio;resolution:=optio
  nal,javax.imageio.metadata;resolution:=optional,javax.imageio.stream;
@@ -40,4 +39,5 @@ Import-Package: EDU.oswego.cs.dl.util.concurrent;resolution:=optional,
  c.dom;resolution:=optional,sun.misc;resolution:=optional
 Embed-Dependency: xchart,trove,colt,RserveEngine,REngine,guava,javasta
  t,jsc;inline=true
+Bundle-SymbolicName: HyperModules
 

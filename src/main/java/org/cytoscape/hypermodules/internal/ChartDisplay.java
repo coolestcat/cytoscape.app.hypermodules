@@ -68,6 +68,7 @@ public class ChartDisplay {
 	}	
 	
 	public void initClinicals(){
+		//System.out.println("size::" + this.clinicalValues.size());
 		//have a "load (String/Double) Column" method?
 		allPatients = new String[5];
 		allPatients = new String[this.clinicalValues.size()];
@@ -124,7 +125,7 @@ public class ChartDisplay {
 	}
 	
 	public void display(String s){
-		String[] genes = s.split(":");
+		String[] genes = s.split(":|;");
 		
 		HashSet<String> truePatients = new HashSet<String>();
 		String[] thesePatients;
@@ -138,6 +139,7 @@ public class ChartDisplay {
 		}
 		
 		int alpha=truePatients.size();
+		//System.out.println("alpha:: " + alpha);
 		
 		double[] time1 = new double[alpha];
 		double[] time2 = new double[allPatients.length-alpha];

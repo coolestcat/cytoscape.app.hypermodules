@@ -1,6 +1,6 @@
 package org.cytoscape.hypermodules.internal;
 
-import gnu.trove.set.hash.TIntHashSet;
+//import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.*;
 
@@ -144,7 +144,7 @@ public class FindPaths {
 	 * @param seed the seed node
 	 * @return hashset of string representing the names of all the genes in all the paths of length 2 from the seed node
 	 */
-	
+	/*
 	public HashSet<TIntHashSet> getAllPaths3(CyNode seed){
 		HashSet<HashSet<String>> set = new HashSet<HashSet<String>>();
 		String nameOfSeed = "default";
@@ -163,7 +163,7 @@ public class FindPaths {
 		}
 		
 		HashSet<TIntHashSet> ret = new HashSet<TIntHashSet>();
-		/*
+		
 		for (HashSet<String> setElement : set){
 			TIntHashSet newT = new TIntHashSet();
 			for (String element : setElement){
@@ -171,10 +171,10 @@ public class FindPaths {
 			}
 			ret.add(newT);
 		}
-		*/
+		
 		return ret;
 		
 		
 	}
-	
+	*/
 }

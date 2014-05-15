@@ -129,7 +129,7 @@ public class GenerateNetworkTask extends AbstractTask implements Task{
 	
 	public void generate(String s, String t){
 		//filter unique strings:
-		String[] inputStrings = t.split(":");
+		String[] inputStrings = t.split(":|;");
 		
 		this.inputHash = new HashSet<String>();
 		for (int i=0; i<inputStrings.length; i++){

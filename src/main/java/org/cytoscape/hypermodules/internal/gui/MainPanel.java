@@ -1340,8 +1340,10 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 	            catch (Exception e) {
 	                String errmsg = e.getMessage();
 	                System.out.println ("File not found:" +errmsg);
-	            }                  
+	            }       
+		    //System.out.println("Rssize: " + Rs.size());
 	        return Rs;
+
 	        }
 	 }
 	
