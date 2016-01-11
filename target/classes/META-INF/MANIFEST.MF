@@ -1,16 +1,10 @@
 Manifest-Version: 1.0
-Bundle-ClassPath: .,xchart-2.3.2.jar,trove-3.0.3.jar,colt-1.2.0.jar,Rs
- erveEngine-1.0.0.jar,REngine-1.0.0.jar,guava-12.0.jar,javastat-1.4.ja
- r
+Bundle-SymbolicName: HyperModules
 Built-By: alvinleung
-Tool: Bnd-1.15.0
-Bundle-Name: HyperModules
-Created-By: Apache Maven Bundle Plugin
-Build-Jdk: 1.6.0_65
-Bundle-Version: 1.0.2
-Bnd-LastModified: 1400188241626
 Bundle-ManifestVersion: 2
-Bundle-Activator: org.cytoscape.hypermodules.internal.CyActivator
+Bnd-LastModified: 1452487513054
+Embed-Dependency: xchart,trove,colt,RserveEngine,REngine,guava,javasta
+ t,jsc;inline=true
 Import-Package: EDU.oswego.cs.dl.util.concurrent;resolution:=optional,
  javax.annotation;resolution:=optional,javax.imageio;resolution:=optio
  nal,javax.imageio.metadata;resolution:=optional,javax.imageio.stream;
@@ -19,25 +13,31 @@ Import-Package: EDU.oswego.cs.dl.util.concurrent;resolution:=optional,
  .swing.filechooser;resolution:=optional,javax.swing.plaf;resolution:=
  optional,javax.swing.plaf.basic;resolution:=optional,javax.swing.tabl
  e;resolution:=optional,javax.swing.text;resolution:=optional,javax.sw
- ing.text.html;resolution:=optional,org.cytoscape.application;resoluti
- on:=optional;version="[3.0,4)",org.cytoscape.application.swing;resolu
- tion:=optional;version="[3.0,4)",org.cytoscape.event;resolution:=opti
- onal;version="[3.0,4)",org.cytoscape.model;resolution:=optional;versi
- on="[3.0,4)",org.cytoscape.model.events;resolution:=optional;version=
- "[3.0,4)",org.cytoscape.model.subnetwork;resolution:=optional;version
- ="[3.0,4)",org.cytoscape.service.util;resolution:=optional;version="[
- 3.0,4)",org.cytoscape.session;resolution:=optional;version="[3.0,4)",
- org.cytoscape.util.swing;resolution:=optional;version="[3.0,4)",org.c
- ytoscape.view.layout;resolution:=optional;version="[3.0,4)",org.cytos
- cape.view.model;resolution:=optional;version="[3.0,4)",org.cytoscape.
- view.presentation.property;resolution:=optional;version="[3.0,4)",org
- .cytoscape.view.presentation.property.values;resolution:=optional;ver
- sion="[3.0,4)",org.cytoscape.view.vizmap;resolution:=optional;version
- ="[3.0,4)",org.cytoscape.view.vizmap.mappings;resolution:=optional;ve
- rsion="[3.0,4)",org.cytoscape.work;resolution:=optional;version="[3.0
- ,4)",org.osgi.framework;resolution:=optional;version="[1.5,2)",org.w3
- c.dom;resolution:=optional,sun.misc;resolution:=optional
-Embed-Dependency: xchart,trove,colt,RserveEngine,REngine,guava,javasta
- t,jsc;inline=true
-Bundle-SymbolicName: HyperModules
+ ing.text.html;resolution:=optional,org.cytoscape.application;version=
+ "[3.0,4)";resolution:=optional,org.cytoscape.application.swing;versio
+ n="[3.0,4)";resolution:=optional,org.cytoscape.event;version="[3.0,4)
+ ";resolution:=optional,org.cytoscape.model;version="[3.0,4)";resoluti
+ on:=optional,org.cytoscape.model.events;version="[3.0,4)";resolution:
+ =optional,org.cytoscape.model.subnetwork;version="[3.0,4)";resolution
+ :=optional,org.cytoscape.service.util;version="[3.0,4)";resolution:=o
+ ptional,org.cytoscape.session;version="[3.0,4)";resolution:=optional,
+ org.cytoscape.util.swing;version="[3.0,4)";resolution:=optional,org.c
+ ytoscape.view.layout;version="[3.0,4)";resolution:=optional,org.cytos
+ cape.view.model;version="[3.0,4)";resolution:=optional,org.cytoscape.
+ view.presentation.property;version="[3.0,4)";resolution:=optional,org
+ .cytoscape.view.presentation.property.values;version="[3.0,4)";resolu
+ tion:=optional,org.cytoscape.view.vizmap;version="[3.0,4)";resolution
+ :=optional,org.cytoscape.view.vizmap.mappings;version="[3.0,4)";resol
+ ution:=optional,org.cytoscape.work;version="[3.0,4)";resolution:=opti
+ onal,org.osgi.framework;version="[1.5,2)";resolution:=optional,org.ro
+ suda.REngine;resolution:=optional,org.w3c.dom;resolution:=optional,su
+ n.misc;resolution:=optional
+Tool: Bnd-1.15.0
+Bundle-Name: HyperModules
+Bundle-Version: 1.0.2
+Bundle-ClassPath: .,xchart-2.3.2.jar,trove-3.0.3.jar,colt-1.2.0.jar,RE
+ ngine-1.0.0.jar,guava-12.0.jar,javastat-1.4.jar
+Bundle-Activator: org.cytoscape.hypermodules.internal.CyActivator
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk: 1.8.0_65
 

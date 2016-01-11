@@ -23,8 +23,6 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REngineException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -404,14 +402,14 @@ public class AlgorithmTask implements Task {
 		*/
 	}
 	
-	private void adjustWithR() throws REngineException, REXPMismatchException{
-		adjustedWithR = new HashMap<String, HashMap<String, Double>>();
-		for (String s : originalResults.keySet()){
-			ConnectR cr = new ConnectR(originalResults.get(s), shuffling.get(s));
-			HashMap<String, Double> adjusted = cr.fdrAdjust();
-			adjustedWithR.put(s, adjusted);
-		}
-	}
+//	private void adjustWithR() throws REngineException, REXPMismatchException{
+//		adjustedWithR = new HashMap<String, HashMap<String, Double>>();
+//		for (String s : originalResults.keySet()){
+//			ConnectR cr = new ConnectR(originalResults.get(s), shuffling.get(s));
+//			HashMap<String, Double> adjusted = cr.fdrAdjust();
+//			adjustedWithR.put(s, adjusted);
+//		}
+//	}
 	
 	/**
 	 * formats/concatenates the results into one object to pass to results panel

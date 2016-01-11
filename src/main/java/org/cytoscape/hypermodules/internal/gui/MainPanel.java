@@ -1208,12 +1208,12 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 				}
 				
 			if (stat.equals("logRank") && genes2samplesvaluescopy!=null && clinicalValues!=null){
-				if (handleSurvivalExceptions()){
+				if (handleSurvivalExceptions() && handlePatientMismatchException(this.clinicalValues, this.genes2samplesvaluescopy)){
 					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, foregroundVariable, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
 				}
 			}
 			else if (stat.equals("fisher") && genes2samplesvaluescopy!=null && otherValues!=null){
-				if (handleClinicalVariableExceptions()){
+				if (handleClinicalVariableExceptions() && handlePatientMismatchException(this.clinicalValues, this.genes2samplesvaluescopy)){
 					utils.taskMgr.execute(new TaskIterator(new AlgorithmTask(currNet, number,expandOption, stat, foregroundVariable, genes2samplesvaluescopy, clinicalValues, otherValues, utils)));
 				}
 			}
@@ -1234,6 +1234,35 @@ public class MainPanel extends JPanel implements CytoPanelComponent, ActionListe
 			}
 		}
 		
+	}
+	
+	
+	public boolean handlePatientMismatchException(ArrayList<String[]> clinicalValues, ArrayList<String[]> sampleValues){
+		boolean valid = true;
+		HashSet<String> patientids = new HashSet<String>();
+		for (int i=0; i<clinicalValues.size(); i++){
+			if (clinicalValues.get(i)[0]!=null){
+				if (!clinicalValues.get(i)[0].isEmpty()){
+					patientids.add(clinicalValues.get(i)[0]);
+				}
+			}
+		}
+		patientids.add("no_sample");
+		
+		for (int i=0; i<sampleValues.size(); i++){
+				if (!patientids.contains(sampleValues.get(i)[1])){
+					System.err.println("Patient not in clinical data file: " + sampleValues.get(i)[1]);
+					valid = false;
+				}
+		}
+		if (valid == false){
+			ErrorDialog ed = new ErrorDialog(utils, "INPUT ERROR: Please make sure all patients in the mutations file are present in the clinical data file");
+			ed.setLocationRelativeTo(null);
+			ed.setVisible(true);
+			System.err.println("Please make sure all patients in the mutations file are present in the clinical data file");
+		}
+		
+		return valid;
 	}
 
 	public boolean handleSurvivalExceptions(){
